@@ -22,10 +22,15 @@ PowerPlay/
 │   ├── SECURITY.md                 (API key management & rotation)
 │   ├── IMPLEMENTATION_SUMMARY.md   (Complete project overview)
 │   │
-│   ├── 📁 guides/                  (How-To Guides)
+│   ├── 📁 guides/                  (How-To Guides & Implementation Plans)
 │   │   ├── QUICK_REFERENCE.md      (One-page cheat sheet — print this!)
 │   │   ├── STRUCTURE.md            (Project structure explained)
-│   │   └── VERSIONING_STRATEGY.md  (Release process & roadmap)
+│   │   ├── VERSIONING_STRATEGY.md  (Release process & roadmap)
+│   │   ├── CLAUDE_CODE_SUPERPOWER_PLAN.md (Strategic analysis & gap analysis)
+│   │   ├── MASTER_IMPLEMENTATION_ROADMAP.md (Overall 20-week plan with all phases)
+│   │   ├── IMPLEMENTATION_PLAN_V1_1_0.md (Detailed inline powers plan — weeks 1-6)
+│   │   ├── IMPLEMENTATION_PLAN_V1_2_0.md (Detailed intelligent context plan — weeks 7-12)
+│   │   └── IMPLEMENTATION_PLAN_V2_0_0.md (Detailed Claude Code parity plan — weeks 13-20)
 │   │
 │   ├── 📁 reference/               (Templates & Checklists)
 │   │   ├── RELEASE_CHECKLIST.md    (Pre-release validation steps)
@@ -154,6 +159,11 @@ PowerPlay/
 | **QUICK_REFERENCE.md** | One-page cheat sheet (print this!) |
 | **STRUCTURE.md** | Directory & project structure explained |
 | **VERSIONING_STRATEGY.md** | Release process, roadmap, automation |
+| **CLAUDE_CODE_SUPERPOWER_PLAN.md** | Strategic analysis: current state → v2.0.0 goal, gap analysis vs Claude Code, 3-phase approach |
+| **MASTER_IMPLEMENTATION_ROADMAP.md** | Complete 20-week roadmap: all 3 phases, timelines, milestones, resource requirements, decision points |
+| **IMPLEMENTATION_PLAN_V1_1_0.md** | Detailed plan for Inline Powers (weeks 1-6): 5 inline actions, 3 multi-file generators, 4 rules, 5 prompts |
+| **IMPLEMENTATION_PLAN_V1_2_0.md** | Detailed plan for Intelligent Context (weeks 7-12): memory system, workflows, caching, 6+ agents |
+| **IMPLEMENTATION_PLAN_V2_0_0.md** | Detailed plan for Claude Code Parity (weeks 13-20): full context, IDE integration, 6 advanced agents, schema v2 |
 
 ### docs/reference/
 | File | Purpose | Use When |
@@ -223,6 +233,15 @@ Growing knowledge base (6/8 guides created):
 ### "I need to understand the project"
 → `docs/IMPLEMENTATION_SUMMARY.md` → `docs/guides/STRUCTURE.md` → This INDEX.md
 
+### "I want to see the implementation roadmap"
+→ `docs/guides/MASTER_IMPLEMENTATION_ROADMAP.md` (20-week overview with milestones)
+  → `docs/guides/IMPLEMENTATION_PLAN_V1_1_0.md` (Weeks 1-6: Inline Powers)
+  → `docs/guides/IMPLEMENTATION_PLAN_V1_2_0.md` (Weeks 7-12: Intelligent Context)
+  → `docs/guides/IMPLEMENTATION_PLAN_V2_0_0.md` (Weeks 13-20: Claude Code Parity)
+
+### "I want to understand the vision & gaps"
+→ `docs/guides/CLAUDE_CODE_SUPERPOWER_PLAN.md` (Current state, gap analysis, strategic approach)
+
 ---
 
 ## 📊 File Statistics
@@ -231,13 +250,14 @@ Growing knowledge base (6/8 guides created):
 |----------|-------|----------|
 | **Configuration** | 3 active + 2 archived | config.yaml, .env.example |
 | **Documentation** | 4 main | README, CHANGELOG, SECURITY, SUMMARY |
-| **Guides** | 3 | Quick Reference, Structure, Versioning |
+| **Strategic Plans** | 5 | Claude Code analysis, 20-week roadmap, 3 detailed phase plans |
+| **Guides** | 8 | Quick Reference, Structure, Versioning, + 5 implementation plans |
 | **Reference** | 2 | Release Checklist, Release Template |
 | **Audit** | 1 | ConfigArchitect Audit |
 | **Rules** | 6 | Core, Security, .NET, SQL, Angular, Tests |
 | **Wiki** | 2 created + 6 planned | Getting Started, Config Reference |
 | **Tools** | 1 | ConfigArchitect Prompt |
-| **Total** | 30+ files | Well-organized, documented |
+| **Total** | 40+ files | Professional, strategic, well-documented |
 
 ---
 

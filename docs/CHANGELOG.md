@@ -13,6 +13,50 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.1.0] — 2026-04-09 (Data, Observability & API Standards)
+
+**Data & Observability release — Database design standards, structured logging, API versioning, input validation, git workflow**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/data-model` — Design or review database schema: normalization, indexes, constraints, naming, soft delete
+- `/observability-audit` — Audit logging, tracing, metrics: find gaps, suggest structured log statements
+- `/api-contract` — Generate OpenAPI 3.0 spec for API endpoints (complete, ready to use)
+- `/git-workflow` — Branch naming, commit message rewrite to Conventional Commits, squash plan
+- `/dep-update` — Audit dependencies: outdated, CVE-affected, breaking changes, safe update path
+
+#### Rules (5 new)
+- `database-design.md` — Schema standards: normalization (1NF/2NF/3NF), indexes, constraints, naming, soft delete, migrations
+- `observability-standards.md` — Structured logging (ILogger<T>, key=value), correlation IDs, metrics, health checks, no secrets
+- `api-versioning.md` — URL versioning, deprecation process (6-month notice), breaking vs non-breaking changes, migration guides
+- `input-validation.md` — Validation at boundaries (controllers), parameterized queries, sanitization, file upload safety
+- `git-workflow.md` — Branch naming (feature/id-description), Conventional Commits, granular commits, merge strategy, conflict resolution
+
+#### Models (1 new)
+- `Qwen3 235B [Deep Analysis]` via OpenRouter — large context complex tasks, temp 0.2, maxTokens 16384
+
+### Changed
+- Version bumped to 2.1.0
+- Models: 13 → 14 total (added Qwen3 235B)
+- Rules: 19 → 24 total (added 5 data/observability rules)
+- Prompts: 28 → 33 total (added 5 data/observability prompts)
+- Updated capability map in config.yaml header
+- Updated releaseUrl to v2.1.0
+
+### Files Modified
+- `config.yaml` — version 2.1.0, 1 new model, 5 new rules, 5 new prompts
+- `.continue/rules/database-design.md` — NEW (350+ lines)
+- `.continue/rules/observability-standards.md` — NEW (400+ lines)
+- `.continue/rules/api-versioning.md` — NEW (350+ lines)
+- `.continue/rules/input-validation.md` — NEW (400+ lines)
+- `.continue/rules/git-workflow.md` — NEW (350+ lines)
+
+### Summary
+v2.1.0 fills remaining coverage gaps: database design standards (schema, indexes, migrations), observability (logging, tracing, metrics), API versioning with deprecation strategy, input validation & security, and git workflow standards. All fully configurable within config.yaml using Continue.dev slash commands and rules.
+
+---
+
 ## [2.0.0] — 2026-04-09 (Agent-Era Standards)
 
 **Agent-era release — Autonomous agents, code review standards, CI/CD automation, project learning**
