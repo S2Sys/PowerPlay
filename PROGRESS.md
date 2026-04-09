@@ -333,6 +333,96 @@ All deployed to `main` branch ✅
 
 ---
 
+## v3.0.0 Implementation — COMPLETE ✅ (NEW)
+
+### 10. Added Requirements Phase — Complete SDLC Coverage (THIS SESSION)
+
+**Milestone**: v3.0.0 marks the first version with **complete SDLC coverage** end-to-end (Requirements → Design → Development → Testing → Deployment → Monitoring). This is a **major version bump** because it's a fundamental shift in PowerPlay positioning from "dev productivity tools" to "full-SDLC AI pair."
+
+**Problem Addressed**: Requirements phase had zero coverage. PowerPlay v2.9.0 had agents for design, development, testing, deployment, and monitoring—but nothing for the critical first phase where ambiguity, poor user stories, and untested feasibility cause cascading failures downstream.
+
+**Solution**: Two comprehensive rule files + four specialized agents that guide users from business requirement → specification → acceptance criteria → risk assessment → quality review.
+
+**New Rule Files Created** (2):
+
+1. `.continue/rules/requirements-elicitation.md` (290 lines, alwaysApply: false)
+   - **User Story Format**: "As a [specific role], I want [single feature], so that [measurable benefit]"
+   - **INVEST Principles** table: Independent, Negotiable, Valuable, Estimable, Small, Testable (6-point checklist)
+   - **Acceptance Criteria Format**: Given/When/Then Gherkin with exhaustive Then clauses (side effects: emails, logs, flags, state changes)
+   - **Completeness Checklist**: 6 dimensions (functional reqs, NFRs, edge cases, error scenarios, security, performance)
+   - **Ambiguity Anti-Patterns**: "fast" → "< 200ms at P95"; "easy" → "task completion time"; "should" → definitive action
+   - **Non-Functional Requirements Template**: Performance, Security, Scalability, Availability with example thresholds
+
+2. `.continue/rules/feasibility-assessment.md` (330 lines, alwaysApply: false)
+   - **3 Feasibility Dimensions**: Technical (can we build it?), Resource (capacity?), Timeline (deliver by X?)
+   - **Risk Tiers** (Low → Medium → High → Critical): When to spike, when to proceed, when to stop
+   - **Spike vs Build Decision**: When to invest 3-5 days in prototyping before committing to build
+   - **Estimation Principles**: Cone of Uncertainty (Req phase ±50%, Architecture ±30%, Sprint ±10%), T-shirt sizing at requirements
+   - **Definition of Ready**: 13-point checklist ensuring story format, INVEST, acceptance criteria, feasibility assessed, risk tier assigned
+   - **Risk Register Template**: Risk ID | Description | Category | Likelihood/Impact | Score | Mitigation
+
+**New Agent Prompts** (4):
+
+1. `/requirements-to-specs` (6-step analysis)
+   - Step 1: PARSE (roles, goals, features, constraints, assumptions)
+   - Step 2: FUNCTIONAL REQUIREMENTS (REQ-F-### numbered list, measurable/testable)
+   - Step 3: NON-FUNCTIONAL REQUIREMENTS (REQ-NF-### for perf/security/scalability/availability)
+   - Step 4: TECHNICAL SPECIFICATION (API contracts, database entities, system interactions, apply existing patterns)
+   - Step 5: DESIGN IMPLICATIONS (rules triggered, patterns applied, new/changed code)
+   - Step 6: OPEN QUESTIONS (what remains unclear, who decides, impact if unanswered)
+   - Output: Structured spec doc with "DoR Status: READY / NOT READY"
+
+2. `/acceptance-criteria` (6-step Gherkin generation)
+   - Step 1: PARSE story intent (role, goal, benefit, preconditions)
+   - Step 2: HAPPY PATH (exhaustive Given/When/Then with all side effects)
+   - Step 3: ALTERNATIVE PATHS (min 2, AC-ALT-1/AC-ALT-2 for different roles/states)
+   - Step 4: EDGE CASES (min 2, AC-EDGE-### for empty/null/max/concurrent/special chars)
+   - Step 5: ERROR SCENARIOS (min 1, AC-ERR-### with exact error message shown to user)
+   - Step 6: NON-FUNCTIONAL CRITERIA (response time, accessibility, browser/device support, data retention)
+   - Output: Gherkin criteria + Test Case table (Scenario ID | Name | Given | When | Then | Priority P1/P2/P3)
+
+3. `/risk-assessment` (5-step risk register)
+   - Step 1: TECHNICAL RISKS (unknown tech, complexity, integration, migration, security)
+   - Step 2: RESOURCE RISKS (skill gaps, key-person deps, capacity, effort range)
+   - Step 3: TIMELINE RISKS (fixed deadlines, critical path, review cycles, buffer)
+   - Step 4: BUSINESS RISKS (regulatory, user disruption, revenue impact, reversibility, reputation)
+   - Step 5: MITIGATION STRATEGIES (spike needed? prototype? phased? fallback? monitoring?)
+   - Output: Risk Register (sorted by Score descending) + Go/No-Go decision (GO / NO-GO / BLOCKED)
+
+4. `/requirements-review` (5-step quality audit)
+   - Step 1: COMPLETENESS (missing roles, scenarios, NFRs, integrations, data flows)
+   - Step 2: CLARITY (scan for fuzzy words: should/might/fast/easy/many/appropriate/robust → replace with measurable)
+   - Step 3: TESTABILITY (each req: can it be unit/integration/E2E/perf/security tested?)
+   - Step 4: CONSISTENCY (contradictions between reqs, conflicts with PowerPlay rules, terminology drift)
+   - Step 5: TRACEABILITY (matrix: REQ ID | Summary | Spec Section | Rule | Test Type | Test Status)
+   - Output: Review table (Status Pass/Fail/Warning, Issue Type, Description) + Revised Gherkin (for Fail/Warning) + Readiness verdict (READY / NEEDS REVISION / BLOCKED)
+
+**Config Updates**:
+- Bumped version: 2.9.0 → 3.0.0 (4 locations)
+- Added 2 rule entries (requirements-elicitation, feasibility-assessment) before `# MODELS` section
+- Added 4 agent prompts (500+ lines total) before `experimental:` section
+- Updated /pp routing table with 4 new rows (requirements domain)
+- Updated routing-intelligence rule with requirements routing guidance
+- Capability map: Rules 58 → 60, Prompts 70 → 74
+
+**Commit**: `f2ae1fa` — Add v3.0.0 Requirements Phase — complete SDLC coverage ✅ Deployed
+
+**Why This Matters**:
+- Closes SDLC gap: Now PowerPlay covers all 6 phases, not just design-through-monitoring
+- Shifts positioning: From "dev productivity tools" to "full-SDLC AI pair"
+- Prevents downstream failures: Clear requirements → clear acceptance criteria → testable acceptance criteria → low-risk estimation
+- De-risks projects: Risk assessment happens BEFORE estimates, not after surprises
+- Quality gateway: Requirements review catches ambiguity, unmeasurable claims, and testability gaps before development
+- Reusable patterns: INVEST, risk tiers, Definition of Ready are industry-standard frameworks
+
+**Test Cases Embedded**:
+- `/requirements-to-specs "Users need password reset via email"` → 6-section spec with REQ-F-###, REQ-NF-###, API contracts, DoR status
+- `/acceptance-criteria [password reset story]` → Happy path GWT, 2 alternatives, edge cases, error scenarios, test table with P1/P2/P3
+- `/risk-assessment "Integrate new payment processor never used before"` → Technical risk = High, PCI-DSS flagged, spike recommended, NO-GO until spike complete
+- `/requirements-review [ambiguous requirements]` → Flags "fast", "easy", "should", provides rewrites, NEEDS REVISION verdict
+
+---
+
 ## v2.8.0 Implementation — COMPLETE ✅
 
 ### 8. Added Claude-Like AI Behavior Rules (THIS SESSION)
