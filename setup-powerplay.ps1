@@ -192,16 +192,29 @@ if (Test-Path $destPath) {
 # STEP 5: Test Continue.dev
 # ============================================================================
 
-Write-Host "`nSTEP 5: Continue.dev Test Instructions" -ForegroundColor Yellow
+Write-Host "`nSTEP 5: IMPORTANT - Restart VS Code to Load Environment Variables" -ForegroundColor Yellow
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`n"
 
-Write-Host "  📋 Follow these steps to test:" -ForegroundColor Cyan
-Write-Host "  1. Close VS Code completely (all windows)"
-Write-Host "  2. Wait 5 seconds"
-Write-Host "  3. Reopen VS Code"
-Write-Host "  4. Open Continue.dev panel (Ctrl+L or Continue icon)"
-Write-Host "  5. Type '/' in the chat input"
-Write-Host "  6. You should see 63+ prompts available"
+Write-Host "  ⚠️  CRITICAL: Close and reopen VS Code COMPLETELY" -ForegroundColor Red
+Write-Host "  Environment variables are only loaded when VS Code starts." -ForegroundColor Red
+Write-Host ""
+Write-Host "  1. ❌ CLOSE VS Code (all windows, all instances)"
+Write-Host "  2. ⏱️  WAIT 5-10 seconds"
+Write-Host "  3. ✅ REOPEN VS Code fresh"
+Write-Host ""
+Write-Host "  Why? Environment variables are set in Windows registry." -ForegroundColor Gray
+Write-Host "       VS Code only reads them at startup. If you skip restart," -ForegroundColor Gray
+Write-Host "       API keys will be empty and Continue.dev will fail." -ForegroundColor Gray
+Write-Host ""
+
+Write-Host "`nSTEP 6: Continue.dev Test Instructions" -ForegroundColor Yellow
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`n"
+
+Write-Host "  📋 After restarting VS Code, test:" -ForegroundColor Cyan
+Write-Host "  1. Open Continue.dev panel (Ctrl+L or Continue icon)"
+Write-Host "  2. Type '/' in the chat input"
+Write-Host "  3. You should see 63+ prompts available"
+Write-Host "  4. No 'Empty API key' errors should appear"
 Write-Host ""
 Write-Host "  ✨ Example prompts to try:" -ForegroundColor Cyan
 Write-Host "     • /zero-trust-design (v2.5.0)"
@@ -221,15 +234,20 @@ Write-Host "║  Setup Complete! ✅                    ║" -ForegroundColor Gr
 Write-Host "╚════════════════════════════════════════╝`n" -ForegroundColor Green
 
 Write-Host "Summary:" -ForegroundColor Cyan
-Write-Host "  • Environment variables: Set ✅"
-Write-Host "  • Config file: Copied to Continue.dev ✅"
-Write-Host "  • Version: $Version ✅"
+Write-Host "  • Environment variables: Set ✅" -ForegroundColor Green
+Write-Host "  • Config file: Copied to Continue.dev ✅" -ForegroundColor Green
+Write-Host "  • Version: $Version ✅" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next Steps:" -ForegroundColor Cyan
-Write-Host "  1. Restart VS Code (option [R] below)"
-Write-Host "  2. Type '/' in Continue.dev chat"
-Write-Host "  3. Select a prompt to test"
-Write-Host "  4. Read docs: docs/README.md or docs/reference/release/CHANGELOG.md"
+Write-Host "⚠️  IMPORTANT - You MUST do this next:" -ForegroundColor Yellow
+Write-Host "  1. ❌ CLOSE VS Code completely (all windows)"
+Write-Host "  2. ⏱️  WAIT 5-10 seconds (important!)"
+Write-Host "  3. ✅ REOPEN VS Code (it will load environment variables)"
+Write-Host ""
+Write-Host "Then test:" -ForegroundColor Cyan
+Write-Host "  1. Open Continue.dev (Ctrl+L)"
+Write-Host "  2. Type '/' in chat"
+Write-Host "  3. Select /review or any prompt"
+Write-Host "  4. Should work without 'Empty API key' errors"
 Write-Host ""
 
 # ============================================================================
