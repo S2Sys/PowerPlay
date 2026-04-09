@@ -13,6 +13,46 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.4.0] — 2026-04-10 (Cloud & DevOps Standards)
+
+**Cloud & DevOps release — AWS, Azure, Docker/Kubernetes, Infrastructure as Code, CI/CD automation**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/aws-design` — Design AWS architecture (Lambda, S3, RDS, DynamoDB, API Gateway, CloudFront)
+- `/azure-setup` — Generate Azure deployment configuration (App Service, Functions, SQL, monitoring)
+- `/docker-containerize` — Generate Dockerfile and Docker Compose for containerization
+- `/kubernetes-deploy` — Generate Kubernetes manifests (deployments, services, ingress, HPA)
+- `/iac-generate` — Generate Infrastructure as Code (Terraform or Bicep)
+
+#### Rules (5 new)
+- `aws-patterns.md` — Lambda, RDS, DynamoDB, API Gateway, CloudFront, IAM best practices
+- `azure-deployment.md` — App Service, Azure Functions, SQL Database, Cosmos DB, Key Vault, monitoring
+- `docker-kubernetes.md` — Dockerfile optimization, Docker Compose, Kubernetes manifests, Helm charts
+- `infrastructure-iac.md` — Terraform state management, CloudFormation templates, Bicep, GitOps
+- `ci-cd-automation.md` — GitHub Actions, Azure Pipelines, blue-green deployments, secrets management
+
+### Changed
+- Version bumped to 2.4.0
+- Models: 14 (unchanged)
+- Rules: 34 → 39 total (+5 cloud & DevOps rules)
+- Prompts: 43 → 48 total (+5 cloud & DevOps prompts)
+- Updated capability map in config.yaml header
+
+### Files Modified
+- `config.yaml` — version 2.4.0, 5 new rules, 5 new prompts
+- `.continue/rules/aws-patterns.md` — NEW (500+ lines)
+- `.continue/rules/azure-deployment.md` — NEW (450+ lines)
+- `.continue/rules/docker-kubernetes.md` — NEW (500+ lines)
+- `.continue/rules/infrastructure-iac.md` — NEW (450+ lines)
+- `.continue/rules/ci-cd-automation.md` — NEW (400+ lines)
+
+### Summary
+v2.4.0 completes the comprehensive PowerPlay stack with cloud and DevOps standards. Now includes AWS architecture patterns (serverless, databases, CDN), Azure managed services, containerization with Docker/Kubernetes, Infrastructure as Code (Terraform/Bicep), and CI/CD automation (GitHub Actions, Azure Pipelines). Complete end-to-end coverage from code to production deployment.
+
+---
+
 ## [2.3.0] — 2026-04-10 (Advanced UI Patterns & Performance)
 
 **Advanced UI release — Component libraries, data visualization, tables, Storybook, performance monitoring**
