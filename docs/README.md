@@ -2,9 +2,11 @@
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
-[![Version: 2.1.0](https://img.shields.io/badge/version-2.1.0-blue)](./CHANGELOG.md)
+[![Version: 2.6.0](https://img.shields.io/badge/version-2.6.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)]()
 [![Stack: .NET + Angular](https://img.shields.io/badge/stack-.NET%20%2B%20Angular-blueviolet)]()
+[![Rules: 49](https://img.shields.io/badge/rules-49-brightgreen)]()
+[![Prompts: 58](https://img.shields.io/badge/prompts-58-brightgreen)]()
 [![Latest Release](https://img.shields.io/github/v/release/SmartWorkz-Dev/PowerPlay)](https://github.com/SmartWorkz-Dev/PowerPlay/releases)
 
 ---
