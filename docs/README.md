@@ -254,12 +254,16 @@ This script will:
 /app-distribution-plan Plan app distribution (versioning, store submission, monitoring)
 ```
 
-### MCP Servers (5 Tools)
-- **Git**: Read logs, diffs, blame, branch info
-- **FileSystem**: Read/write/create files autonomously
-- **Continue Docs**: Search Continue documentation
-- **SQLite**: Query local development databases
-- **Playwright**: Browser automation (scrape, test, fill forms)
+### Built-in Context Providers (Available by Default)
+All of these are built-in to Continue.dev — no installation needed:
+- **@git**: Read/write git logs, diffs, blame, branches
+- **@filesystem**: Read/write/create files autonomously
+- **@docs**: Search documentation (Continue.dev docs, codebase, etc.)
+- **@terminal**: Execute shell commands
+- **@codebase**: Search/analyze codebase
+- **@file**: Work with specific files
+
+**Use in chat**: `@git show recent commits` or `@filesystem read src/main.ts`
 
 ### Context Providers (11 Available)
 `@code`, `@codebase`, `@docs`, `@diff`, `@terminal`, `@problems`, `@folder`, `@file`, `@currentFile`, `@repo-map`, `@open`
