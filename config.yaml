@@ -2907,6 +2907,354 @@ prompts:
         Suggested next: return to Product Owner with Open Blockers list
 
 
+  # ── v3.5.0 Master Prompts & Aliases ──────────────────
+
+  - name: doc
+    description: "Alias for /add-docs — Add documentation comments"
+    invokable: true
+    prompt: |
+      [This is an alias for /add-docs]
+      Add XML docs to all public members:
+      <summary>, <param>, <returns>, <exception>, <remarks>.
+      Add <example> for utility methods. Keep logic unchanged.
+
+  - name: deep
+    description: "Alias for /explain-deep — Deep code explanation"
+    invokable: true
+    prompt: |
+      [This is an alias for /explain-deep]
+      Deep explanation of selected code:
+      ## Problem — What is this solving?
+      ## Logic — How does it work? (step-by-step)
+      ## Design Decisions — Why this approach? (alternatives + tradeoffs)
+      ## Failure Modes — What can go wrong?
+      ## Edge Cases — When does it break?
+
+  - name: learn
+    description: "Alias for /workspace-learn — Analyze project conventions + discover patterns + suggest commands"
+    invokable: true
+    prompt: |
+      [This is an alias for /workspace-learn]
+      You are a codebase analyst. Analyse this project and produce a structured conventions document.
+
+      ## Step 1: STANDARD CONVENTIONS
+      Examine:
+      1. Naming conventions — files, classes, methods, variables (C#, TypeScript, SCSS)
+      2. Folder structure and module boundaries — where do controllers/services/repos live?
+      3. Recurring patterns — repository pattern, service layer, component patterns, DI registration
+      4. Error handling — ProblemDetails? global exception middleware? controller-level try/catch?
+      5. Testing approach — framework (xUnit/Jasmine), naming pattern, coverage targets, test data strategy
+      6. Key architectural decisions — layering, DI, state management (signals/BehaviorSubject), auth flow
+
+      ## Step 2: SMARTWORKZ PATTERN DETECTION
+      Detect and report each (PRESENT / ABSENT / PARTIAL):
+      - **DevExtreme components** — dxGrid, dxForm, dxButton etc.? What version?
+      - **Dapper vs EF Core** — which ORM? Are both present (mixed)?
+      - **Angular inject()** — constructor injection or inject() dominant pattern?
+      - **ILogger<T>** — structured logging used? Log levels correct?
+      - **sw- BEM CSS prefix** — does SCSS follow sw-component__element--modifier naming?
+      - **async/await with CancellationToken** — are CancellationToken parameters passed through?
+      - **FluentValidation** — used at controller boundary or inline only?
+      - **Primary constructors (C# 12)** — used, or old-style constructors?
+
+      ## Step 3: POWERPLAY FIT ANALYSIS
+      Based on detected patterns, suggest the top 5 most relevant PowerPlay commands for THIS project:
+      Format: `/command-name` — [one sentence why this fits this specific codebase]
+      Rank by: estimated usage frequency × impact.
+
+      ## Step 4: WORKSPACE CONTEXT BLOCK
+      Emit this block at the end (future /pp calls can read it as context):
+      ---
+      ## WORKSPACE CONTEXT — [ProjectName]
+      **Generated**: [date]
+      **Stack**: [detected stack — e.g., .NET 8 / Angular 17 / SQL Server / Dapper]
+      **ORM**: [Dapper | EF Core | Mixed]
+      **CSS Convention**: [sw-BEM | BEM | utility-first | none detected]
+      **Injection Pattern**: [inject() | constructor | mixed]
+      **Logging**: [ILogger<T> structured | Console | none detected]
+      **Test Framework**: [xUnit | Jasmine | both | none detected]
+      **CancellationToken**: [consistent | inconsistent | absent]
+      **DevExtreme**: [version X.Y | absent]
+      **C# Version**: [12 (primary constructors) | 11 | 10 | unknown]
+      **Key Deviations from PowerPlay Rules**: [list or "None detected"]
+      **Top 5 Relevant Commands**: /[cmd1], /[cmd2], /[cmd3], /[cmd4], /[cmd5]
+      ---
+
+  - name: discover
+    description: "Alias for /workspace-learn — Discover project patterns + conventions"
+    invokable: true
+    prompt: |
+      [This is an alias for /workspace-learn]
+      [Same prompt as /learn — discover project architecture, naming conventions, patterns, and top PowerPlay commands]
+
+  - name: requirement
+    description: "Alias for /pp-requirements — Full 4-phase requirements chain"
+    invokable: true
+    prompt: |
+      [This is an alias for /pp-requirements]
+      Execute the full 4-phase requirements engineering chain:
+
+      ## Phase 1: Requirements → Specs
+      Convert business requirement to technical specification:
+      - Functional specs (user-facing features)
+      - Non-functional specs (performance, security, compliance)
+      - Technical design (architecture, tech stack, data model)
+
+      ## Phase 2: Specs → Acceptance Criteria
+      Convert specs to testable Gherkin acceptance criteria (Given/When/Then format)
+
+      ## Phase 3: Risk Assessment
+      Identify risks, estimate feasibility, provide Go/No-Go decision
+
+      ## Phase 4: Quality Review
+      Audit completeness, clarity, feasibility, security, performance
+
+      Each phase includes HANDOFF BLOCK for context carry-over to next phase.
+      Output: Complete requirements package ready for development.
+
+  - name: master-prompt-builder
+    description: "Interactive HTML tech stack builder + master prompt generator"
+    invokable: true
+    prompt: |
+      You are a tech stack architect. Generate an interactive HTML page for building project master prompts.
+
+      Build a self-contained HTML file with:
+
+      ## UI Sections:
+
+      ### 1. Project Basics
+      - Input: Project Name
+      - Input: Description (textarea)
+      - Dropdown: Industry (FinTech, Healthcare, E-commerce, SaaS, etc.)
+
+      ### 2. Tech Stack Selection
+      **Backend**:
+      - Checkbox: .NET 8 / 7 / 6
+      - Checkbox: ASP.NET Core
+      - Dropdown: ORM (Dapper, EF Core, Mixed)
+      - Checkbox: SQL Server / PostgreSQL / MySQL / Cosmos DB
+
+      **Frontend**:
+      - Checkbox: Angular 17+
+      - Checkbox: React
+      - Checkbox: Vue.js
+      - Checkbox: TypeScript
+      - Dropdown: State Management (Redux, NgRx, Context, Signals, etc.)
+      - Checkbox: Tailwind / Bootstrap / Material Design
+
+      **Infrastructure**:
+      - Checkbox: AWS / Azure / GCP
+      - Checkbox: Docker
+      - Checkbox: Kubernetes
+      - Checkbox: CI/CD (GitHub Actions, Azure Pipelines, Jenkins)
+
+      **Data**:
+      - Checkbox: Redis / Memcached
+      - Checkbox: Message Queue (RabbitMQ, Kafka, Service Bus)
+      - Checkbox: Search (Elasticsearch, Solr)
+
+      ### 3. Code Standards
+      - Checkbox: FluentValidation
+      - Checkbox: Structured Logging (ILogger<T>)
+      - Checkbox: Async/CancellationToken
+      - Checkbox: C# 12 Primary Constructors
+      - Checkbox: DevExtreme Components
+      - Checkbox: Unit Tests (xUnit, Jasmine)
+      - Checkbox: WCAG Accessibility
+      - Checkbox: Zero-Trust Security
+
+      ### 4. Architecture Patterns
+      - Checkbox: Repository Pattern
+      - Checkbox: Service Layer
+      - Checkbox: CQRS
+      - Checkbox: Event-Driven
+      - Checkbox: Microservices
+      - Checkbox: Monolith
+      - Dropdown: Naming Convention (PascalCase, camelCase, snake_case, BEM)
+
+      ### 5. Compliance & Security
+      - Checkbox: SOC 2
+      - Checkbox: HIPAA
+      - Checkbox: PCI-DSS
+      - Checkbox: GDPR
+      - Checkbox: Audit Logging Required
+
+      ## Output Section:
+      Large textarea that dynamically generates:
+      ```
+      # [Project Name] Master Prompt
+
+      ## Project Summary
+      [Industry] | [Description]
+
+      ## Tech Stack
+      Backend: [selected items]
+      Frontend: [selected items]
+      Infrastructure: [selected items]
+      Data: [selected items]
+
+      ## Code Standards (PowerPlay Rules)
+      [All checked items listed]
+
+      ## Architecture
+      [Selected patterns with rationale]
+
+      ## Compliance & Security
+      [Selected frameworks + requirements]
+
+      ## PowerPlay Commands (Top 10 Recommended)
+      1. [Based on detected stack]
+      2. [Based on patterns]
+      ...
+      ```
+
+      ## Button: Copy to Clipboard
+      Button: Generate Markdown
+      Button: Download as .md file
+
+      **Note**: This HTML page should be self-contained (single file), use inline CSS/JS, no external dependencies.
+
+  - name: master-prompt
+    description: "Project master prompt — analysis + recommendations + PowerPlay fit"
+    invokable: true
+    prompt: |
+      You are a project architect. Analyze this project and produce a comprehensive master prompt.
+
+      ## Section 1: PROJECT ANALYSIS
+
+      **Name**: [Detect from folder structure, package.json, .csproj, or ask]
+      **Type**: [Monolithic API | Microservices | Frontend | Full-Stack | Mobile | Data Pipeline]
+      **Industry**: [FinTech | Healthcare | E-commerce | SaaS | Internal Tools]
+
+      Analyze:
+      1. Purpose — What problem does this solve?
+      2. Scale — Users? Transactions? Data volume?
+      3. Constraints — Performance? Latency? Throughput?
+      4. Criticality — Mission-critical? Nice-to-have?
+      5. Team — Frontend + Backend + DevOps? Solo?
+
+      ## Section 2: TECH STACK INVENTORY
+
+      **Backend**:
+      - Runtime: [.NET version, Node.js, Python, Java]
+      - Framework: [ASP.NET Core, Express, FastAPI, Spring Boot]
+      - ORM: [Dapper, EF Core, Sequelize, SQLAlchemy]
+      - Database: [SQL Server, PostgreSQL, MySQL, MongoDB, Cosmos DB]
+      - Cache: [Redis, Memcached, None]
+      - Message Queue: [RabbitMQ, Kafka, Service Bus, None]
+
+      **Frontend**:
+      - Framework: [Angular, React, Vue, Svelte, None]
+      - Language: [TypeScript, JavaScript, C#/Blazor]
+      - UI Library: [Material, Bootstrap, Tailwind, DevExtreme, None]
+      - State: [Redux, NgRx, Context, Signals, Vuex, Pinia, None]
+
+      **Infrastructure**:
+      - Cloud: [AWS, Azure, GCP, On-Prem]
+      - Containers: [Docker, Kubernetes, None]
+      - CI/CD: [GitHub Actions, Azure Pipelines, Jenkins, GitLab CI, None]
+      - Hosting: [App Service, Lambda, EC2, AKS, ECS, None]
+
+      **Data**:
+      - Warehouse: [Redshift, BigQuery, Snowflake, None]
+      - Search: [Elasticsearch, Solr, None]
+      - Analytics: [dbt, Airflow, None]
+
+      ## Section 3: CODE STANDARDS DETECTED
+
+      Check for:
+      - async/await with CancellationToken? ✓/✗
+      - Parameterized queries (SQL injection safety)? ✓/✗
+      - ILogger<T> structured logging? ✓/✗
+      - Input validation (FluentValidation)? ✓/✗
+      - ProblemDetails error responses? ✓/✗
+      - WCAG accessibility? ✓/✗
+      - Test coverage target (70/20/10)? ✓/✗
+      - Design patterns (Repository, Service, CQRS)? ✓/✗
+
+      ## Section 4: ARCHITECTURE PATTERNS
+
+      **Identified**:
+      - Layering: [N-tier, DDD, Ports & Adapters, Clean Architecture]
+      - Messaging: [Event-Driven, CQRS, Saga, None]
+      - Scaling: [Horizontal, Vertical, Sharded, None]
+      - Data Flow: [Request/Response, Pub/Sub, Batch, Stream]
+      - Deployment: [Monolith, Microservices, Serverless, Hybrid]
+
+      ## Section 5: COMPLIANCE & SECURITY POSTURE
+
+      Frameworks Required:
+      - SOC 2 Type II? [Required / Not required]
+      - HIPAA? [Required / Not required]
+      - PCI-DSS? [Required / Not required]
+      - GDPR? [Required / Not required]
+
+      Security Checks:
+      - Secrets rotation? [Yes / No / Partial]
+      - HTTPS + TLS 1.2+? [Yes / No]
+      - JWT + PKCE? [Yes / No]
+      - Network segmentation? [Yes / No / Planned]
+      - Audit logging? [Yes / No / Partial]
+
+      ## Section 6: POWERPLAY FIT ANALYSIS
+
+      Top 10 Recommended PowerPlay Commands (ranked by impact):
+
+      1. `/[cmd]` — [Why this command fits this project] (Usage: daily / weekly / rarely)
+      2. `/[cmd]` — [Rationale]
+      ...
+
+      Example ranking:
+      ```
+      High Impact (Use Daily):
+      1. /sec — Zero-trust architecture + compliance audit (SOC 2 required)
+      2. /db — SQL optimization + schema review (heavy query workloads)
+      3. /api — API endpoint generation + spec validation (REST-heavy)
+      4. /test — Complete test suite generation (critical system, 70/20/10 coverage)
+      5. /deploy — CI/CD pipeline hardening (AWS multi-region)
+
+      Medium Impact (Use Weekly):
+      6. /arch — System redesign planning (microservices strategy)
+      7. /frontend — Angular component generation (DevExtreme patterns)
+      8. /ml — Model deployment pipelines (data science team)
+
+      Low Impact (Use as Needed):
+      9. /review — Code review + security audit
+      10. /doc — API documentation generation
+      ```
+
+      ## Section 7: IMPROVEMENT ROADMAP
+
+      ### Next 30 Days:
+      - [ ] [Priority 1]
+      - [ ] [Priority 2]
+      - [ ] [Priority 3]
+
+      ### Next 90 Days:
+      - [ ] [Initiative 1]
+      - [ ] [Initiative 2]
+
+      ### Long-term (6-12 months):
+      - [ ] [Strategic move 1]
+      - [ ] [Strategic move 2]
+
+      ## Section 8: MASTER RULES (For This Project)
+
+      **Rule 1: [Project-Specific Rule]**
+      [Description and impact]
+
+      **Rule 2: ...**
+
+      ---
+
+      ## OUTPUT: Master Prompt Summary
+
+      Name: [Project Name]
+      Stack: [Backend] / [Frontend] / [Data] / [Cloud]
+      Team Size: [1-5 / 5-15 / 15+ people]
+      Criticality: [Mission-Critical / Important / Nice-to-Have]
+      Maturity: [MVP / Growth / Scale / Mature]
+      **Top 5 PowerPlay Commands**: /[cmd1], /[cmd2], /[cmd3], /[cmd4], /[cmd5]
 
 experimental:
   readResponseToCursor: false
