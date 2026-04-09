@@ -13,6 +13,48 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.1.0] — 2026-04-09 (Inline Powers)
+
+**First v1.1.0 release — Inline code actions and utility prompts**
+
+### Added
+
+#### Inline Action Prompts (5 new)
+- `/inline-review` — Quick inline code review with Severity | Line | Issue | Fix table
+- `/quick-fix` — Auto-fix selected code (drop-in replacement, no explanation)
+- `/explain-inline` — Explain selected code with `//` comments per line
+- `/refactor-inline` — Refactor selection in single transformation (extract, simplify, or modernize)
+- `/add-types` — Add TypeScript `any` → types or C# `var` → explicit types
+
+#### Utility Prompts (5 new)
+- `/performance-check` — Identify N+1, allocations, blocking awaits
+- `/memory-audit` — Detect memory leaks and disposal issues
+- `/database-design` — Review or generate database schema
+- `/architecture-design` — System architecture advice for features
+- `/refactor-large` — Plan large refactoring with analysis and ordered steps
+
+#### Rules (4 new)
+- `performance-audit.md` — SQL, C#, TypeScript performance standards
+- `memory-management.md` — Disposal patterns, event cleanup, GC awareness
+- `async-best-practices.md` — Async/await, ConfigureAwait, CancellationToken
+- `error-handling-advanced.md` — Exception hierarchy, ProblemDetails, structured logging, Polly
+
+### Fixed
+- Fixed hardcoded API key in `tabAutocompleteModel` (line 237) → now `${DHONI_API_KEY}`
+- Fixed hardcoded API key in `embeddingsProvider` (line 254) → now `${OPENROUTER_API_KEY}`
+
+### Changed
+- Version bumped to 1.1.0
+- Updated capability map in config header
+- Updated releaseUrl to point to v1.1.0
+
+### Total New Features
+- 10 new prompts (5 inline actions, 5 utility)
+- 4 new rules
+- 2 remaining hardcoded secrets fixed
+
+---
+
 ## [1.0.1] — 2026-04-09 (Security Patch)
 
 **CRITICAL SECURITY FIX**
