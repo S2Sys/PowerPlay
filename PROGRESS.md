@@ -262,7 +262,83 @@ All deployed to `main` branch ✅
 
 ---
 
-## v2.9.0 Implementation — COMPLETE ✅ (NEW)
+## v3.2.0 Implementation — COMPLETE ✅ (NEW)
+
+### 12. Fixed Orchestrator Gaps — Robustness & Auto-Cascade (THIS SESSION)
+
+**Audit Summary**: Post-release audit of v3.1.0 found 7 confirmed gaps + 7 design limitations. v3.2.0 fixes the 4 high-priority items.
+
+**Gap 1: Multi-Intent Tiebreaker — FIXED**
+- **Problem**: When user says "test this SQL", matches both `/test` (Testing) AND `/db` (Database) equally. `/pp` had no disambiguation rule; silently picked first match.
+- **Solution**: Explicit precedence order in `/pp` Step 2:
+  1. Security (vulnerability, injection, breach, exploit)
+  2. Requirements (requirement, spec, story, criteria, risk)
+  3. Testing (test, coverage)
+  4. Database (SQL, query, schema)
+  5. Performance (slow, N+1, optimize)
+  6. Code Review (default)
+  - If still ambiguous after precedence: ask ONE clarifying question
+- **Code**: Lines 2031–2042 in config.yaml
+
+**Gap 2: Orphaned Commands — FIXED**
+- **Problem**: `/pentest-plan` and `/incident-response` are invokable commands but have ZERO routing keywords. Users can't discover them via `/pp`.
+- **Solution**: Added 2 new rows to `/pp` routing table:
+  - `pentest, penetration test, ethical hack, red team` → `/pentest-plan`
+  - `incident, outage, breach, post-mortem, IR playbook` → `/incident-response`
+- **Impact**: Both commands now discoverable via `/pp`
+- **Code**: Lines 2024–2025 in config.yaml (new routing rows)
+
+**Gap 3: No Fallback for Non-Engineering Requests — FIXED**
+- **Problem**: If user said "write me a recipe" or "explain quantum physics", `/pp` had no fallback—it would silently try to match keywords and either pick wrong category or fall through.
+- **Solution**: Explicit fallback in `/pp` Step 4:
+  - If no category matches AND request is not a software engineering task:
+  - Respond: "I specialise in software engineering tasks — code review, security, testing, refactoring, requirements, database, cloud, and architecture. Could you rephrase?"
+  - Prevents /pp from hallucinating answers to unrelated topics
+- **Code**: Lines 2140–2143 in config.yaml
+
+**Gap 4: Phase Agents Don't Auto-Cascade — FIXED**
+- **Problem**: After running `/requirements-to-specs`, user must manually:
+  1. Copy HANDOFF BLOCK from output
+  2. Remember to run `/acceptance-criteria` next
+  3. Paste HANDOFF BLOCK into the next invocation
+  - This is error-prone and undiscovered by casual users.
+- **Solution**: Added explicit "NEXT PHASE" suggestion at the end of each phase agent:
+  - `/requirements-to-specs` → "Copy HANDOFF BLOCK and run `/acceptance-criteria`"
+  - `/acceptance-criteria` → "Copy HANDOFF BLOCK and run `/risk-assessment`"
+  - `/risk-assessment` → "Copy HANDOFF BLOCK and run `/requirements-review`"
+  - `/requirements-review` → "If READY: run `/api-endpoint`, `/database-design`, or `/architecture-design`"
+  - Each line includes "Or run `/pp-requirements` to execute all 4 phases at once"
+- **Impact**: Phase chaining is now explicit, discoverable, and automatic
+- **Code**: Lines 2288–2290, 2392–2394, 2526–2528, 2640–2642 in config.yaml (NEXT PHASE / FINAL PHASE additions)
+
+**Gaps NOT Fixed (Lower Priority, v3.3.0+ backlog)**:
+- Domain-specific orchestrators (/api, /arch, /deploy shortcuts) — design trade-off: /pp is general + category shortcuts (/sec, /test, /db) for common cases
+- Three-tier scope (Medium tier for 100–500 lines) — heuristic-based scope detection is simpler
+- Cross-SDLC spanning — complex to prioritize; focus on requirements phase first
+- Session context beyond HANDOFF BLOCK — would require API-level session management
+
+**Config Changes**:
+- 5 targeted edits: tiebreaker rule, 2 routing rows, fallback clause, 4 NEXT PHASE lines
+- Lines added: ~60 (mostly instructions, no new agents or rules)
+- Version: 3.1.0 → 3.2.0
+
+**Commit**: `7fc6fb2` — Add v3.2.0 orchestrator gap fixes ✅ Deployed
+
+**Why These Fixes Matter**:
+- **Tiebreaker**: Removes silent disambiguation; makes routing predictable
+- **Orphaned commands**: Increases discoverability; no more "I didn't know /pentest-plan existed"
+- **Fallback**: Prevents scope creep; system respects its boundaries
+- **Auto-cascade**: Transforms multi-phase workflow from manual copy-paste to guided flow; reduces friction
+
+**Test Cases**:
+- "test this SQL query" → routes to /optimize-sql (Database > Testing by precedence)
+- "help me plan a pentest" → routes to /pentest-plan
+- "write me a recipe" → responds with "I specialise in software engineering tasks..."
+- Run `/requirements-to-specs` → output ends with NEXT PHASE pointing to `/acceptance-criteria`
+
+---
+
+## v2.9.0 Implementation — COMPLETE ✅
 
 ### 9. Added Orchestrator System — Routes Tasks Intelligently (THIS SESSION)
 
