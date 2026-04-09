@@ -7,10 +7,49 @@ Versioning: [Semantic Versioning](https://semver.org/)
 ## [Unreleased]
 
 ### Planned
-- [ ] v2.6.0 — Integration & APIs (event-driven, API gateways, message queues, webhooks)
 - [ ] v2.7.0 — Mobile & Cross-Platform (iOS, Android, React Native, offline-first)
 - [ ] Config validation tool
 - [ ] Claude API model support
+
+---
+
+## [2.6.0] — 2026-04-09 (Integration & APIs)
+
+**Integration & APIs release — Event-driven architecture, API gateways, message queues, webhooks, integration testing**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/event-driven-design` — Design event-driven system with CQRS & event sourcing
+- `/api-composition` — Design API composition gateway (multi-service aggregation)
+- `/message-queue-setup` — Design message queue architecture (RabbitMQ/Kafka)
+- `/webhook-implementation` — Implement webhook system with retries & signatures
+- `/integration-test-design` — Design contract tests, E2E tests, test data strategy
+
+#### Rules (5 new)
+- `event-driven-architecture.md` — Event sourcing, CQRS, saga pattern, eventual consistency
+- `api-gateway-patterns.md` — Request routing, composition, rate limiting, versioning, caching
+- `message-queue-patterns.md` — RabbitMQ/Kafka, queues vs. topics, DLQ, idempotency
+- `webhook-standards.md` — HTTPS, HMAC signatures, retries, delivery guarantees
+- `integration-testing.md` — Contract testing, E2E testing, test data, CI/CD integration
+
+### Changed
+- Version bumped to 2.6.0
+- Models: 14 (unchanged)
+- Rules: 44 → 49 total (+5 integration rules)
+- Prompts: 53 → 58 total (+5 integration prompts)
+- Updated capability map in config.yaml header
+
+### Files Modified
+- `config.yaml` — version 2.6.0, 5 new rules, 5 new prompts
+- `.continue/rules/event-driven-architecture.md` — NEW (600+ lines)
+- `.continue/rules/api-gateway-patterns.md` — NEW (550+ lines)
+- `.continue/rules/message-queue-patterns.md` — NEW (500+ lines)
+- `.continue/rules/webhook-standards.md` — NEW (400+ lines)
+- `.continue/rules/integration-testing.md` — NEW (450+ lines)
+
+### Summary
+v2.6.0 adds comprehensive integration and API patterns to PowerPlay. Covers event-driven architecture (event sourcing, CQRS, sagas), API gateways (routing, composition, rate limiting), message queues (RabbitMQ/Kafka patterns), webhooks (reliable delivery, signature verification), and integration testing (contract tests, E2E, test data management). Enables building scalable, decoupled microservices with real-time integrations.
 
 ---
 
