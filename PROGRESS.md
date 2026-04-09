@@ -6,6 +6,29 @@
 
 ## Current Session: 2026-04-09
 
+### Latest Changes
+
+#### 4. Cleaned Up Config — Removed Paid Models & Phi4
+**Action**: Removed all paid models and Phi4 from config.yaml
+
+**Removed (5 models)**:
+- Phi4 Mini [Fast] - local (per user request)
+- Claude 3.5 Haiku [Fast Agent] - paid on OpenRouter
+- DeepSeek V3 [Coder] - paid model
+- Mistral Large [Analysis] - paid model
+- Qwen3 235B [Deep Analysis] - paid model
+
+**Kept (9 free models)**:
+- 4 local GPU (Qwen 3.5 9B, DeepSeek R1 8B, Qwen Coder, DeepSeek Coder)
+- 5 OpenRouter free (GPT OSS 120B, MiniMax M2.5, Qwen3 Coder, Gemma 4, Llama 3.1)
+- 1 embedding (NVIDIA Nemotron - free)
+
+**Updated**: Capability map now emphasizes "FREE MODELS ONLY"
+
+**Commit**: `aa967c6`
+
+---
+
 ### What Was Done
 
 #### 1. API Keys Issue Investigation & Fix
@@ -112,6 +135,8 @@
 | `db76da5` | Add API keys troubleshooting guide | 1 |
 | `80a7e8d` | Add API keys fix summary | 1 |
 | `a6a1737` | Add implementation status summary | 1 |
+| `5e8dbcb` | Consolidate all progress tracking into single PROGRESS.md | 1 |
+| `aa967c6` | Remove paid models and Phi4 from config.yaml | 1 |
 
 All deployed to `main` branch ✅
 
