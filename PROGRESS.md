@@ -6,6 +6,31 @@
 
 ## Current Session: 2026-04-09
 
+### Summary of All API Key Implementation Changes
+
+**3 API Keys stored in Windows Registry** (via `SetEnvironmentVariable()`):
+- `DHONI_API_KEY` - Local GPU server (4 models use this)
+- `KAPIL_API_KEY` - Local GPU server (reserved)
+- `OPENROUTER_API_KEY` - Cloud fallback (5 models + tab autocomplete + embeddings)
+
+**All models in config.yaml use placeholder substitution**:
+- Local models: `apiKey: ${DHONI_API_KEY}` (lines 855, 873, 888, 898)
+- Cloud models: `apiKey: ${OPENROUTER_API_KEY}` (lines 910, 921, 931, 939, 959)
+- Tab autocomplete: `apiKey: ${OPENROUTER_API_KEY}` (line 973)
+- Embeddings: `apiKey: ${OPENROUTER_API_KEY}` (line 992)
+
+**Documentation created** (4 files, 1,130 lines total):
+- `ENVIRONMENT-VARIABLES.md` - Why & how env vars work (250 lines)
+- `API-KEYS-TROUBLESHOOTING.md` - Diagnosis & fixes (280 lines)
+- `API-KEYS-FIX-SUMMARY.md` - Root cause analysis (300 lines)
+- `API-KEYS-IMPLEMENTATION.md` - Technical implementation details (350 lines)
+
+**Critical insight**: VS Code only reads environment variables at startup, not dynamically. Setup script sets them in registry but VS Code must be completely closed and reopened to load the new values.
+
+---
+
+## Current Session: 2026-04-09
+
 ### Latest Changes
 
 #### 4. Cleaned Up Config — Removed Paid Models & Phi4
