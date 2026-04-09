@@ -44,7 +44,7 @@ This script will:
 4. Type "/" → See 58+ prompts ✅
 ```
 
-**See also**: [SETUP-ENVIRONMENT.md](./SETUP-ENVIRONMENT.md) for detailed setup guide
+**See also**: [Setup Guide](./reference/setup/SETUP-ENVIRONMENT.md) for detailed setup guide
 
 ### 4. Restart Continue
 - VS Code: Ctrl+Shift+P → "Reload Window"
@@ -84,7 +84,7 @@ This script will:
 | **Qwen3 Coder** | Code | ⚡ | v1.0.0 |
 | **Gemma 4 26B** | Reasoning | ⚡ | v1.0.0 |
 
-### Rules (24 Categories)
+### Rules (54 Categories)
 
 **Core Rules (6)**
 - **smartworkz-core**: C# 12, async/await, ILogger<T>
@@ -107,6 +107,47 @@ This script will:
 - **api-versioning**: URL versioning, deprecation (6-month notice), breaking changes
 - **input-validation**: Validation at boundaries, parameterized queries, sanitization
 - **git-workflow**: Branch naming, Conventional Commits, squash strategy, conflict resolution
+
+**v2.2.0 UX Design Agent Rules (4)**
+- **ux-design**: Component design, accessibility (WCAG 2.1), responsive patterns, design systems
+- **component-library**: Reusable component patterns, API design, documentation standards
+- **user-experience**: User flows, interaction patterns, usability heuristics
+- **design-accessibility**: Accessibility standards, color contrast, keyboard navigation, screen readers
+
+**v2.3.0 Advanced UI Patterns Rules (5)**
+- **advanced-css**: CSS Grid, Flexbox, custom properties, responsive strategies
+- **animations**: CSS animations, transitions, performance optimization, accessibility
+- **state-management**: State patterns, immutability, reactive flows, debugging
+- **form-patterns**: Form validation, async validation, multi-step flows, accessibility
+- **performance-optimization**: Bundle analysis, lazy loading, caching, rendering optimization
+
+**v2.4.0 Cloud & DevOps Rules (5)**
+- **cloud-architecture**: Cloud design patterns, auto-scaling, load balancing, disaster recovery
+- **cicd-standards**: Pipeline design, deployment strategies, rollback procedures, monitoring
+- **containerization**: Docker best practices, multi-stage builds, security scanning
+- **kubernetes**: K8s manifests, helm charts, resource management, networking
+- **infrastructure-as-code**: IaC patterns, terraform, parameterization, version control
+
+**v2.5.0 Security & Compliance Rules (5)**
+- **zero-trust-security**: Zero-trust architecture, identity-based access, continuous verification
+- **compliance-standards**: SOC 2, ISO 27001, HIPAA, PCI-DSS compliance checklists
+- **incident-response**: Incident response playbooks, post-mortem templates, communication
+- **threat-modeling**: STRIDE methodology, attack trees, risk assessment
+- **security-posture**: Security assessment framework, vulnerability management, gap analysis
+
+**v2.6.0 Integration & APIs Rules (5)**
+- **event-driven-architecture**: CQRS, event sourcing, sagas, eventual consistency
+- **api-composition**: API gateway patterns, aggregation, caching, resilience patterns
+- **message-queues**: RabbitMQ/Kafka patterns, ordering, dead-letter queues
+- **webhook-standards**: Webhook implementation, retries, idempotency, signatures
+- **integration-testing**: Contract testing, E2E testing, test data management
+
+**v2.7.0 Mobile & Cross-Platform Rules (5)**
+- **mobile-development**: iOS Swift, Android Kotlin, React Native, Flutter standards
+- **cross-platform-design**: Platform abstraction, UI adaptation, design tokens
+- **offline-first**: Local data stores, event logs, sync strategies, conflict resolution
+- **mobile-security**: Credential storage, OAuth 2.0, certificate pinning, jailbreak detection
+- **app-distribution**: App store submission, versioning, beta testing, signing, monitoring
 
 ### Prompts (63 Commands)
 
@@ -159,6 +200,33 @@ This script will:
 /dep-update          Audit dependencies (outdated, CVE, safe update path)
 ```
 
+**v2.2.0 UX Design Agent Commands (5)**
+```
+/ux-audit            Audit UX/UI for accessibility, usability, design consistency
+/component-design    Design reusable component library
+/user-flow           Design user flows and wireframes
+/accessibility-scan  WCAG 2.1 accessibility audit
+/design-system       Create design system documentation
+```
+
+**v2.3.0 Advanced UI Patterns Commands (5)**
+```
+/advanced-layout     Complex layout system design (CSS Grid, Flexbox, responsive)
+/animation-design    Design animations and micro-interactions
+/state-management    Design application state management strategy
+/form-design         Advanced form patterns (validation, multi-step, conditional)
+/performance-ui      Optimize UI performance (rendering, animations, bundles)
+```
+
+**v2.4.0 Cloud & DevOps Commands (5)**
+```
+/cloud-architecture  Design cloud infrastructure (Azure/AWS)
+/cicd-pipeline       Design CI/CD pipeline with stages and gates
+/docker-setup        Containerize application with Docker best practices
+/kubernetes-design   Design Kubernetes deployment strategy
+/monitoring-setup    Design observability stack (logging, metrics, tracing)
+```
+
 **v2.5.0 Security & Compliance Commands (5)**
 ```
 /zero-trust-design   Design zero-trust security architecture
@@ -207,20 +275,22 @@ This script will:
 
 | Guide | Purpose |
 |-------|---------|
-| [**Wiki**](./wiki/) | Complete knowledge base |
-| [**CHANGELOG**](./CHANGELOG.md) | Version history & releases |
-| [**VERSIONING_STRATEGY**](./VERSIONING_STRATEGY.md) | Release process & roadmap |
-| [**config.yaml**](./config.yaml) | Full configuration (annotated) |
+| [**Setup Guide**](./reference/setup/SETUP-ENVIRONMENT.md) | Installation & configuration |
+| [**Troubleshooting**](./reference/setup/TROUBLESHOOTING.md) | Common issues & solutions |
+| [**CHANGELOG**](./reference/release/CHANGELOG.md) | Version history & releases |
+| [**Release Notes**](./reference/release/RELEASES_v2.5.0_v2.6.0.md) | Latest release details |
+| [**SDLC Coverage**](./reference/SDLC-COVERAGE-MATRIX.md) | Rules mapped to phases & stacks |
+| [**Architecture Guide**](./guides/release/DOCUMENTATION_ARCHITECTURE.md) | Documentation structure |
 
-### Wiki Structure
-- [01-Getting-Started](./wiki/01-Getting-Started.md) — Installation, first chat
-- [02-Config-Reference](./wiki/02-Config-Reference.md) — Every section explained
-- [03-Rules-Guide](./wiki/03-Rules-Guide.md) — Rule-by-rule breakdown
-- [04-Models-Explained](./wiki/04-Models-Explained.md) — When to use which model
-- [05-MCP-Servers-Guide](./wiki/05-MCP-Servers-Guide.md) — Tool setup & usage
-- [06-Prompts-Reference](./wiki/06-Prompts-Reference.md) — All commands + examples
-- [07-Troubleshooting](./wiki/07-Troubleshooting.md) — Common issues + fixes
-- [08-Contributing](./wiki/08-Contributing.md) — Add rules, models, prompts
+### By Version
+- [v2.7.0 — Mobile & Cross-Platform](./releases/v2.7.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.6.0 — Integration & APIs](./releases/v2.6.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.5.0 — Security & Compliance](./releases/v2.5.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.4.0 — Cloud & DevOps](./releases/v2.4.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.3.0 — Advanced UI Patterns](./releases/v2.3.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.2.0 — UX Design Agent](./releases/v2.2.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.1.0 — Data & Observability](./releases/v2.1.0/IMPLEMENTATION_SUMMARY.md)
+- [v2.0.0 — Agent-Era Standards](./releases/v2.0.0/IMPLEMENTATION_SUMMARY.md)
 
 ---
 
@@ -324,7 +394,7 @@ Modify these without breaking anything:
 | "Wrong model used" | Restart Continue, check model role in config (`chat`, `apply`, `edit`) |
 | Rules not applying | Check `globs` match your file, or set `alwaysApply: true` |
 
-See [Troubleshooting Wiki](./wiki/07-Troubleshooting.md) for more.
+See [Troubleshooting Guide](./reference/setup/TROUBLESHOOTING.md) for more.
 
 ---
 
@@ -332,7 +402,7 @@ See [Troubleshooting Wiki](./wiki/07-Troubleshooting.md) for more.
 
 Want to add a rule, model, or prompt?
 
-1. Read [Contributing Guide](./wiki/08-Contributing.md)
+1. See [Architecture Guide](./guides/release/DOCUMENTATION_ARCHITECTURE.md) for structure
 2. Edit `config.yaml`
 3. Update `CHANGELOG.md` (new feature section)
 4. Bump `version:` (minor)
