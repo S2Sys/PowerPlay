@@ -18,55 +18,118 @@ PowerPlay/
 │
 ├── 📁 docs/                        (Documentation Hub)
 │   ├── README.md                   (START HERE — user guide & features)
-│   ├── CHANGELOG.md                (Version history & migration guides)
-│   ├── SECURITY.md                 (API key management & rotation)
-│   ├── IMPLEMENTATION_SUMMARY.md   (Complete project overview)
+│   ├── INDEX.md                    (Navigation guide)
 │   │
-│   ├── 📁 guides/                  (How-To Guides & Implementation Plans)
-│   │   ├── QUICK_REFERENCE.md      (One-page cheat sheet — print this!)
-│   │   ├── STRUCTURE.md            (Project structure explained)
-│   │   ├── VERSIONING_STRATEGY.md  (Release process & roadmap)
-│   │   ├── CLAUDE_CODE_SUPERPOWER_PLAN.md (Strategic analysis & gap analysis)
-│   │   ├── MASTER_IMPLEMENTATION_ROADMAP.md (Overall 20-week plan with all phases)
-│   │   ├── IMPLEMENTATION_PLAN_V1_1_0.md (Detailed inline powers plan — weeks 1-6)
-│   │   ├── IMPLEMENTATION_PLAN_V1_2_0.md (Detailed intelligent context plan — weeks 7-12)
-│   │   └── IMPLEMENTATION_PLAN_V2_0_0.md (Detailed Claude Code parity plan — weeks 13-20)
+│   ├── 📁 guides/                  (How-To Guides & Planning)
+│   │   ├── release/
+│   │   │   ├── DOCUMENTATION_ARCHITECTURE.md (7-level doc structure)
+│   │   │   ├── DOCUMENTATION-RESTRUCTURING-SUMMARY.md (Restructuring plan)
+│   │   │   └── VISUAL-OVERVIEW.md (Before/after comparison)
+│   │   ├── UX_DESIGN/
+│   │   │   ├── INTEGRATION_PROPOSAL.md
+│   │   │   └── INTEGRATION_SUMMARY.md
+│   │   └── getting-started/ (Placeholder for onboarding)
 │   │
-│   ├── 📁 reference/               (Templates & Checklists)
-│   │   ├── RELEASE_CHECKLIST.md    (Pre-release validation steps)
-│   │   └── NEXT_RELEASE_TEMPLATE.md (Step-by-step release guide)
+│   ├── 📁 reference/               (Setup & Release Reference)
+│   │   ├── setup/
+│   │   │   ├── SETUP-ENVIRONMENT.md (Installation & configuration)
+│   │   │   └── TROUBLESHOOTING.md (FAQ & common issues)
+│   │   ├── release/
+│   │   │   ├── CHANGELOG.md (Version history & migration guides)
+│   │   │   └── RELEASES_v2.5.0_v2.6.0.md (Release details)
+│   │   ├── SECURITY.md (API key management & rotation)
+│   │   ├── RELEASE-NOTES-TEMPLATE.md (Template for future releases)
+│   │   ├── SDLC-COVERAGE-MATRIX.md (Rules mapped to phases & stacks)
+│   │   ├── NEXT_RELEASE_TEMPLATE.md (Release checklist)
+│   │   └── RELEASE_CHECKLIST.md (Pre-release validation)
+│   │
+│   ├── 📁 releases/                (Version Implementation Summaries)
+│   │   ├── v1.1.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v1.2.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.0.0/IMPLEMENTATION_SUMMARY.md & TASK_BREAKDOWN.md
+│   │   ├── v2.1.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.2.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.3.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.4.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.5.0/IMPLEMENTATION_SUMMARY.md
+│   │   ├── v2.6.0/IMPLEMENTATION_SUMMARY.md
+│   │   └── v2.7.0/IMPLEMENTATION_SUMMARY.md
+│   │
+│   ├── 📁 archive/                 (Legacy Planning & Status Documents)
+│   │   ├── IMPLEMENTATION_SUMMARY.md (Old project overview)
+│   │   ├── PROJECT_STATUS_ARCHIVE.md (Historical status)
+│   │   ├── REORGANIZATION_NOTES.md (Past cleanup notes)
+│   │   ├── README-INDEX.md (Old index)
+│   │   ├── IMMEDIATE-CLEANUP-PLAN.md (Old cleanup plan)
+│   │   └── DELIVERY_SUMMARY.md (Old delivery notes)
 │   │
 │   └── 📁 audit/                   (Quality & Security Reports)
 │       └── CONFIGARCHITECT_AUDIT.md (12-phase audit findings)
 │
 ├── 📁 .continue/                   (Continue.dev Integration)
-│   └── rules/                      (24 Production-Ready Rule Files)
-│       ├── core-standards.md       (Universal patterns, naming, docs)
-│       ├── security-guard.md       (OWASP Top 10, input validation)
-│       ├── dotnet-csharp.md        (ASP.NET Core 8 standards)
-│       ├── sql-server.md           (T-SQL & stored procedures)
-│       ├── angular-typescript.md   (Angular 17+ components & forms)
-│       ├── test-standards.md       (Unit testing best practices)
-│       ├── agent-behavior.md       (v2.0.0: Autonomous agent patterns)
-│       ├── pr-standards.md         (v2.0.0: Pull request standards)
-│       ├── code-review-standards.md (v2.0.0: Code review guidelines)
-│       ├── ci-cd-standards.md      (v2.0.0: Pipeline automation)
-│       ├── workspace-conventions.md (v2.0.0: Project-specific patterns)
-│       ├── database-design.md      (v2.1.0: Schema, indexes, migrations)
-│       ├── observability-standards.md (v2.1.0: Logging, tracing, metrics)
-│       ├── api-versioning.md       (v2.1.0: API versioning, deprecation)
-│       ├── input-validation.md     (v2.1.0: Validation, sanitization, security)
-│       └── git-workflow.md         (v2.1.0: Branch naming, commits, merge strategy)
-│
-├── 📁 wiki/                        (Knowledge Base — User Guides)
-│   ├── 01-Getting-Started.md       (Installation & first setup)
-│   ├── 02-Config-Reference.md      (Config section breakdown)
-│   ├── 03-Rules-Guide.md           (Planned — detailed rule breakdown)
-│   ├── 04-Models-Explained.md      (Planned — model selection guide)
-│   ├── 05-MCP-Servers-Guide.md     (Planned — tool setup guide)
-│   ├── 06-Prompts-Reference.md     (Planned — all /commands explained)
-│   ├── 07-Troubleshooting.md       (Planned — FAQ & common issues)
-│   └── 08-Contributing.md          (Planned — how to contribute)
+│   └── rules/                      (54 Production-Ready Rule Files)
+│       ├── CORE RULES (6)
+│       ├── smartworkz-core.md      (C# 12, async/await, ILogger<T>)
+│       ├── dotnet-rules.md         (Controllers, Services, Repositories, FluentValidation)
+│       ├── angular-rules.md        (Standalone components, inject(), OnPush, Signals)
+│       ├── sql-rules.md            (Parameterized queries, NOLOCK, SARGable WHERE)
+│       ├── security-always.md      (No hardcoded secrets, XSS, SQL injection protection)
+│       ├── testing-pyramid.md      (AAA pattern, 70/20/10 coverage)
+│       │
+│       ├── v2.0.0 AGENT RULES (5)
+│       ├── agent-behavior.md       (Autonomous agents, plan-before-execute)
+│       ├── pr-standards.md         (Pull request standards, description format)
+│       ├── code-review-standards.md (Code review guidelines, severity levels)
+│       ├── ci-cd-standards.md      (Pipeline automation, environment promotion)
+│       └── workspace-conventions.md (Project patterns, naming, error handling)
+│       │
+│       ├── v2.1.0 DATA & OBSERVABILITY RULES (5)
+│       ├── database-design.md      (Schema design, indexes, migrations, soft delete)
+│       ├── observability-standards.md (Structured logging, correlation IDs, metrics)
+│       ├── api-versioning.md       (URL versioning, deprecation, breaking changes)
+│       ├── input-validation.md     (Validation at boundaries, parameterized queries)
+│       └── git-workflow.md         (Branch naming, Conventional Commits, merge strategy)
+│       │
+│       ├── v2.2.0 UX DESIGN RULES (4)
+│       ├── ux-design.md            (Component design, accessibility, design systems)
+│       ├── component-library.md    (Reusable components, API design, documentation)
+│       ├── user-experience.md      (User flows, interaction patterns, usability)
+│       └── design-accessibility.md (WCAG 2.1, color contrast, keyboard navigation)
+│       │
+│       ├── v2.3.0 ADVANCED UI RULES (5)
+│       ├── advanced-css.md         (CSS Grid, Flexbox, responsive strategies)
+│       ├── animations.md           (CSS animations, transitions, performance)
+│       ├── state-management.md     (State patterns, immutability, reactive flows)
+│       ├── form-patterns.md        (Form validation, multi-step flows, accessibility)
+│       └── performance-optimization.md (Bundle analysis, lazy loading, caching)
+│       │
+│       ├── v2.4.0 CLOUD & DEVOPS RULES (5)
+│       ├── cloud-architecture.md   (Cloud patterns, auto-scaling, disaster recovery)
+│       ├── cicd-standards.md       (Pipeline design, deployment strategies, rollback)
+│       ├── containerization.md     (Docker best practices, multi-stage builds)
+│       ├── kubernetes.md           (K8s manifests, helm charts, resource management)
+│       └── infrastructure-as-code.md (IaC patterns, terraform, parameterization)
+│       │
+│       ├── v2.5.0 SECURITY & COMPLIANCE RULES (5)
+│       ├── zero-trust-security.md  (Zero-trust architecture, identity-based access)
+│       ├── compliance-standards.md (SOC 2, ISO 27001, HIPAA, PCI-DSS)
+│       ├── incident-response.md    (Playbooks, post-mortems, communication)
+│       ├── threat-modeling.md      (STRIDE, attack trees, risk assessment)
+│       └── security-posture.md     (Assessment framework, vulnerability management)
+│       │
+│       ├── v2.6.0 INTEGRATION & APIS RULES (5)
+│       ├── event-driven-architecture.md (CQRS, event sourcing, sagas)
+│       ├── api-composition.md      (API gateway patterns, aggregation, caching)
+│       ├── message-queues.md       (RabbitMQ/Kafka patterns, ordering)
+│       ├── webhook-standards.md    (Webhook implementation, retries, idempotency)
+│       └── integration-testing.md  (Contract testing, E2E, test data)
+│       │
+│       └── v2.7.0 MOBILE & CROSS-PLATFORM RULES (5)
+│           ├── mobile-development.md (iOS Swift, Android Kotlin, RN, Flutter)
+│           ├── cross-platform-design.md (Platform abstraction, UI adaptation)
+│           ├── offline-first.md    (Local data stores, event logs, sync)
+│           ├── mobile-security.md  (Credential storage, OAuth, cert pinning)
+│           └── app-distribution.md (App store submission, versioning, signing)
 │
 └── 📁 tools/                       (External Tools & Agents)
     └── continue-config-architect.md (ConfigArchitect audit system prompt)
