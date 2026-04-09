@@ -40,13 +40,23 @@ PowerPlay/
 │       └── CONFIGARCHITECT_AUDIT.md (12-phase audit findings)
 │
 ├── 📁 .continue/                   (Continue.dev Integration)
-│   └── rules/                      (6 Production-Ready Rule Files)
+│   └── rules/                      (24 Production-Ready Rule Files)
 │       ├── core-standards.md       (Universal patterns, naming, docs)
 │       ├── security-guard.md       (OWASP Top 10, input validation)
 │       ├── dotnet-csharp.md        (ASP.NET Core 8 standards)
 │       ├── sql-server.md           (T-SQL & stored procedures)
 │       ├── angular-typescript.md   (Angular 17+ components & forms)
-│       └── test-standards.md       (Unit testing best practices)
+│       ├── test-standards.md       (Unit testing best practices)
+│       ├── agent-behavior.md       (v2.0.0: Autonomous agent patterns)
+│       ├── pr-standards.md         (v2.0.0: Pull request standards)
+│       ├── code-review-standards.md (v2.0.0: Code review guidelines)
+│       ├── ci-cd-standards.md      (v2.0.0: Pipeline automation)
+│       ├── workspace-conventions.md (v2.0.0: Project-specific patterns)
+│       ├── database-design.md      (v2.1.0: Schema, indexes, migrations)
+│       ├── observability-standards.md (v2.1.0: Logging, tracing, metrics)
+│       ├── api-versioning.md       (v2.1.0: API versioning, deprecation)
+│       ├── input-validation.md     (v2.1.0: Validation, sanitization, security)
+│       └── git-workflow.md         (v2.1.0: Branch naming, commits, merge strategy)
 │
 ├── 📁 wiki/                        (Knowledge Base — User Guides)
 │   ├── 01-Getting-Started.md       (Installation & first setup)
@@ -177,7 +187,9 @@ PowerPlay/
 | **CONFIGARCHITECT_AUDIT.md** | 12-phase audit findings & prevention checklist |
 
 ### .continue/rules/
-All rule files apply to Continue.dev to enforce standards:
+All 24 rule files apply to Continue.dev to enforce standards:
+
+**Core Rules (6 files)**
 | File | Applies To | Coverage |
 |------|-----------|----------|
 | **core-standards.md** | All files | Universal patterns, naming, documentation |
@@ -186,6 +198,24 @@ All rule files apply to Continue.dev to enforce standards:
 | **sql-server.md** | `**/*.sql` | T-SQL, procedures, performance, indexes |
 | **angular-typescript.md** | `**/*.ts` | Angular 17+, components, forms, signals |
 | **test-standards.md** | `**/*Tests.cs`, `**/*.spec.ts` | xUnit, Jasmine, AAA pattern |
+
+**v2.0.0 Agent-Era Rules (5 files)**
+| File | Applies To | Coverage |
+|------|-----------|----------|
+| **agent-behavior.md** | All files (universal) | Autonomous agent patterns, verification, audit trails |
+| **pr-standards.md** | `**/*.cs`, `**/*.ts`, `**/*.md`, `**/*.yml` | PR size limits, description format, review checklist |
+| **code-review-standards.md** | `**/*.cs`, `**/*.ts` | Review mindset, severity levels, approval criteria |
+| **ci-cd-standards.md** | `**/*.yml`, `**/*.yaml`, `**/Dockerfile` | Pipeline stages, hard blocks, deployment gates |
+| **workspace-conventions.md** | All files (universal) | Naming, folder structure, patterns, testing, error handling |
+
+**v2.1.0 Data & Observability Rules (5 files)**
+| File | Applies To | Coverage |
+|------|-----------|----------|
+| **database-design.md** | `**/*.sql`, `**/Migrations/**`, `**/*Migration*.cs`, `**/DbContext*.cs` | Normalization, indexes, constraints, migrations, soft delete |
+| **observability-standards.md** | `**/*.cs`, `**/*.ts`, `**/appsettings*.json` | Structured logging, correlation IDs, metrics, health checks |
+| **api-versioning.md** | `**/*Controller*.cs`, `**/*.ts`, `**/*.yaml`, `**/*.yml` | URL versioning, deprecation, breaking changes, migration guides |
+| **input-validation.md** | `**/*.cs`, `**/*.ts` | Validation at boundaries, parameterized queries, sanitization |
+| **git-workflow.md** | All files (universal) | Branch naming, Conventional Commits, squash strategy |
 
 ### wiki/
 Growing knowledge base (6/8 guides created):
@@ -248,16 +278,17 @@ Growing knowledge base (6/8 guides created):
 
 | Category | Count | Examples |
 |----------|-------|----------|
-| **Configuration** | 3 active + 2 archived | config.yaml, .env.example |
+| **Configuration** | 3 active + 3 archived | config.yaml, .env.example, config-v2.1.0.yaml |
 | **Documentation** | 4 main | README, CHANGELOG, SECURITY, SUMMARY |
 | **Strategic Plans** | 5 | Claude Code analysis, 20-week roadmap, 3 detailed phase plans |
 | **Guides** | 8 | Quick Reference, Structure, Versioning, + 5 implementation plans |
 | **Reference** | 2 | Release Checklist, Release Template |
 | **Audit** | 1 | ConfigArchitect Audit |
-| **Rules** | 6 | Core, Security, .NET, SQL, Angular, Tests |
+| **Rules** | 24 | 6 core + 5 v2.0.0 agents + 5 v2.1.0 data/observability |
 | **Wiki** | 2 created + 6 planned | Getting Started, Config Reference |
 | **Tools** | 1 | ConfigArchitect Prompt |
-| **Total** | 40+ files | Professional, strategic, well-documented |
+| **Implementation Summaries** | 4 | v1.1.0, v1.2.0, v2.0.0, v2.1.0 |
+| **Total** | 50+ files | Professional, strategic, well-documented |
 
 ---
 

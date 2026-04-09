@@ -2,7 +2,7 @@
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
-[![Version: 1.0.1](https://img.shields.io/badge/version-1.0.1-blue)](./CHANGELOG.md)
+[![Version: 2.1.0](https://img.shields.io/badge/version-2.1.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)]()
 [![Stack: .NET + Angular](https://img.shields.io/badge/stack-.NET%20%2B%20Angular-blueviolet)]()
 [![Latest Release](https://img.shields.io/github/v/release/SmartWorkz-Dev/PowerPlay)](https://github.com/SmartWorkz-Dev/PowerPlay/releases)
@@ -62,27 +62,57 @@ cp config.yaml ~/.continue/config.yaml
 
 ## 📊 What's Included
 
-### Models (9 Total)
-| Model | Role | Speed | Cost |
-|-------|------|-------|------|
-| **Qwen 3.5 9B** | Chat | ⚡⚡⚡ | Free (local) |
-| **DeepSeek R1 8B** | Reasoning | ⚡ | Free (local) |
-| **Phi4 Mini** | Fast chat | ⚡⚡⚡⚡ | Free (local) |
-| **Qwen Coder** | Code apply/edit | ⚡⚡ | Free (local) |
-| **DeepSeek Coder 6.7B** | Code edit | ⚡⚡ | Free (local) |
-| **GPT-OSS 120B** | Reasoning (cloud) | ⚡ | Free (OpenRouter) |
-| **MiniMax M2.5** | Creative (cloud) | ⚡ | Free (OpenRouter) |
-| **Qwen3 Coder** | Code (cloud) | ⚡ | Free (OpenRouter) |
-| **Gemma 4 26B** | Reasoning (cloud) | ⚡ | Free (OpenRouter) |
+### Models (14 Total)
 
-### Rules (5 Categories)
+**Local (5 models)**
+| Model | Role | Speed |
+|-------|------|-------|
+| **Qwen 3.5 9B** | Chat | ⚡⚡⚡ |
+| **DeepSeek R1 8B** | Reasoning | ⚡ |
+| **Phi4 Mini** | Fast chat | ⚡⚡⚡⚡ |
+| **Qwen Coder** | Code apply/edit | ⚡⚡ |
+| **DeepSeek Coder 6.7B** | Code edit | ⚡⚡ |
+
+**Cloud (9 models via OpenRouter)**
+| Model | Role | Speed | Type |
+|-------|------|-------|------|
+| **Llama 3.1 70B** | Reasoning | ⚡ | v1.2.0 |
+| **Mistral Large** | Analysis | ⚡ | v1.2.0 |
+| **Claude 3.5 Haiku** | Fast agent | ⚡⚡⚡ | v2.0.0 |
+| **DeepSeek V3** | Code generation | ⚡⚡ | v2.0.0 |
+| **Qwen3 235B** | Deep analysis | ⚡ | v2.1.0 |
+| **GPT-OSS 120B** | Reasoning | ⚡ | v1.0.0 |
+| **MiniMax M2.5** | Creative | ⚡ | v1.0.0 |
+| **Qwen3 Coder** | Code | ⚡ | v1.0.0 |
+| **Gemma 4 26B** | Reasoning | ⚡ | v1.0.0 |
+
+### Rules (24 Categories)
+
+**Core Rules (6)**
 - **smartworkz-core**: C# 12, async/await, ILogger<T>
 - **dotnet-rules**: Controllers, Services, Repositories, FluentValidation
 - **angular-rules**: Standalone components, inject(), OnPush, Signals
 - **sql-rules**: Parameterized queries, NOLOCK, SARGable WHERE
 - **security-always**: No hardcoded secrets, input sanitization, XSS protection
+- **testing-pyramid**: AAA pattern, 70/20/10 coverage ratios, Moq patterns
 
-### Prompts (10 Commands)
+**v2.0.0 Agent-Era Rules (5)**
+- **agent-behavior**: Autonomous agents, plan-before-execute, verification, audit trails
+- **pr-standards**: PR size limits (< 400 lines), description format, review checklist
+- **code-review-standards**: Severity levels, approval criteria, disagreement handling
+- **ci-cd-standards**: Pipeline stages, hard blocks, environment promotion, rollback
+- **workspace-conventions**: Naming, folder structure, patterns, error handling, testing
+
+**v2.1.0 Data & Observability Rules (5)**
+- **database-design**: Normalization (1NF/2NF/3NF), indexes, constraints, soft delete, migrations
+- **observability-standards**: Structured logging, correlation IDs, metrics, health checks
+- **api-versioning**: URL versioning, deprecation (6-month notice), breaking changes
+- **input-validation**: Validation at boundaries, parameterized queries, sanitization
+- **git-workflow**: Branch naming, Conventional Commits, squash strategy, conflict resolution
+
+### Prompts (33 Commands)
+
+**Core Commands (10)**
 ```
 /review              Full code review (bugs, security, patterns)
 /optimize-sql        Optimize SQL procedures + indexes
@@ -92,6 +122,43 @@ cp config.yaml ~/.continue/config.yaml
 /api-endpoint        Generate complete .NET 8 API endpoint
 /security-scan       OWASP Top 10 audit
 /explain-deep        Deep explanation with ASCII diagrams
+/performance-check   Identify N+1, allocations, blocking awaits
+/memory-audit        Detect memory leaks and disposal issues
+```
+
+**v1.1.0-v1.2.0 Utility Commands (13)**
+```
+/inline-review       Inline code review with severity levels
+/quick-fix           Auto-fix selected code
+/explain-inline      Add inline comments explaining code
+/refactor-inline     Single transformation (extract, simplify, modernize)
+/add-types           Add TypeScript/C# explicit types
+/database-design     Review or generate database schema
+/architecture-design System architecture advice
+/refactor-large      Plan large refactoring with ordered steps
+/generate-tests-complete  Generate complete test suite (unit + integration + edge cases)
+/doc-complete        Generate full API documentation
+/refactor-module     Analyse module + refactoring plan
+/migrate-version     Framework/version upgrade migration plan
+/audit-all           Full audit (security + performance + quality + coverage + docs)
+```
+
+**v2.0.0 Agent Commands (5)**
+```
+/pr-review           Autonomous PR review (quality, security, performance, testing, docs)
+/coverage-gaps       Find test coverage gaps, generate test cases
+/security-agent      OWASP Top 10 security audit with remediation
+/perf-optimize       Profile, identify bottlenecks, suggest optimizations
+/workspace-learn     Analyse project conventions, generate onboarding summary
+```
+
+**v2.1.0 Data & Observability Commands (5)**
+```
+/data-model          Design or review database schema (normalization, indexes, constraints)
+/observability-audit Audit logging, tracing, metrics (find gaps, suggest fixes)
+/api-contract        Generate OpenAPI 3.0 spec for API endpoints
+/git-workflow        Git branch naming, commit rewrite, squash plan
+/dep-update          Audit dependencies (outdated, CVE, safe update path)
 ```
 
 ### MCP Servers (5 Tools)

@@ -13,7 +13,8 @@
       "Bash(mv RELEASE_CHECKLIST.md docs/reference/)",
       "Bash(mv NEXT_RELEASE_TEMPLATE.md docs/reference/)",
       "Bash(wc -l docs/guides/IMPLEMENTATION*.md docs/guides/CLAUDE_CODE*.md docs/guides/MASTER*.md docs/guides/ROADMAP*.md)",
-      "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\('config.yaml'\\)\\); print\\('✅ YAML is valid'\\)\")"
+      "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\('config.yaml'\\)\\); print\\('✅ YAML is valid'\\)\")",
+      "Bash(ls -la *.md)"
     ]
   }
 }
