@@ -14,8 +14,8 @@
 #>
 
 param(
-    [ValidateSet("2.4.0", "2.5.0", "2.6.0")]
-    [string]$Version = "2.6.0"
+    [ValidateSet("2.4.0", "2.5.0", "2.6.0", "2.7.0")]
+    [string]$Version = "2.7.0"
 )
 
 Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Cyan
@@ -85,7 +85,7 @@ Write-Host "STEP 3: Copying PowerPlay Config to Continue.dev" -ForegroundColor Y
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`n"
 
 $basePath = "s:\Code101\PowerPlay"
-$configVersion = if ($Version -eq "2.6.0") {
+$configVersion = if ($Version -eq "2.7.0") {
     "config.yaml"
 } else {
     "config\versions\config-v$Version.yaml"
@@ -162,13 +162,15 @@ Write-Host "  2. Wait 5 seconds"
 Write-Host "  3. Reopen VS Code"
 Write-Host "  4. Open Continue.dev panel (Ctrl+L or Continue icon)"
 Write-Host "  5. Type '/' in the chat input"
-Write-Host "  6. You should see 58+ prompts available"
+Write-Host "  6. You should see 63+ prompts available"
 Write-Host ""
 Write-Host "  ✨ Example prompts to try:" -ForegroundColor Cyan
 Write-Host "     • /zero-trust-design (v2.5.0)"
 Write-Host "     • /compliance-audit (v2.5.0)"
 Write-Host "     • /event-driven-design (v2.6.0)"
 Write-Host "     • /api-composition (v2.6.0)"
+Write-Host "     • /mobile-architecture (v2.7.0)"
+Write-Host "     • /offline-sync (v2.7.0)"
 Write-Host ""
 
 # ============================================================================
@@ -185,10 +187,10 @@ Write-Host "  • Config file: Copied to Continue.dev ✅"
 Write-Host "  • Version: $Version ✅"
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Cyan
-Write-Host "  1. Restart VS Code"
+Write-Host "  1. Restart VS Code (option [R] below)"
 Write-Host "  2. Type '/' in Continue.dev chat"
 Write-Host "  3. Select a prompt to test"
-Write-Host "  4. Read docs: docs/RELEASES_v2.5.0_v2.6.0.md"
+Write-Host "  4. Read docs: docs/README.md or docs/reference/release/CHANGELOG.md"
 Write-Host ""
 
 # ============================================================================
