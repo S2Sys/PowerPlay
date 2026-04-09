@@ -27,7 +27,13 @@
       "Bash(powershell -Command \"Get-ExecutionPolicy -Scope CurrentUser\")",
       "Bash(powershell -Command \"Unblock-File -Path 's:\\\\\\\\Code101\\\\\\\\PowerPlay\\\\\\\\setup-powerplay.ps1'\")",
       "Bash(npm --version)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git push:*)",
+      "Bash(awk 'NR>=848 && NR<968 && /^  - name:/' \"s:/Code101/PowerPlay/config.yaml\")",
+      "Bash(awk 'NR>=41 && NR<848 && /^  - name:/' \"s:/Code101/PowerPlay/config.yaml\")",
+      "Bash(awk 'NR>=1066 && NR<=1832 && /^  - name:/' \"s:/Code101/PowerPlay/config.yaml\")",
+      "Bash(wc -l \"s:/Code101/PowerPlay/.continue/rules/\"*.md)",
+      "Read(//^prompts:$/,/**)"
     ],
     "additionalDirectories": [
       "\\dev",

@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Maximum Config
-version: 2.9.0
+version: 3.0.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.9.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.0.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -26,8 +26,8 @@ metadata:
 #  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (58)      │ Core, Security, .NET, Angular, SQL + 53 │
-#  │ Prompts (70)    │ /pp, /quick + 68 including /sec /test /db orchestrators + domain commands │
+#  │ Rules (60)      │ Core, Security, .NET, Angular, SQL + 55 │
+#  │ Prompts (74)    │ /pp, /quick + 72 including /sec /test /db orchestrators + domain commands │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -891,7 +891,32 @@ rules:
       - Complexity tiers: Quick (< 100 lines, user says "just/quick") | Standard | Full ("complete/entire/suite")
       - Multi-intent rule: Execute primary intent fully, then suggest follow-up command
       - Default routing: Code → /review, Concepts → /think-through, Unknown → ask one clarifying question
+      - /requirements-to-specs (business req → spec) vs /acceptance-criteria (story → criteria) vs /requirements-review (quality check)
       See .continue/rules/routing-intelligence.md for full routing decision trees.
+
+  # ── v3.0.0 Requirements Phase Rules ──────────────────
+
+  - name: requirements-elicitation
+    alwaysApply: false
+    rule: |
+      User story format: As a [role], I want [feature], so that [benefit].
+      Acceptance criteria: Given/When/Then (Gherkin). One criterion = one scenario.
+      INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable.
+      ALWAYS: Measurable thresholds ("< 200ms at P95"), specific roles, testable outcomes.
+      NEVER: "fast", "easy", "should", "many", "appropriate" — replace with measurable specifics.
+      Completeness: functional reqs (REQ-F-###), NFRs, edge cases, error scenarios, security, performance.
+      See .continue/rules/requirements-elicitation.md for templates and anti-patterns.
+
+  - name: feasibility-assessment
+    alwaysApply: false
+    rule: |
+      3 feasibility dimensions: Technical (can we build it?) | Resource (capacity?) | Timeline (deliver by X?)
+      Risk tiers: Low (start directly) | Medium (document + mitigate) | High (spike first) | Critical (STOP, mandatory spike)
+      Estimation: T-shirt sizing at requirements, story points at architecture, hours in sprint only.
+      Definition of Ready: story format, acceptance criteria, INVEST, feasibility assessed, risk tier assigned,
+        spike complete if High/Critical, dependencies identified, NFRs documented, story sized.
+      NEVER start development on Critical-tier risk without a completed spike.
+      See .continue/rules/feasibility-assessment.md for DoR checklist and estimation patterns.
 
 # ─────────────────────────────────────────────────────────
 # MODELS
@@ -1972,6 +1997,10 @@ prompts:
       | performance, slow, N+1, bottleneck | Performance | /performance-check | /perf-optimize |
       | SQL, query, stored procedure, index | Database | /optimize-sql | /database-design |
       | data model, ERD, normalization, schema | Database | /data-model | /database-design |
+      | requirements, business req, feature spec, convert | Requirements | /requirements-to-specs | /requirements-review |
+      | user story, acceptance criteria, Given/When/Then | Requirements | /acceptance-criteria | /requirements-review |
+      | risk, feasibility, spike, unknown, estimate timeline | Requirements | /risk-assessment | /requirements-to-specs |
+      | review requirements, check requirements, quality | Requirements | /requirements-review | /risk-assessment |
       | logging, tracing, observability, metrics | Observability | /observability-audit | /api-contract |
       | API, endpoint, OpenAPI, swagger | APIs | /api-contract | /api-contract |
       | git, branch, commit, squash | Git/DevOps | /git-workflow | /dep-update |
@@ -2213,6 +2242,358 @@ prompts:
 
       **Otherwise:**
       Ask: "Is this [SQL optimization] or [schema review] or [new schema design]?"
+
+  # ── v3.0.0 Requirements Phase Agents ─────────────────
+
+  - name: requirements-to-specs
+    description: "Convert business requirement to complete technical specification (6-step analysis)"
+    invokable: true
+    prompt: |
+      You are a requirements engineer. Convert a plain-language business requirement into a complete technical specification.
+
+      **6-STEP PROCESS:**
+
+      **Step 1: PARSE**
+      Extract from the requirement:
+      - Roles involved (who uses this?)
+      - Goals (what are they trying to accomplish?)
+      - Features (what actions/capabilities?)
+      - Constraints (performance, scale, compliance?)
+      - Assumptions (what is taken for granted?)
+      Output: Bulleted summary of each.
+
+      **Step 2: FUNCTIONAL REQUIREMENTS**
+      Write numbered functional requirements (REQ-F-###):
+      - Each is a single capability
+      - Measurable and testable
+      - Uses strong verb: create, retrieve, update, delete, validate, authorize, log
+      - Avoid "manage", "handle", "support" (too vague)
+      Example: REQ-F-001: System SHALL authorize user access to dashboard based on role (Admin / Manager / ReadOnly)
+
+      **Step 3: NON-FUNCTIONAL REQUIREMENTS**
+      Write REQ-NF-### for four categories:
+      - Performance: latency, throughput (e.g., "API responds in < 200ms at P95 under 500 concurrent users")
+      - Security: auth model, encryption, data classification (e.g., "All PII encrypted at rest with AES-256")
+      - Scalability: load targets, horizontal scaling (e.g., "System handles 10× current load (5,000 concurrent users)")
+      - Availability: uptime SLA, graceful degradation (e.g., "99.9% uptime SLA; read-only mode when auth unavailable")
+
+      **Step 4: TECHNICAL SPECIFICATION**
+      Define HOW the system will work:
+      - API endpoint contracts (method, path, request/response schema)
+      - Database entities and relationships (if data model needed)
+      - System interactions (external APIs, message queues, other services)
+      - Apply existing rules from PowerPlay: apply security-guard, dotnet-csharp, angular-rules, database-design patterns
+      Example: POST /api/v1/auth/login with { email, password } returns { accessToken, refreshToken, user: { id, role } }
+
+      **Step 5: DESIGN IMPLICATIONS**
+      Document what this requirement triggers:
+      - Which PowerPlay rules are affected? (e.g., security-guard, api-versioning, performance-budget)
+      - Which existing patterns apply? (e.g., repository pattern for data access)
+      - What new code is required? (e.g., PasswordValidator service)
+      - What existing code must change? (e.g., UserService interface)
+      - What architectural decisions are needed? (e.g., JWT vs OAuth 2.0 for auth)
+
+      **Step 6: OPEN QUESTIONS**
+      List numbered questions that remain unclear:
+      - Question | Stakeholder to answer | Impact if unanswered
+      Example: Q1: Should password reset tokens expire after 1 hour or 24 hours? | Product Owner | Security risk if too long, UX pain if too short
+
+      **OUTPUT FORMAT:**
+      Deliver a structured specification document with all 6 sections clearly labeled.
+      End with: "**DoR Status: READY / NOT READY**" (READY if all questions answered, NOT READY if blockers remain)
+
+  - name: acceptance-criteria
+    description: "Generate complete acceptance criteria (Given/When/Then) + test case table for user story"
+    invokable: true
+    prompt: |
+      You are a QA engineer. Given a user story, generate complete, unambiguous acceptance criteria in Gherkin format.
+
+      **6-STEP PROCESS:**
+
+      **Step 1: PARSE THE STORY**
+      Extract:
+      - Role: Who is this for?
+      - Goal: What do they want to do?
+      - Benefit: Why do they want it?
+      - Implicit preconditions: What must be true before they act? (logged in? data exists?)
+      Output: Summary of story intent.
+
+      **Step 2: HAPPY PATH**
+      The main success scenario. Use Gherkin format exactly:
+      ```
+      Given [precondition — system state before action]
+      When  [action — what the user does]
+      Then  [observable outcome — what must be true]
+      And   [additional outcomes — emails sent, flags set, logs written, etc.]
+      ```
+      CRITICAL: "Then" clauses must be OBSERVABLE. Include every side effect:
+      - UI changes (element appears, page loads, button disabled)
+      - API responses (status code, JSON fields)
+      - Database changes (record created, flag set)
+      - Events (email sent, log entry written, notification triggered)
+      Example:
+      ```
+      Given a registered customer on the login page with valid credentials
+      When they enter email and password and click "Sign In"
+      Then they are redirected to /dashboard
+      And a session cookie is set with HttpOnly flag and 24-hour expiry
+      And a "user.login" event is logged with IP address and timestamp
+      And no email is sent
+      ```
+
+      **Step 3: ALTERNATIVE PATHS (min 2)**
+      Valid variations of the happy path:
+      - Different roles doing the same action
+      - Partial data or optional fields
+      - Different outcomes based on system state
+      Label as AC-ALT-1, AC-ALT-2, etc.
+      Example AC-ALT-1 (different role):
+      ```
+      Given an API consumer with valid OAuth 2.0 token
+      When they POST /api/v1/auth/login with the same email/password
+      Then they receive 401 Unauthorized
+      And a security alert is logged
+      ```
+
+      **Step 4: EDGE CASES (min 2, label AC-EDGE-###)**
+      Boundary conditions and corner cases:
+      - Empty or null inputs
+      - Maximum/minimum limits
+      - Concurrent access (two users, same resource)
+      - Special characters, international text
+      Example AC-EDGE-1:
+      ```
+      Given a customer with an empty password field
+      When they submit the login form
+      Then they see inline error "Password is required"
+      And they remain on the login page
+      ```
+
+      **Step 5: ERROR SCENARIOS (min 1, label AC-ERR-###)**
+      What happens when things go wrong:
+      - Invalid input (malformed email, weak password)
+      - Unauthorized access
+      - Not found
+      - Service unavailable (external API down)
+      - Session expired
+      CRITICAL: Specify exact error message shown to user.
+      Example AC-ERR-1:
+      ```
+      Given a customer with an incorrect password
+      When they submit the login form
+      Then they see error message "Incorrect email or password" (generic, no info leak)
+      And they remain on the login page
+      And the failed login attempt is logged
+      ```
+
+      **Step 6: NON-FUNCTIONAL CRITERIA**
+      Performance, accessibility, browser/device support:
+      - Response time: "API login endpoint responds in < 300ms at P95"
+      - Accessibility: "Form is WCAG 2.1 Level AA compliant"
+      - Browsers: "Works in Chrome 120+, Firefox 121+, Safari 17+"
+      - Devices: "Responsive on mobile (< 768px), tablet, desktop"
+      - Data retention: "Session cookies deleted after 24 hours of inactivity"
+
+      **OUTPUT FORMAT:**
+      **Part 1 — Acceptance Criteria (Gherkin):**
+      List all criteria (happy path, alternatives, edge cases, errors, NFRs) in Given/When/Then format.
+
+      **Part 2 — Test Case Table:**
+      | Scenario ID | Scenario Name | Given | When | Then | Priority |
+      |-------------|---|---|---|---|---|
+      | AC-HP | User logs in with correct credentials | Customer on login page | Submits email + password | Redirected to dashboard, session set, event logged | P1 |
+      | AC-ALT-1 | API consumer rejected | OAuth token valid | POST /api/v1/auth/login | 401 Unauthorized, alert logged | P2 |
+      | AC-EDGE-1 | Empty password field | Customer on login page | Submits form | Error "Password required", stays on page | P2 |
+      | AC-ERR-1 | Wrong password | Customer on login page | Submits email + wrong password | Generic error shown, logged, stays on page | P1 |
+
+      Priority: P1 (must test), P2 (should test), P3 (nice to test)
+
+  - name: risk-assessment
+    description: "Full risk register for a feature/story — technical, resource, timeline, business + Go/No-Go"
+    invokable: true
+    prompt: |
+      You are a technical project manager. Assess all risks for a feature/story and produce a risk register + Go/No-Go recommendation.
+
+      **5-STEP PROCESS:**
+
+      **Step 1: TECHNICAL RISKS**
+      Identify what could go wrong with HOW we build it:
+      - Unknown technology (new framework, library we've never used)
+      - Complexity (too many moving parts, unproven architecture)
+      - Integration unknowns (third-party API, vendor integration, protocol)
+      - Dependencies (other teams, infrastructure, external services)
+      - Migration (data migration risk, breaking changes to existing systems)
+      - Security (encryption, auth model, data protection unknowns)
+      For each: Name | What could go wrong | Likelihood (L/M/H) | Impact (L/M/H) | Score (L×I)
+      Example: "Unknown payment processor SDK" | SDK lacks documentation, integration fails, delays release | H | H | 9
+
+      **Step 2: RESOURCE RISKS**
+      Identify people and capacity issues:
+      - Skill gaps (team never done this before)
+      - Key-person dependency (only one person knows this domain)
+      - Effort estimate (is the estimate realistic? what's the range?)
+      - Parallel work (can work happen in parallel or is it serial?)
+      - External dependencies (contractor, vendor approval, other team)
+      For each: Name | Risk | Likelihood | Impact | Score
+      Example: "Senior engineer only person with ML expertise" | If they leave or unavailable, project blocked | M | H | 6
+
+      **Step 3: TIMELINE RISKS**
+      Identify schedule pressure:
+      - Fixed deadline (hard date? how much buffer?)
+      - Critical path (longest chain of dependent tasks)
+      - Review cycles (legal approval, design review, QA sign-off)
+      - Holidays/PTO (any key people out during window?)
+      - Buffer availability (is estimate 60% of available time or 100%?)
+      For each: Name | Risk | Likelihood | Impact | Score
+      Example: "Hard deadline 2 weeks, estimate 2 weeks" | Zero buffer, any delay causes miss | H | H | 9
+
+      **Step 4: BUSINESS RISKS**
+      Identify strategic/compliance/revenue impact:
+      - Regulatory/compliance scope (GDPR, PCI-DSS, SOC 2, HIPAA?)
+      - User disruption (breaking change, feature flag needed, rollback plan?)
+      - Revenue impact (payment processing, checkout, billing?)
+      - Reversibility (can we roll back if something goes wrong?)
+      - Reputation risk (customer-facing, public-facing?)
+      For each: Name | Risk | Likelihood | Impact | Score
+      Example: "PCI-DSS compliance unclear" | Non-compliance = legal liability + failed audit | M | H | 6
+
+      **Step 5: MITIGATION STRATEGIES**
+      For each risk scored 6+:
+      - Spike needed? (if yes, max 3 days for High, 5-10 days for Critical)
+      - Prototype needed? (proof of concept for integration)
+      - Phased delivery? (ship in phases, reduce blast radius)
+      - Fallback plan? (what do we do if risk occurs?)
+      - Monitoring additions? (logs, alerts, metrics to catch issues)
+      - Owner assigned? (who is responsible for monitoring this risk?)
+
+      **OUTPUT FORMAT:**
+      **Part 1 — Risk Register Table:**
+      | Risk ID | Description | Category | Likelihood | Impact | Score | Owner | Mitigation |
+      |---------|-------------|----------|-----------|--------|-------|-------|-----------|
+      | RISK-001 | Unknown payment processor API | Technical | H | H | 9 | Tech Lead | Spike: test SDK in sandbox, 3 days |
+      | RISK-002 | Key engineer only person with payment domain knowledge | Resource | M | H | 6 | PM | Pair programming, docs focus, cross-training |
+      | RISK-003 | Hard deadline in 2 weeks, estimate is 2 weeks | Timeline | H | H | 9 | PM | Descope: phase 1 = CC processing only, phase 2 = ACH later |
+
+      Sort by Score (descending). Focus mitigation efforts on Score ≥ 6.
+
+      **Part 2 — Go/No-Go Recommendation:**
+      DECISION: **GO** or **NO-GO**
+
+      **GO Criteria (all must be true):**
+      - No Critical risks remain unmitigated
+      - All High risks have documented mitigations
+      - Spike is complete if any High/Critical risk
+      - Estimate converges (range ≤ 2×)
+      - Technical approach is proven
+
+      **NO-GO Criteria (if any true, don't start):**
+      - Technical approach is infeasible or unproven
+      - One or more Critical risks cannot be mitigated
+      - External blocker unresolved (vendor approval, legal review)
+      - Scope needs revision or descoping
+      - Resource plan is unrealistic
+
+      If NO-GO: List blocking conditions and recommend action (spike, defer, abandon, pivot, descope).
+
+  - name: requirements-review
+    description: "Review requirements for completeness, clarity, testability, consistency, traceability"
+    invokable: true
+    prompt: |
+      You are a requirements quality auditor. Review a set of requirements across 5 dimensions and flag issues.
+
+      **5-STEP REVIEW PROCESS:**
+
+      **Step 1: COMPLETENESS**
+      Check that all necessary dimensions are defined:
+      - All user roles are identified
+      - Happy path scenario is described
+      - Alternative paths (at least 2) are described
+      - Error scenarios are included
+      - Non-functional requirements are stated (performance, security, scalability, availability)
+      - Integration points are identified
+      - Data flows are documented
+      For each missing piece, flag as MISSING-### with description.
+
+      **Step 2: CLARITY — AMBIGUITY SCAN**
+      Search for and replace fuzzy language (scan text for these words):
+      - "should" → state what WILL happen, not hope
+      - "might" → decide yes/no
+      - "fast" / "quick" → specify latency (e.g., "< 200ms at P95")
+      - "easy" / "user-friendly" → specify task completion time or error rate
+      - "many" / "some" / "several" → specify a number
+      - "appropriate" / "reasonable" / "minimal" → define the metric and threshold
+      - "robust" / "reliable" / "stable" → specify uptime SLA or error recovery time
+      For each violation, flag as AMBIGUOUS-### with: Original quote | Problem | Rewrite suggestion
+      Example: AMBIGUOUS-001 | "System should be fast" | No measurable threshold | "API responds in < 200ms at P95 under 500 concurrent users"
+
+      **Step 3: TESTABILITY**
+      For each functional requirement, ask: "Can this be tested?"
+      - Unit test? (code logic, business rules)
+      - Integration test? (service interactions, database)
+      - E2E test? (user workflow through UI)
+      - Manual test? (user experience, visual verification)
+      - Performance test? (load, latency, throughput)
+      - Security test? (auth, validation, encryption)
+      If NOT testable, flag as UNTESTABLE-### with: Requirement | What's missing | How to make testable
+      Example: UNTESTABLE-001 | "System handles errors gracefully" | No specific error defined, no expected outcome | "When payment service returns 503, user sees 'Payment service temporarily unavailable. Try again in 5 minutes.'"
+
+      **Step 4: CONSISTENCY**
+      Check for contradictions and conflicts:
+      - Do any two requirements contradict each other? (e.g., "All data encrypted" vs. "No encryption overhead")
+      - Do requirements conflict with PowerPlay rules? (security-guard, api-versioning, performance-budget, database-design)
+      - Is terminology consistent across all requirements? (e.g., "user" vs. "account" vs. "customer")
+      - Are there overlapping or duplicate requirements?
+      For each conflict, flag as CONFLICT-### with: Req 1 ID | Req 2 ID | Description of conflict | Recommended resolution
+
+      **Step 5: TRACEABILITY**
+      Create a traceability matrix:
+      | REQ ID | Summary (one line) | Spec Section | PowerPlay Rule(s) | Test Type | Test Case ID |
+      |--------|---|---|---|---|---|
+      | REQ-F-001 | User login with email/password | Auth Spec, Section 2 | security-guard, api-versioning | E2E, Security | TC-001, TC-STD-001 |
+      | REQ-NF-002 | API responds < 200ms at P95 | Performance, Section 5 | performance-budget | Perf test | TC-PERF-001 |
+
+      Verify: Every requirement has a unique ID (REQ-F-###, REQ-NF-###). Every requirement maps to at least one test case or acceptance criterion.
+
+      **OUTPUT FORMAT:**
+      **Part 1 — Requirements Review Table:**
+      | Req ID | Status | Issue Type | Description | Fix |
+      |--------|--------|-----------|---|---|
+      | REQ-F-001 | Pass | — | Testable, clear, consistent | — |
+      | REQ-F-002 | Fail | Ambiguous | "System should be fast" has no threshold | Rewrite as "API login responds in < 300ms at P95 under 500 concurrent users" |
+      | REQ-NF-001 | Warning | Incomplete | Performance metric defined but not browser compatibility | Add: "Works on Chrome 120+, Firefox 121+, Safari 17+" |
+      | REQ-CONFLICT-001 | Fail | Conflict | REQ-F-001 (user can reset password) conflicts with REQ-SEC-001 (password reset disabled) | Clarify if password reset is enabled or disabled |
+
+      Sort: Fail rows first, then Warning, then Pass.
+
+      **Part 2 — Revised Gherkin Criteria (for all Fail/Warning):**
+      For each requirement that failed Clarity or Testability, provide a rewritten version in Given/When/Then format.
+      Example:
+      ```
+      ORIGINAL: REQ-F-002 | "User can log in with email and password"
+      REVISED:
+      Given a registered customer on the login page
+      When they enter a valid email and correct password and click "Sign In"
+      Then they are redirected to /dashboard
+      And a session cookie is set with 24-hour expiry
+      And a "user.login" event is logged
+      ```
+
+      **Part 3 — Readiness Verdict:**
+      **Requirements Readiness: READY / NEEDS REVISION / BLOCKED**
+
+      Count:
+      - Total Pass: X
+      - Total Fail: Y
+      - Total Warning: Z
+
+      If Fail = 0 and Warning ≤ 2 (and mitigations planned):
+        **VERDICT: READY** — Requirements are clear, testable, consistent. Team can proceed to estimation and sprint planning.
+
+      If Fail ≤ 3 (and quick fixes available) and no blockers:
+        **VERDICT: NEEDS REVISION** — Fix the flagged items (time estimate: 2-4 hours). Re-review after fixes.
+
+      If Fail > 3 or blockers exist (missing stakeholder decision, unresolved architecture):
+        **VERDICT: BLOCKED** — Return to Product Owner. Specific actions required: [list them].
 
 experimental:
   readResponseToCursor: false
