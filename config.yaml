@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Maximum Config
-version: 3.0.0
+version: 3.1.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.0.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.1.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -27,7 +27,7 @@ metadata:
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
 #  │ Rules (60)      │ Core, Security, .NET, Angular, SQL + 55 │
-#  │ Prompts (74)    │ /pp, /quick + 72 including /sec /test /db orchestrators + domain commands │
+#  │ Prompts (75)    │ /pp, /quick + 73 including /sec /test /db orchestrators + domain commands + /pp-requirements chain │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -891,6 +891,7 @@ rules:
       - Complexity tiers: Quick (< 100 lines, user says "just/quick") | Standard | Full ("complete/entire/suite")
       - Multi-intent rule: Execute primary intent fully, then suggest follow-up command
       - Default routing: Code → /review, Concepts → /think-through, Unknown → ask one clarifying question
+      - /pp-requirements (full 4-phase chain, shared memory) vs individual agents with HANDOFF BLOCK copy-paste for manual stepping
       - /requirements-to-specs (business req → spec) vs /acceptance-criteria (story → criteria) vs /requirements-review (quality check)
       See .continue/rules/routing-intelligence.md for full routing decision trees.
 
@@ -1997,10 +1998,11 @@ prompts:
       | performance, slow, N+1, bottleneck | Performance | /performance-check | /perf-optimize |
       | SQL, query, stored procedure, index | Database | /optimize-sql | /database-design |
       | data model, ERD, normalization, schema | Database | /data-model | /database-design |
-      | requirements, business req, feature spec, convert | Requirements | /requirements-to-specs | /requirements-review |
-      | user story, acceptance criteria, Given/When/Then | Requirements | /acceptance-criteria | /requirements-review |
-      | risk, feasibility, spike, unknown, estimate timeline | Requirements | /risk-assessment | /requirements-to-specs |
-      | review requirements, check requirements, quality | Requirements | /requirements-review | /risk-assessment |
+      | full requirements, complete requirements, requirements chain, all phases | Requirements Chain | /pp-requirements | /pp-requirements |
+      | requirements, business req, feature spec, convert | Requirements (Step) | /requirements-to-specs | /pp-requirements |
+      | user story, acceptance criteria, Given/When/Then | Requirements (Step) | /acceptance-criteria | /pp-requirements |
+      | risk, feasibility, spike, unknown, estimate timeline | Requirements (Step) | /risk-assessment | /pp-requirements |
+      | review requirements, check requirements, quality | Requirements (Step) | /requirements-review | /pp-requirements |
       | logging, tracing, observability, metrics | Observability | /observability-audit | /api-contract |
       | API, endpoint, OpenAPI, swagger | APIs | /api-contract | /api-contract |
       | git, branch, commit, squash | Git/DevOps | /git-workflow | /dep-update |
@@ -2113,6 +2115,14 @@ prompts:
 
       **For /think-through:**
       1. Restate. 2. Decompose. 3. Assumptions. 4. Reasoning per sub-problem. 5. Answer + confidence. 6. Confidence rating (1-5) + caveats.
+
+      **For /pp-requirements:**
+      Execute the full 4-phase requirements chain. User has provided a plain-language requirement.
+      Phase 1: PARSE → REQ-F-### + REQ-NF-### + tech spec → HANDOFF BLOCK 1.
+      Phase 2: Gherkin criteria anchored to Phase 1 REQ IDs → AC-HP, AC-ALT-###, AC-EDGE-###, AC-ERR-### → HANDOFF BLOCK 2.
+      Phase 3: Risk register (Technical/Resource/Timeline/Business) + Go/No-Go → HANDOFF BLOCK 3.
+      Phase 4: Quality audit (Completeness/Clarity/Testability/Consistency/Traceability) + READY/NEEDS REVISION/BLOCKED.
+      FINAL HANDOFF BLOCK + WORKFLOW VERDICT: GO / CONDITIONAL GO / NO-GO + next command suggestion.
 
       **For any command not listed:**
       Apply the most relevant analysis approach. Be direct, include code snippets for every fix.
@@ -2249,6 +2259,32 @@ prompts:
     description: "Convert business requirement to complete technical specification (6-step analysis)"
     invokable: true
     prompt: |
+      ## PRIOR CONTEXT (optional)
+      If the user's input includes a "## HANDOFF BLOCK" section, extract these fields and use them:
+      - **Requirement**: the original plain-language requirement (do not re-parse)
+      - **REQ-F IDs** / **REQ-NF IDs**: existing IDs — continue numbering from the highest, never re-use
+      - **Tech Stack Decisions**: already-agreed choices — do not contradict them
+      - **AC IDs**: carry forward in Phase 3/4 without regenerating
+      - **Risk Tier** / **Risk IDs** / **Go/No-Go**: carry forward in Phase 4
+      - **Open Blockers**: carry forward unless explicitly resolved in this run
+      If no HANDOFF BLOCK is present, begin fresh.
+
+      At the end of your output, emit this block:
+      ---
+      ## HANDOFF BLOCK — Phase 1: Requirements to Specs
+      **Requirement**: [one-line original requirement]
+      **REQ-F IDs**: [comma-separated, e.g. REQ-F-001, REQ-F-002]
+      **REQ-NF IDs**: [comma-separated, e.g. REQ-NF-001, REQ-NF-002]
+      **Tech Stack Decisions**: [key decisions, e.g. JWT auth, Dapper, Angular 17 standalone]
+      **API Contracts**: [key endpoints, e.g. POST /api/v1/auth/login]
+      **AC IDs**: [from Phase 2 if available, else "pending Phase 2"]
+      **Risk Tier**: [from Phase 3 if available, else "pending Phase 3"]
+      **Risk IDs**: [from Phase 3 if available, else "pending Phase 3"]
+      **Go/No-Go**: [from Phase 3 if available, else "pending Phase 3"]
+      **Review Verdict**: [from Phase 4 if available, else "pending Phase 4"]
+      **Open Blockers**: [list or "None"]
+      ---
+
       You are a requirements engineer. Convert a plain-language business requirement into a complete technical specification.
 
       **6-STEP PROCESS:**
@@ -2306,6 +2342,32 @@ prompts:
     description: "Generate complete acceptance criteria (Given/When/Then) + test case table for user story"
     invokable: true
     prompt: |
+      ## PRIOR CONTEXT (optional)
+      If the user's input includes a "## HANDOFF BLOCK" section, extract these fields and use them:
+      - **Requirement**: the original plain-language requirement (do not re-parse)
+      - **REQ-F IDs** / **REQ-NF IDs**: existing IDs — continue numbering from the highest, never re-use
+      - **Tech Stack Decisions**: already-agreed choices — do not contradict them
+      - **AC IDs**: carry forward in Phase 3/4 without regenerating
+      - **Risk Tier** / **Risk IDs** / **Go/No-Go**: carry forward in Phase 4
+      - **Open Blockers**: carry forward unless explicitly resolved in this run
+      If no HANDOFF BLOCK is present, begin fresh.
+
+      At the end of your output, emit this block:
+      ---
+      ## HANDOFF BLOCK — Phase 2: Acceptance Criteria
+      **Requirement**: [one-line original requirement]
+      **REQ-F IDs**: [comma-separated, e.g. REQ-F-001, REQ-F-002]
+      **REQ-NF IDs**: [comma-separated, e.g. REQ-NF-001, REQ-NF-002]
+      **Tech Stack Decisions**: [key decisions, e.g. JWT auth, Dapper, Angular 17 standalone]
+      **API Contracts**: [key endpoints, e.g. POST /api/v1/auth/login]
+      **AC IDs**: [e.g. AC-HP, AC-ALT-1, AC-ALT-2, AC-EDGE-1, AC-ERR-1]
+      **Risk Tier**: [from Phase 3 if available, else "pending Phase 3"]
+      **Risk IDs**: [from Phase 3 if available, else "pending Phase 3"]
+      **Go/No-Go**: [from Phase 3 if available, else "pending Phase 3"]
+      **Review Verdict**: [from Phase 4 if available, else "pending Phase 4"]
+      **Open Blockers**: [list or "None"]
+      ---
+
       You are a QA engineer. Given a user story, generate complete, unambiguous acceptance criteria in Gherkin format.
 
       **6-STEP PROCESS:**
@@ -2412,6 +2474,32 @@ prompts:
     description: "Full risk register for a feature/story — technical, resource, timeline, business + Go/No-Go"
     invokable: true
     prompt: |
+      ## PRIOR CONTEXT (optional)
+      If the user's input includes a "## HANDOFF BLOCK" section, extract these fields and use them:
+      - **Requirement**: the original plain-language requirement (do not re-parse)
+      - **REQ-F IDs** / **REQ-NF IDs**: existing IDs — continue numbering from the highest, never re-use
+      - **Tech Stack Decisions**: already-agreed choices — do not contradict them
+      - **AC IDs**: carry forward in Phase 3/4 without regenerating
+      - **Risk Tier** / **Risk IDs** / **Go/No-Go**: carry forward in Phase 4
+      - **Open Blockers**: carry forward unless explicitly resolved in this run
+      If no HANDOFF BLOCK is present, begin fresh.
+
+      At the end of your output, emit this block:
+      ---
+      ## HANDOFF BLOCK — Phase 3: Risk Assessment
+      **Requirement**: [one-line original requirement]
+      **REQ-F IDs**: [comma-separated, e.g. REQ-F-001, REQ-F-002]
+      **REQ-NF IDs**: [comma-separated, e.g. REQ-NF-001, REQ-NF-002]
+      **Tech Stack Decisions**: [key decisions, e.g. JWT auth, Dapper, Angular 17 standalone]
+      **API Contracts**: [key endpoints, e.g. POST /api/v1/auth/login]
+      **AC IDs**: [e.g. AC-HP, AC-ALT-1, AC-ALT-2, AC-EDGE-1, AC-ERR-1]
+      **Risk Tier**: [overall tier: Low / Medium / High / Critical]
+      **Risk IDs**: [e.g. RISK-001 (score 9), RISK-002 (score 6)]
+      **Go/No-Go**: [GO — all risks mitigated / NO-GO — [one-line reason]]
+      **Review Verdict**: [from Phase 4 if available, else "pending Phase 4"]
+      **Open Blockers**: [list or "None"]
+      ---
+
       You are a technical project manager. Assess all risks for a feature/story and produce a risk register + Go/No-Go recommendation.
 
       **5-STEP PROCESS:**
@@ -2499,6 +2587,32 @@ prompts:
     description: "Review requirements for completeness, clarity, testability, consistency, traceability"
     invokable: true
     prompt: |
+      ## PRIOR CONTEXT (optional)
+      If the user's input includes a "## HANDOFF BLOCK" section, extract these fields and use them:
+      - **Requirement**: the original plain-language requirement (do not re-parse)
+      - **REQ-F IDs** / **REQ-NF IDs**: existing IDs — continue numbering from the highest, never re-use
+      - **Tech Stack Decisions**: already-agreed choices — do not contradict them
+      - **AC IDs**: carry forward in Phase 3/4 without regenerating
+      - **Risk Tier** / **Risk IDs** / **Go/No-Go**: carry forward in Phase 4
+      - **Open Blockers**: carry forward unless explicitly resolved in this run
+      If no HANDOFF BLOCK is present, begin fresh.
+
+      At the end of your output, emit this block:
+      ---
+      ## HANDOFF BLOCK — Phase 4: Requirements Review
+      **Requirement**: [one-line original requirement]
+      **REQ-F IDs**: [comma-separated, e.g. REQ-F-001, REQ-F-002]
+      **REQ-NF IDs**: [comma-separated, e.g. REQ-NF-001, REQ-NF-002]
+      **Tech Stack Decisions**: [key decisions, e.g. JWT auth, Dapper, Angular 17 standalone]
+      **API Contracts**: [key endpoints, e.g. POST /api/v1/auth/login]
+      **AC IDs**: [e.g. AC-HP, AC-ALT-1, AC-ALT-2, AC-EDGE-1, AC-ERR-1]
+      **Risk Tier**: [overall tier: Low / Medium / High / Critical]
+      **Risk IDs**: [e.g. RISK-001 (score 9), RISK-002 (score 6)]
+      **Go/No-Go**: [GO — all risks mitigated / NO-GO — [one-line reason]]
+      **Review Verdict**: [READY / NEEDS REVISION / BLOCKED — one line reason]
+      **Open Blockers**: [final consolidated list, or "None — ready to proceed"]
+      ---
+
       You are a requirements quality auditor. Review a set of requirements across 5 dimensions and flag issues.
 
       **5-STEP REVIEW PROCESS:**
@@ -2594,6 +2708,165 @@ prompts:
 
       If Fail > 3 or blockers exist (missing stakeholder decision, unresolved architecture):
         **VERDICT: BLOCKED** — Return to Product Owner. Specific actions required: [list them].
+
+  # ── v3.1.0 Requirements Chain Orchestrator ───────────
+
+  - name: pp-requirements
+    description: "Full requirements chain — all 4 phases (spec → criteria → risk → review) in one pass with shared memory"
+    invokable: true
+    prompt: |
+      You are the PowerPlay Requirements Chain Orchestrator. Execute all 4 requirements phases in this single response so each phase has full access to all prior decisions.
+
+      The user has provided a plain-language business requirement. Process it through all 4 phases completely.
+
+      ---
+
+      ## CHAIN OVERVIEW
+
+      | Phase | Purpose |
+      |-------|---------|
+      | 1 — Requirements to Specs | Parse → REQ-F-### + REQ-NF-### + Tech Spec |
+      | 2 — Acceptance Criteria | Gherkin Given/When/Then + test case table |
+      | 3 — Risk Assessment | Risk register + Go/No-Go decision |
+      | 4 — Requirements Review | Quality audit → READY / NEEDS REVISION / BLOCKED |
+
+      Execute every phase fully. Do NOT skip or summarise any phase.
+
+      ---
+
+      ## PHASE 1 — REQUIREMENTS TO SPECS
+
+      **Step 1: PARSE**
+      Extract: Roles | Goals | Features | Constraints | Assumptions. Output as bulleted summary.
+
+      **Step 2: FUNCTIONAL REQUIREMENTS (REQ-F-###)**
+      Numbered list. Each: single capability, strong verb (create/retrieve/update/delete/validate/authorize/log), measurable, testable.
+      Format: REQ-F-001: System SHALL [verb] [object] [condition]
+
+      **Step 3: NON-FUNCTIONAL REQUIREMENTS (REQ-NF-###)**
+      Four categories: Performance | Security | Scalability | Availability. Each with measurable threshold.
+      Format: REQ-NF-001: [category] — [measurable threshold]
+
+      **Step 4: TECHNICAL SPECIFICATION**
+      - API endpoint contracts (method, path, request/response schema)
+      - Database entities and relationships
+      - System interactions (external APIs, services)
+      - Apply .NET 8, Angular 17+, SQL Server, PowerPlay rules (security-guard, dotnet-rules, angular-rules, sql-rules)
+
+      **Step 5: DESIGN IMPLICATIONS**
+      - Which PowerPlay rules apply?
+      - Which patterns apply? (repository, CQRS, etc.)
+      - What new code is required? What existing code must change?
+      - What architectural decisions are needed?
+
+      **Step 6: OPEN QUESTIONS**
+      | # | Question | Stakeholder | Impact if unanswered |
+
+      End with: **DoR Status: READY / NOT READY**
+
+      ---
+
+      ## PHASE 2 — ACCEPTANCE CRITERIA
+
+      You have the full Phase 1 specification above. Use REQ-F-### IDs to anchor every criterion.
+
+      **Step 1: PARSE THE STORY**
+      Derive: As a [role], I want [feature], so that [benefit]. Identify implicit preconditions.
+
+      **Step 2: HAPPY PATH (AC-HP)**
+      Given [precondition] → When [action] → Then [observable outcome — reference REQ-F-### it satisfies]
+      And [side effects: emails, logs, DB changes, events]
+
+      **Step 3: ALTERNATIVE PATHS (AC-ALT-###, min 2)**
+      Valid variations. Label each. Note which REQ-F-### they test.
+
+      **Step 4: EDGE CASES (AC-EDGE-###, min 2)**
+      Empty inputs, max limits, concurrent access, special characters.
+
+      **Step 5: ERROR SCENARIOS (AC-ERR-###, min 1)**
+      Invalid input, unauthorized, not found, service down. Specify exact error message shown.
+
+      **Step 6: NON-FUNCTIONAL CRITERIA**
+      Derive from REQ-NF-### IDs: performance SLAs, accessibility, browser support.
+
+      Output:
+      Part 1 — Acceptance Criteria (Gherkin)
+      Part 2 — Test Case Table: | Scenario ID | Name | Given | When | Then | Linked REQ | Priority |
+
+      ---
+
+      ## PHASE 3 — RISK ASSESSMENT
+
+      You have Phase 1 spec and Phase 2 criteria above. Reference REQ-F-### and AC-### IDs when describing risks.
+
+      **Step 1: TECHNICAL RISKS**
+      For each: Name | What could go wrong | Likelihood (L/M/H) | Impact (L/M/H) | Score (L×I: L=1, M=2, H=3)
+      Note which REQ-F-### creates this risk.
+
+      **Step 2: RESOURCE RISKS**
+      Skill gaps, key-person dependency, capacity, external team deps.
+
+      **Step 3: TIMELINE RISKS**
+      Fixed deadlines, critical path, review cycles, holidays/PTO, buffer availability.
+
+      **Step 4: BUSINESS RISKS**
+      Compliance (GDPR/PCI-DSS/SOC2/HIPAA), revenue impact, reversibility, reputation.
+
+      **Step 5: MITIGATION STRATEGIES**
+      For all risks scored ≥ 6: Spike needed? | Prototype? | Phased delivery? | Fallback? | Owner?
+
+      Output:
+      Part 1 — Risk Register: | Risk ID | Description | Category | L | I | Score | Owner | Mitigation | (sorted by Score desc)
+      Part 2 — Go/No-Go: DECISION: GO or NO-GO + one paragraph rationale.
+
+      ---
+
+      ## PHASE 4 — REQUIREMENTS REVIEW
+
+      You have all Phase 1, 2, and 3 output above. Review everything across 5 dimensions.
+
+      **Step 1: COMPLETENESS**
+      All roles? Happy path? 2+ alternatives? Error scenarios? NFRs? Integration points? Data flows?
+      Flag each gap as MISSING-###.
+
+      **Step 2: CLARITY — AMBIGUITY SCAN**
+      Scan Phase 1 REQ-F-### for: "should/might/fast/easy/many/appropriate/robust/reliable".
+      For each: AMBIGUOUS-### | Original quote | Problem | Rewrite suggestion
+
+      **Step 3: TESTABILITY**
+      For each REQ-F-###: can it be unit / integration / E2E / performance / security tested?
+      Flag untestable: UNTESTABLE-###
+
+      **Step 4: CONSISTENCY**
+      Contradictions between REQs? Conflicts with PowerPlay rules? Terminology drift? Duplicates?
+      Flag: CONFLICT-###
+
+      **Step 5: TRACEABILITY MATRIX**
+      | REQ ID | Summary | Spec Section | PowerPlay Rule | Test Type | AC ID |
+      Every REQ-F-### and REQ-NF-### must link to at least one AC-### from Phase 2.
+
+      Output:
+      Part 1 — Review Table: | Req ID | Status (Pass/Fail/Warning) | Issue Type | Description | Fix | (Fail rows first)
+      Part 2 — Revised Gherkin for all Fail/Warning items
+      Part 3 — Readiness Verdict: READY / NEEDS REVISION / BLOCKED
+
+      ---
+
+      ## WORKFLOW VERDICT
+
+      **Chain Result: [GO / CONDITIONAL GO / NO-GO]**
+
+      - **GO**: Go/No-Go is GO AND Review Verdict is READY
+        "All 4 phases complete. Requirements are sprint-ready."
+        Suggested next: `/api-endpoint` (scaffold implementation) or `/database-design` (data model) or `/architecture-design` (system design)
+
+      - **CONDITIONAL GO**: Go/No-Go is GO BUT Review Verdict is NEEDS REVISION
+        "Requirements can proceed after fixing [N] items. Open blockers: [list]. Estimated fix time: [X hours]."
+        Suggested next: fix flagged items, then re-run `/pp-requirements` or individual `/requirements-review`
+
+      - **NO-GO**: Go/No-Go is NO-GO or Review Verdict is BLOCKED
+        "Do not proceed. Blocking conditions: [list]. Required actions: [list]."
+        Suggested next: return to Product Owner with Open Blockers list
 
 experimental:
   readResponseToCursor: false
