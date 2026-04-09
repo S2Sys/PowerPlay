@@ -27,7 +27,28 @@
 
 **Commits**: `aa967c6`, `fd7bbf7`
 
-#### 5. Cleaned Up Old Documentation Files
+#### 5. Fixed Tab Autocomplete Configuration
+**Problem**: Tab autocomplete not loading any models in Continue.dev
+
+**Root Cause**: Autocomplete was configured to use local GPU (kapil-qwen-coder at http://rohit:4000/v1):
+- Local server may be offline or unreachable
+- No fallback to cloud models
+- Silent failure (no error message)
+
+**Solution**: Changed to use OpenRouter free model:
+- From: `kapil-qwen-coder` (local GPU)
+- To: `qwen/qwen3-coder:free` (OpenRouter)
+- Same model quality, always available
+
+**Benefits**:
+- Autocomplete works immediately
+- Zero cost (uses :free endpoint)
+- No dependency on local GPU
+- Same functionality as local
+
+**Commit**: `0eaf782`
+
+#### 6. Cleaned Up Old Documentation Files
 **Action**: Removed 12 old scattered implementation plan files from docs/guides
 
 **Removed (old files)**:
@@ -160,12 +181,27 @@
 | `aa967c6` | Remove paid models and Phi4 from config.yaml | 1 |
 | `fd7bbf7` | Update PROGRESS.md with paid models removal | 1 |
 | `9255f21` | Clean up old implementation plan files from docs/guides | 12 |
+| `0eaf782` | Fix tab autocomplete: use OpenRouter free model | 1 |
 
 All deployed to `main` branch ✅
 
 ---
 
 ## Current Status
+
+### ⏳ Pending User Testing
+
+**After deploying these changes, user should test**:
+1. Open Continue.dev in VS Code
+2. Start typing code → Autocomplete should appear
+3. Try Tab to accept suggestion
+4. Try Ctrl+K for chat
+5. Type `/review` command → Should list all 63 prompts
+
+**If autocomplete still not working**:
+- Check: OPENROUTER_API_KEY is set in environment
+- Verify: Environment variables loaded (close/reopen VS Code)
+- See: docs/reference/setup/API-KEYS-TROUBLESHOOTING.md
 
 ### ✅ Complete
 - API keys root cause identified and documented
