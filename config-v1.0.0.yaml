@@ -116,7 +116,7 @@ models:
     provider: openai
     model: dhoni-qwen
     apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    apiKey: V4B50HJ-EN143DP-G5S71ZN-G5WM267
     roles: [chat]
     capabilities: [tool_use]
     chatOptions:
@@ -134,7 +134,7 @@ models:
     provider: openai
     model: dhoni-deepseek
     apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    apiKey: V4B50HJ-EN143DP-G5S71ZN-G5WM267
     roles: [chat]
     capabilities: [tool_use]
     defaultCompletionOptions:
@@ -145,7 +145,7 @@ models:
     provider: openai
     model: dhoni-phi
     apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    apiKey: V4B50HJ-EN143DP-G5S71ZN-G5WM267
     roles: [chat]
     defaultCompletionOptions:
       maxTokens: 2048
@@ -159,7 +159,7 @@ models:
     provider: openai
     model: kapil-qwen-coder
     apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    apiKey: V4B50HJ-EN143DP-G5S71ZN-G5WM267
     roles: [apply, edit]
     defaultCompletionOptions:
       maxTokens: 16384
@@ -169,7 +169,7 @@ models:
     provider: openai
     model: kapil-deepseek-coder
     apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    apiKey: V4B50HJ-EN143DP-G5S71ZN-G5WM267
     roles: [edit, chat]
     defaultCompletionOptions:
       maxTokens: 16384
@@ -181,7 +181,7 @@ models:
     provider: openai
     model: openai/gpt-oss-120b:free
     apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
+    apiKey: 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
     roles: [chat]
     capabilities: [tool_use]
     defaultCompletionOptions:
@@ -192,7 +192,7 @@ models:
     provider: openai
     model: minimax/minimax-m2.5:free
     apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
+    apiKey: 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
     roles: [chat]
     defaultCompletionOptions:
       maxTokens: 4096
@@ -202,7 +202,7 @@ models:
     provider: openai
     model: qwen/qwen3-coder:free
     apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
+    apiKey: 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
     roles: [chat, edit]
     defaultCompletionOptions:
       maxTokens: 16384
@@ -212,7 +212,7 @@ models:
     provider: openai
     model: google/gemma-4-26b-a4b-it:free
     apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
+    apiKey: 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
     roles: [chat]
     defaultCompletionOptions:
       maxTokens: 8192
@@ -224,7 +224,7 @@ models:
     provider: openai
     model: llama-nemotron-embed-vl-1b-v2
     apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
+    apiKey: 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
     roles: [embed]
 
 # ─────────────────────────────────────────────────────────

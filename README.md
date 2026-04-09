@@ -2,13 +2,14 @@
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
-[![Version: 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)](./CHANGELOG.md)
+[![Version: 1.0.1](https://img.shields.io/badge/version-1.0.1-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)]()
 [![Stack: .NET + Angular](https://img.shields.io/badge/stack-.NET%20%2B%20Angular-blueviolet)]()
+[![Latest Release](https://img.shields.io/github/v/release/SmartWorkz-Dev/PowerPlay)](https://github.com/SmartWorkz-Dev/PowerPlay/releases)
 
 ---
 
-## 🚀 Quick Start (2 minutes)
+## 🚀 Quick Start (5 minutes)
 
 ### 1. Install Continue.dev
 ```bash
@@ -19,7 +20,26 @@ Ctrl+Shift+X → Search "Continue" → Install
 Plugins → Marketplace → Continue → Install
 ```
 
-### 2. Copy Config
+### 2. Set Up API Keys
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and fill in your keys:
+# 1. DHONI_API_KEY=<local-gpu-key>
+# 2. KAPIL_API_KEY=<local-gpu-key>
+# 3. OPENROUTER_API_KEY=<your-new-key-from-https://openrouter.ai>
+
+# Save .env (it's in .gitignore, won't be committed)
+```
+
+**Getting OpenRouter Key** (free tier):
+1. Go to https://openrouter.ai/account/api-keys
+2. Click **"Create Key"**
+3. Copy the key (starts with `sk-or-v1-...`)
+4. Paste into `.env` next to `OPENROUTER_API_KEY=`
+
+### 3. Copy Config to Continue
 ```bash
 # Windows
 cp config.yaml "%APPDATA%\Continue\config.yaml"
@@ -28,17 +48,15 @@ cp config.yaml "%APPDATA%\Continue\config.yaml"
 cp config.yaml ~/.continue/config.yaml
 ```
 
-### 3. Verify GPU (Optional)
-If using local models, ensure Dhoni/Kapil GPU services are running:
-```bash
-http://rohit:4000/v1/models
-```
-Should return list of deployed models.
+### 4. Restart Continue
+- VS Code: Ctrl+Shift+P → "Reload Window"
+- JetBrains: Restart IDE
+- Continue will load .env automatically
 
-### 4. Chat
+### 5. Verify Setup
 - Open Continue chat (Ctrl+M)
-- Type: `What's the latest version?`
-- Should respond using **Qwen 3.5 9B** ✅
+- Type: `What models do I have?`
+- Should respond using **Qwen 3.5 9B** (local) or **GPT-OSS** (cloud) ✅
 
 ---
 
@@ -118,11 +136,19 @@ Should return list of deployed models.
 
 **Semantic Versioning**: MAJOR.MINOR.PATCH
 
+### Version Files
+- `config.yaml` — **Always use current version** (environment variables)
+- `config-v1.0.0.yaml` — Archived v1.0.0 (reference only)
+- `config-v1.1.0.yaml` — Archived v1.1.0 (when released)
+
+### Release Policy
 - **Minor bumps** = New models, rules, prompts, MCP servers
-- **Patch bumps** = Bug fixes, parameter tuning
+- **Patch bumps** = Bug fixes, parameter tuning, security updates
 - **Major bumps** = Breaking schema/rule changes
 
-See [CHANGELOG](./CHANGELOG.md) for all releases.
+See [CHANGELOG](./CHANGELOG.md) for all releases and migration guides.
+
+**Latest Version**: [v1.0.1](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v1.0.1) (Security patch)
 
 ---
 
@@ -173,12 +199,26 @@ Modify these without breaking anything:
 
 ## 🔒 Security
 
-✅ **No hardcoded secrets in this config** — uses local GPU + free OpenRouter tier
+✅ **No hardcoded secrets** — All API keys use environment variables
 
-If adding your own APIs:
-1. Use environment variables (not config.yaml)
-2. Use GitHub Secrets for CI/CD
-3. Never commit API keys
+### Setup Security
+1. **Create .env file** from `.env.example`
+2. **Get OpenRouter key**: https://openrouter.ai/account/api-keys
+3. **Fill in .env** with your actual keys
+4. **.gitignore blocks .env** — won't be committed
+
+### If Key Was Exposed
+1. Go to https://openrouter.ai/account/api-keys
+2. Click menu → **Revoke** (invalidates old key immediately)
+3. Click **Create Key** (generate new one)
+4. Update .env with new key
+5. Done! (old key can never be used again)
+
+### Best Practices
+- Never hardcode API keys in config files
+- Use environment variables for all secrets
+- Rotate keys if exposed
+- Use `.env.example` as template (commit this, not .env)
 
 ---
 
@@ -270,5 +310,7 @@ Issues? Feature requests? Open an issue or discussion:
 
 **Built with ❤️ by SmartWorkz Dev**
 
-*Last updated: 2026-04-09 | v1.0.0*
+*Current: [v1.0.1](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v1.0.1) | Updated: 2026-04-09*
+
+**[View All Releases →](https://github.com/SmartWorkz-Dev/PowerPlay/releases)**
 

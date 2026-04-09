@@ -13,6 +13,48 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.0.1] — 2026-04-09 (Security Patch)
+
+**CRITICAL SECURITY FIX**
+
+### Security
+- 🔒 **CRITICAL**: Remove hardcoded API keys from config.yaml
+  - OpenRouter key now uses `${OPENROUTER_API_KEY}` environment variable
+  - Local Dhoni/Kapil keys now use `${DHONI_API_KEY}` / `${KAPIL_API_KEY}`
+  - Users must set .env file (not committed to git)
+  - Added .env.example with setup instructions
+
+### Changed
+- config.yaml now uses environment variable substitution (safer)
+- config-v1.0.0.yaml created for version history
+- Updated .gitignore to exclude .env files
+- Added .env.example template (copy to .env, fill in your keys)
+
+### Fixed
+- Removed exposed OpenRouter API key from repository
+- Prevented accidental key commits going forward
+
+### Docs
+- Added .env.example with clear setup instructions
+- Updated README with security best practices
+- Added API key rotation guide
+
+### Migration
+If upgrading from v1.0.0:
+1. Copy .env.example to .env
+2. Get your OpenRouter key: https://openrouter.ai/account/api-keys
+3. Fill in .env with your actual keys
+4. Restart Continue.dev
+
+### If Key Was Exposed
+1. Go to https://openrouter.ai/account/api-keys
+2. Revoke the old key (click menu → Revoke)
+3. Generate a new key
+4. Update .env with new key
+5. Done! (old key can no longer be used)
+
+---
+
 ## [1.0.0] — 2026-04-09
 
 **Initial Release**
@@ -51,6 +93,7 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 | Version | Release | Highlights |
 |---------|---------|-----------|
+| 1.0.1 | 2026-04-09 | SECURITY: API keys → env variables, .env.example, versioned configs |
 | 1.0.0 | 2026-04-09 | Initial: 5 local + 4 cloud models, 10 prompts, 5 MCP, rules |
 
 ---
