@@ -1,15 +1,57 @@
 # Changelog
 
-All notable changes to SmartWorkz PowerStack are documented here.
+All notable changes to SmartWorkz PowerPlay are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/)
 Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
 ### Planned
-- [ ] Claude API model support
-- [ ] More context providers (LSP, workspace state)
+- [ ] v2.6.0 — Integration & APIs (event-driven, API gateways, message queues, webhooks)
+- [ ] v2.7.0 — Mobile & Cross-Platform (iOS, Android, React Native, offline-first)
 - [ ] Config validation tool
+- [ ] Claude API model support
+
+---
+
+## [2.5.0] — 2026-04-09 (Security & Compliance Standards)
+
+**Enterprise Security release — Zero-trust architecture, secrets management, compliance frameworks, penetration testing, incident response**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/zero-trust-design` — Design zero-trust security architecture (identity, auth, network, encryption, monitoring)
+- `/compliance-audit` — Audit compliance against SOC 2, ISO 27001, HIPAA, PCI-DSS
+- `/pentest-plan` — Create penetration test plan (scope, ROE, methodology, CVSS scoring, reporting)
+- `/incident-response` — Create incident response playbook and blameless post-mortem template
+- `/security-posture` — Assess overall security posture (threats, gaps, improvement roadmap)
+
+#### Rules (5 new)
+- `zero-trust-security.md` — Identity verification (MFA), least privilege, network segmentation, encryption (TLS/AES-256), audit trails
+- `secrets-rotation.md` — Secrets storage (vault), automated rotation (30-90 days), credential lifecycle, compromise response
+- `compliance-standards.md` — SOC 2 Type II, ISO 27001, HIPAA (Privacy/Security Rules, breach notification), PCI-DSS (tokenization, CDE, scanning)
+- `penetration-testing.md` — Pentest planning (scope, ROE), NIST methodology, OWASP Top 10, CVSS scoring, remediation tracking
+- `incident-response.md` — IR playbook (severity levels, detection, triage), war room, blameless post-mortems, action items
+
+### Changed
+- Version bumped to 2.5.0
+- Models: 14 (unchanged)
+- Rules: 39 → 44 total (+5 security & compliance rules)
+- Prompts: 48 → 53 total (+5 security & compliance prompts)
+- Updated capability map in config.yaml header
+- Updated CHANGELOG.md planned versions
+
+### Files Modified
+- `config.yaml` — version 2.5.0, 5 new rules, 5 new prompts, updated capability map
+- `.continue/rules/zero-trust-security.md` — NEW (500+ lines)
+- `.continue/rules/secrets-rotation.md` — NEW (450+ lines)
+- `.continue/rules/compliance-standards.md` — NEW (600+ lines)
+- `.continue/rules/penetration-testing.md` — NEW (500+ lines)
+- `.continue/rules/incident-response.md` — NEW (550+ lines)
+
+### Summary
+v2.5.0 adds enterprise-grade security and compliance standards to PowerPlay. Covers zero-trust architecture (identity verification, least privilege, encryption), automated secrets management with rotation, compliance frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS), systematic penetration testing methodology, and incident response playbooks with blameless post-mortems. Enables organizations to meet regulatory requirements and build defense-in-depth security posture.
 
 ---
 
