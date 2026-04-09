@@ -423,6 +423,105 @@ All deployed to `main` branch ✅
 
 ---
 
+## v3.1.0 Implementation — COMPLETE ✅ (NEW)
+
+### 11. Added Requirements Chain Orchestrator — Shared Memory Across All 4 Phases (THIS SESSION)
+
+**Problem Addressed**: v3.0.0 added 4 standalone requirements agents, but each one runs independently with no context carry-through. Users would have to manually copy-paste output from one agent into the next, leading to decision drift and lost traceability. The 4 agents couldn't reference what prior agents established.
+
+**Solution**: A hybrid architecture combining:
+1. **Primary: `/pp-requirements` mega-agent** — Runs all 4 phases in a single response. Each phase sees prior phases because they're in the same model context window. True shared memory with no copy-paste.
+2. **Fallback: Context-aware individual agents** — All 4 existing agents gain a `## PRIOR CONTEXT` preamble that detects a HANDOFF BLOCK in user input and picks up from there. Continues REQ-F-### numbering, doesn't re-derive already-agreed tech decisions.
+
+**Core Concept: HANDOFF BLOCK**
+A compact ~100-token structured summary emitted at the end of each phase:
+```
+**Requirement** | **REQ-F IDs** | **REQ-NF IDs** | **Tech Stack Decisions** | **API Contracts** | 
+**AC IDs** | **Risk Tier** | **Risk IDs** | **Go/No-Go** | **Review Verdict** | **Open Blockers**
+```
+Grows across phases. Designed to be copy-pasted for manual hand-offs between agents.
+
+**Changes Made**:
+
+1. **New `/pp-requirements` agent** (single mega-prompt, 4 phases inline)
+   - **Phase 1**: Parse → REQ-F-### + REQ-NF-### + Tech Spec → Handoff Block 1
+   - **Phase 2**: Gherkin criteria anchored to Phase 1 REQ IDs → AC-HP/ALT/EDGE/ERR → Handoff Block 2
+   - **Phase 3**: Risk register (Technical/Resource/Timeline/Business) + Go/No-Go → Handoff Block 3
+   - **Phase 4**: Quality audit (Completeness/Clarity/Testability/Consistency/Traceability) + Verdict → Final Handoff Block + Workflow Verdict
+   - **Output**: FINAL HANDOFF BLOCK with all fields populated + Workflow Verdict: GO / CONDITIONAL GO / NO-GO + next command suggestion
+
+2. **Enhanced 4 existing agents** with `## PRIOR CONTEXT` preamble
+   - `/requirements-to-specs`, `/acceptance-criteria`, `/risk-assessment`, `/requirements-review`
+   - Detect HANDOFF BLOCK in input → extract and use established context (don't re-parse, don't re-number, don't contradict tech decisions)
+   - Continue REQ-F-### numbering from highest existing ID
+   - Emit updated HANDOFF BLOCK at end for hand-off to next phase
+
+3. **Updated `/pp` routing table**
+   - Added chain row: "full requirements, complete requirements, all phases" → /pp-requirements
+   - Updated individual rows: Full Command now suggests /pp-requirements as follow-up
+   - Allows smart routing: "full workflow" → chain, "just the spec" → individual agent
+
+4. **Updated `/pp` Step 4 execute block**
+   - Added `/pp-requirements` handler explaining the 4-phase flow
+
+5. **Updated `routing-intelligence` rule**
+   - Added guidance: "chain (shared memory) vs individual agents (manual HANDOFF BLOCK copy-paste)"
+
+6. **Version bump**: 3.0.0 → 3.1.0
+   - Prompts: 74 → 75 (1 new chain agent)
+   - Rules: 60 unchanged
+
+**Token Budget Analysis**:
+- Phase 1: 600–900 tokens
+- Phase 2: 500–700 tokens
+- Phase 3: 400–600 tokens
+- Phase 4: 400–500 tokens
+- Handoff blocks × 4: ~400 tokens
+- Verdict: ~100 tokens
+- **Total: ~2,400–3,300 tokens** ✓ Fits within 4096 limit
+
+**User Experience**:
+
+Full chain (one command):
+```
+/pp-requirements Add OAuth 2.0 login with role-based access to dashboard
+→ All 4 phases execute in one response (~2,500 tokens)
+→ FINAL HANDOFF BLOCK with all IDs, risk tier, verdict
+→ Workflow Verdict: GO/CONDITIONAL GO/NO-GO + suggested next command
+```
+
+Manual stepping with carry-forward:
+```
+1. Run Phase 1 agent, get HANDOFF BLOCK
+2. Copy HANDOFF BLOCK → paste into Phase 2 input
+3. Phase 2 agent detects HANDOFF BLOCK, continues from established context
+4. Repeat for Phases 3 and 4
+→ No re-derivation, full traceability preserved
+```
+
+Intelligent routing via `/pp`:
+```
+"run complete requirements chain" → /pp-requirements
+"convert this business req to a spec" → /requirements-to-specs (suggests /pp-requirements as full)
+```
+
+**Why This Architecture**:
+- **Single-pass option**: `/pp-requirements` executes all 4 phases in one invocation (true shared memory, no manual steps)
+- **Modular fallback**: Each agent remains independent but context-aware (graceful degradation if user runs only one phase)
+- **Backward compatible**: v3.0.0 agents still work standalone; preamble is optional
+- **Traceability**: HANDOFF BLOCK captures decision history across all phases
+- **No new infrastructure**: Leverage conversation context, don't require API calls or state storage
+
+**Test Cases**:
+- `/pp-requirements "Users need password reset with email link"` → All 4 phases, FINAL HANDOFF BLOCK, Workflow Verdict = GO (if all clean)
+- Copy Phase 1 HANDOFF BLOCK → paste into `/requirements-to-specs` → continues from REQ-F-001, doesn't re-parse requirement
+- `/pp "full requirements workflow for login"` → routes to `/pp-requirements` with intelligent scope detection
+- `/pp "what are the risks?"` → routes to `/risk-assessment`, suggests `/pp-requirements` as full chain follow-up
+
+**Commit**: `4856eac` — Add v3.1.0 requirements chain orchestrator — shared memory across all 4 phases ✅ Deployed
+
+---
+
 ## v2.8.0 Implementation — COMPLETE ✅
 
 ### 8. Added Claude-Like AI Behavior Rules (THIS SESSION)
