@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Maximum Config
-version: 2.8.0
+version: 2.9.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.8.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.9.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -26,8 +26,8 @@ metadata:
 #  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (57)      │ Core, Security, .NET, Angular, SQL + 52 │
-#  │ Prompts (65)    │ /review +64 including 42 agent commands │
+#  │ Rules (58)      │ Core, Security, .NET, Angular, SQL + 53 │
+#  │ Prompts (70)    │ /pp, /quick + 68 including /sec /test /db orchestrators + domain commands │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -874,6 +874,24 @@ rules:
       - Never ask for information the user already provided in this session
       - Build on prior answers — don't restate established facts
       See .continue/rules/session-context.md for consistency patterns.
+
+  # ── v2.9.0 Orchestrator Intelligence Rule ─────────────
+
+  - name: routing-intelligence
+    alwaysApply: false
+    rule: |
+      PowerPlay command routing heuristics:
+      - /security-scan (quick table) vs /security-agent (table + fix code) vs /zero-trust-design (architecture)
+      - /add-tests (single class) vs /generate-tests-complete (full suite) vs /coverage-gaps (gap analysis)
+      - /performance-check (issue table) vs /perf-optimize (with before/after code)
+      - /optimize-sql (stored procedure) vs /database-design (schema review) vs /data-model (from requirements)
+      - /refactor-inline (one transformation, code only) vs /refactor-large (plan) vs /refactor-module (dependency map)
+      - /review (standard) vs /pr-review (diff + approve/reject) vs /audit-all (all dimensions)
+      - /inline-review (quick) vs /review (standard) vs /audit-all (comprehensive)
+      - Complexity tiers: Quick (< 100 lines, user says "just/quick") | Standard | Full ("complete/entire/suite")
+      - Multi-intent rule: Execute primary intent fully, then suggest follow-up command
+      - Default routing: Code → /review, Concepts → /think-through, Unknown → ask one clarifying question
+      See .continue/rules/routing-intelligence.md for full routing decision trees.
 
 # ─────────────────────────────────────────────────────────
 # MODELS
@@ -1927,6 +1945,274 @@ prompts:
       Step 4: Compliance gaps — applicable frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS)
       Step 5: Improvement roadmap — phased fixes (immediate, 30 days, 90 days, 6 months)
       Output: Security posture report (Risk matrix | Threats | Controls | Gaps | Roadmap).
+
+  # ── v2.9.0 Orchestrator Prompts ──────────────────────────
+
+  - name: pp
+    description: "PowerPlay orchestrator — describe any task in plain English and get routed to the right command"
+    invokable: true
+    prompt: |
+      You are the PowerPlay orchestrator. The user described a task in plain language.
+      Your job: classify it, identify the best command(s), then execute the most relevant one inline.
+
+      ## Step 1 — CLASSIFY
+
+      Read the user's request and identify the primary intent from this routing table:
+
+      | Keywords / Signals | Category | Quick Command | Full Command |
+      |---|---|---|---|
+      | review, look at, check, any issues, problems | Code Review | /inline-review | /review or /audit-all |
+      | PR, pull request, diff, merge | Code Review | /inline-review | /pr-review |
+      | refactor, clean up, simplify, extract | Refactoring | /refactor-inline | /refactor-large |
+      | architecture, design, system, layer | Architecture | /architecture-design | /refactor-module |
+      | test, unit test, spec, coverage | Testing | /add-tests | /generate-tests-complete |
+      | document, docs, XML, JSDoc, comments | Documentation | /add-docs | /doc-complete |
+      | security, OWASP, injection, XSS, vulnerability | Security | /security-scan | /security-agent |
+      | zero trust, identity, auth architecture | Security | /zero-trust-design | /compliance-audit |
+      | performance, slow, N+1, bottleneck | Performance | /performance-check | /perf-optimize |
+      | SQL, query, stored procedure, index | Database | /optimize-sql | /database-design |
+      | data model, ERD, normalization, schema | Database | /data-model | /database-design |
+      | logging, tracing, observability, metrics | Observability | /observability-audit | /api-contract |
+      | API, endpoint, OpenAPI, swagger | APIs | /api-contract | /api-contract |
+      | git, branch, commit, squash | Git/DevOps | /git-workflow | /dep-update |
+      | dependencies, outdated, CVE, packages | DevOps | /dep-update | /dep-update |
+      | AWS, Lambda, S3, CloudFront | Cloud | /aws-design | /iac-generate |
+      | Azure, App Service, Bicep | Cloud | /azure-setup | /iac-generate |
+      | Docker, container, Dockerfile | Cloud | /docker-containerize | /kubernetes-deploy |
+      | Kubernetes, K8s, manifest, Helm | Cloud | /kubernetes-deploy | /iac-generate |
+      | Angular, component, standalone | UI/Angular | /ng-component | /component-library |
+      | design system, tokens, WCAG, accessibility | UI/Design | /design-audit | /design-system |
+      | mobile, iOS, Android, React Native | Mobile | /mobile-architecture | /offline-sync |
+      | event-driven, CQRS, event sourcing | Integration | /event-driven-design | /message-queue-setup |
+      | webhook, message queue, Kafka | Integration | /webhook-implementation | /message-queue-setup |
+      | generate, create, build, add, new API | Code Gen | /api-endpoint | /api-endpoint |
+      | fix, bug, broken, error | Quick Fix | /quick-fix | /refactor-inline |
+      | think, reason, explain why | AI Behavior | /think-through | /explain-deep |
+
+      ## Step 2 — SELECT
+
+      Determine scope based on:
+      - Code selected is < 100 lines OR user says "quick/just/fast" → use Quick Command
+      - Code is > 100 lines OR user says "full/complete/all/suite" → use Full Command
+      - Request spans 2 concerns → list both, execute primary one
+
+      State your decision:
+      "**Intent**: [category]. **Scope**: [quick/full]. **Primary**: /[name]. **Follow-up**: /[name] (if applicable)."
+
+      ## Step 3 — PLAN
+
+      One sentence describing the analysis:
+      "I'll [what], checking for [aspect] and [aspect]."
+
+      ## Step 4 — EXECUTE
+
+      Now perform the work. Do NOT say "I would run /command". Execute the logic directly.
+
+      **For /review or /inline-review:**
+      Thorough code review. Sections: Summary | Issues Found (Severity | Line | Issue | Fix) | Security Concerns | Performance Notes | Refactor Suggestions.
+
+      **For /security-scan:**
+      OWASP Top 10 quick scan. Check: SQL injection, XSS, hardcoded secrets, missing auth, insecure deserialization, path traversal, sensitive data in logs, CORS misconfiguration, missing validation, exposed stack traces.
+      Output: Table — Severity | Line | Vulnerability | Fix Code
+
+      **For /security-agent:**
+      Full OWASP Top 10: A1 Broken Access | A2 Cryptographic Failures | A3 Injection | A4 Insecure Design | A5 Misconfiguration | A6 Vulnerable Deps | A7 Auth Failures | A8 Integrity | A9 Logging | A10 SSRF.
+      Output: Severity | Category | Issue | Line | Exact Fix Code
+
+      **For /add-tests:**
+      xUnit + Moq + FluentAssertions tests. Happy path + edge cases + null + exceptions. Pattern: MethodName_Scenario_ExpectedResult. AAA comments. Mock all externals.
+
+      **For /generate-tests-complete:**
+      Complete test suite. Unit (happy/edge/null/exception) + integration + boundary. xUnit + Moq + FluentAssertions. AAA comments. Mock externals. Output complete test file.
+
+      **For /coverage-gaps:**
+      1. Identify untested methods/branches. 2. Prioritize (security/data > complexity > frequency). 3. Generate top 5 test cases (AAA pattern).
+
+      **For /optimize-sql:**
+      SET NOCOUNT ON, BEGIN TRY/CATCH, replace cursors with set-ops, CREATE INDEX suggestions, temp tables > 10k rows, WITH (NOLOCK), SARGable WHERE.
+      Output: optimized procedure + index recommendations + change log.
+
+      **For /performance-check or /perf-optimize:**
+      Check: N+1 queries, SELECT *, missing indexes, allocations in loops, blocking .Result/.Wait(), unnecessary Enumerable chains.
+      Output: Severity | Location | Issue | Fix Code table. If optimize: add before/after code + % improvement.
+
+      **For /refactor-inline:**
+      Single best refactoring: extract method, simplify logic, modernize syntax. Output ONLY refactored code.
+
+      **For /refactor-large:**
+      1. Analyze — what needs changing. 2. Plan — ordered steps with risks. 3. Structure — file change order. Output: numbered plan with paths + effort.
+
+      **For /add-docs:**
+      XML docs on all public members: summary, param, returns, exception, remarks, example for utilities.
+
+      **For /doc-complete:**
+      XML docs + usage examples (2-3 scenarios) + README section (description, usage, error handling, gotchas).
+
+      **For /api-endpoint:**
+      Complete ASP.NET Core 8: Controller + DTOs + FluentValidation, Service interface/impl, Dapper repository + parameterized SQL, ILogger + ProblemDetails.
+
+      **For /ng-component:**
+      Angular 17+ standalone: inject(), OnPush, standalone: true, FormGroup<T>, service + impl, DevExtreme HTML, SCSS with BEM naming.
+
+      **For /architecture-design:**
+      Layer responsibilities, dependency direction, design pattern. Testability, scalability, maintainability. Output: ASCII diagram + layer descriptions + pattern rationale.
+
+      **For /database-design or /data-model:**
+      Normalization (1NF/2NF/3NF), indexes, constraints, naming (PascalCase), soft delete. Output: CREATE TABLE + index recommendations + migration skeleton.
+
+      **For /observability-audit:**
+      Audit: logging gaps, log quality (structured key=value), sensitive data, correlation IDs, metrics. Output: Table (Operation | Gap | Severity) + fix code.
+
+      **For /api-contract:**
+      OpenAPI 3.0 spec: endpoints, request bodies, responses (200/400/401/403/404/500), auth schemes, examples. Output: complete YAML spec.
+
+      **For /pr-review:**
+      1. Code quality. 2. Security (OWASP). 3. Performance. 4. Testing gaps. 5. Documentation. 6. Summary table. Approve if no High/Critical. Request changes otherwise.
+
+      **For /audit-all:**
+      ## Security (OWASP) | Performance | Code Quality | Test Coverage | Documentation
+      Each: table format with Severity | Issue | Fix | Recommendation.
+
+      **For /aws-design, /azure-setup, /docker-containerize, /kubernetes-deploy:**
+      Execute relevant cloud analysis. Output: architecture decision + configuration + checklist.
+
+      **For /git-workflow:**
+      Branch name | Commit message rewrite (Conventional Commits) | Squash plan | Conflict guidance.
+
+      **For /quick-fix:**
+      Output ONLY the corrected code. Apply: proper naming, async/await, error handling, nullable types, IDisposable.
+
+      **For /think-through:**
+      1. Restate. 2. Decompose. 3. Assumptions. 4. Reasoning per sub-problem. 5. Answer + confidence. 6. Confidence rating (1-5) + caveats.
+
+      **For any command not listed:**
+      Apply the most relevant analysis approach. Be direct, include code snippets for every fix.
+
+      ## Step 5 — SUGGEST NEXT
+
+      After completing, if a natural follow-up exists:
+      "**Next**: run `/[command]` to `[what it adds]`. Type it with your selected code to continue."
+      Only suggest if it genuinely adds value.
+
+  - name: quick
+    description: "Fast-path router — describe a quick task and get it executed immediately"
+    invokable: true
+    prompt: |
+      You are the PowerPlay fast-path executor. Route to the simplest appropriate action and execute immediately — no planning ceremony.
+
+      | If the request contains... | Execute this logic |
+      |---|---|
+      | fix, broken, error, not working, bug | Fix the code. Output ONLY corrected code. No explanation. |
+      | review, issues, problems, check | Inline review: Severity | Line | Issue | Fix (table only) |
+      | test, unit test, spec | Generate xUnit/Jasmine tests. Happy path + 2 edge cases only. |
+      | document, docs, XML, JSDoc | Add <summary>/<param>/<returns> to all public members. |
+      | security, vulnerable, injection, XSS | OWASP scan: Severity | Line | Vulnerability | Fix |
+      | SQL, query, optimize | Optimise SQL: SET NOCOUNT ON, SARGable WHERE, index suggestion |
+      | performance, slow, N+1 | Top 3 performance issues with fix code per issue. |
+      | refactor, clean, simplify | Single best refactoring. Output refactored code only. |
+      | type, types, any, untyped | Add TypeScript/C# explicit types. No explanation. |
+      | explain, what does, how does | Explain: problem → step-by-step logic → failure modes |
+      | git, commit, branch | Branch name suggestion + Conventional Commits rewrite |
+
+      Execute without preamble. Output the result directly.
+      If intent is unclear, ask ONE clarifying question: "Is this [option A] or [option B]?"
+
+  - name: sec
+    description: "Security fast-path — routes to scan, full audit, or architecture based on scope"
+    invokable: true
+    prompt: |
+      Security routing for selected code or request.
+
+      Determine scope and execute:
+
+      **If code is selected and request doesn't mention "fix/remediate":**
+      Run OWASP Top 10 scan. Check: SQL injection, XSS, hardcoded secrets, missing auth, insecure deserialization, path traversal, sensitive data in logs, CORS misconfiguration, missing validation, exposed stack traces.
+      Output: Severity | Line | Vulnerability | Fix Code
+
+      **If code is selected and request says "fix/remediate/address":**
+      Full OWASP audit: A1 Broken Access | A2 Cryptographic Failures | A3 Injection | A4 Insecure Design | A5 Misconfiguration | A6 Vulnerable Deps | A7 Auth Failures | A8 Integrity | A9 Logging | A10 SSRF.
+      Output: Severity | Category | Issue | Line | Exact Fix Code
+
+      **If request is architecture/design-focused:**
+      Zero-trust design (5 steps): Identity & Access (MFA, OAuth, JWT) | Authentication (verify every) | Authorization (RBAC, JIT) | Network (microseg, mTLS) | Encryption (TLS 1.2+, AES-256) | Monitoring (audit logs, alerts).
+      Output: Zero-trust architecture diagram + policy matrix.
+
+      **If request mentions compliance:**
+      Compliance audit (SOC 2, ISO 27001, HIPAA, PCI-DSS). Check: access controls, encryption, logging, incident response.
+      Output: Gap table with severity + remediation.
+
+      **Otherwise:**
+      Ask: "Is this a [quick vulnerability scan] or [full fix code generation] or [architecture design]?"
+
+  - name: test
+    description: "Testing fast-path — routes to unit tests, full suite, or coverage gaps based on scope"
+    invokable: true
+    prompt: |
+      Testing routing for selected code or request.
+
+      Determine scope and execute:
+
+      **If code is small (< 50 lines) or request says "unit test/quick test":**
+      Generate xUnit tests with Moq and FluentAssertions.
+      Cover: happy path, edge cases, null inputs, exceptions.
+      Pattern: MethodName_Scenario_ExpectedResult.
+      AAA comments. Mock all externals. Output: complete test class — no placeholders.
+
+      **If code is large (> 200 lines) or request says "full suite/complete/all tests":**
+      Generate complete test suite:
+      - Unit: happy path, edge cases, nulls, exceptions
+      - Integration tests (if applicable)
+      - Boundary and special cases
+      Use xUnit + Moq + FluentAssertions. AAA comments. Mock externals. Output: complete test file.
+
+      **If request says "coverage", "gaps", "what's not tested":**
+      Gap analysis:
+      1. Identify untested methods/branches.
+      2. Prioritize by risk (security/data > complexity > frequency).
+      3. For top 5 gaps, generate complete test case (AAA pattern).
+      Output: Gap analysis table + 5 complete test cases ready to paste.
+
+      **Otherwise:**
+      Ask: "Is this a [single class unit test] or [complete test suite] or [coverage gap analysis]?"
+
+  - name: db
+    description: "Database fast-path — routes to SQL optimization, schema design, or data modeling"
+    invokable: true
+    prompt: |
+      Database routing for selected code or request.
+
+      Determine content and execute:
+
+      **If request has a stored procedure or specific SQL query:**
+      Optimize SQL Server procedure:
+      1. SET NOCOUNT ON
+      2. BEGIN TRY/CATCH
+      3. Replace cursors with set-based ops
+      4. CREATE INDEX for missing indexes
+      5. Use temp tables for > 10k rows
+      6. WITH (NOLOCK) where safe
+      7. SARGable WHERE clauses
+      Output: optimized procedure + index recommendations + change log.
+
+      **If request has existing schema (CREATE TABLE statements):**
+      Schema review:
+      1. Normalization (1NF/2NF/3NF violations)
+      2. Index recommendations (WHERE/JOIN/ORDER BY columns)
+      3. Constraints (NOT NULL, FK, UNIQUE, CHECK)
+      4. Naming validation (PascalCase tables/columns, Id PKs)
+      5. Soft delete (recommend IsDeleted + DeletedAt if missing)
+      Output: corrected CREATE TABLE + index recommendations + migration skeleton.
+
+      **If request is from requirements (describe the feature, no existing schema):**
+      Schema design from scratch:
+      1. Tables and relationships
+      2. Primary/foreign keys
+      3. Constraints and indexes
+      4. Normalization rationale
+      Output: CREATE TABLE statements + index recommendations + design rationale.
+
+      **Otherwise:**
+      Ask: "Is this [SQL optimization] or [schema review] or [new schema design]?"
 
 experimental:
   readResponseToCursor: false
