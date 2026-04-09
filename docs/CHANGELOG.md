@@ -13,6 +13,56 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.0] — 2026-04-09 (Intelligent Context & Automation)
+
+**v1.2.0 release — Complete automation rules, 5 new prompts, 2 new models**
+
+### Added
+
+#### Utility Prompts (5 new)
+- `/generate-tests-complete` — Generate complete test suite (unit + integration + edge cases) as ready-to-use test class
+- `/doc-complete` — Generate full API documentation (XML docs, usage examples, README section)
+- `/refactor-module` — Module-level refactoring with dependency analysis and ordered steps
+- `/migrate-version` — Framework/version upgrade plan with breaking changes and code examples
+- `/audit-all` — Combined security + performance + code quality + coverage audit in one command
+
+#### Rules (5 new)
+- `testing-pyramid.md` — Testing ratio standards (70% unit, 20% integration, 10% e2e), mocking strategy, AAA pattern
+- `documentation-standards.md` — XML docs (C#), JSDoc (TypeScript), README requirements, no undocumented public API
+- `deployment-safety.md` — Environment config, secret management, health checks, Dockerfile hardening, CI gates
+- `accessibility.md` — WCAG 2.1 AA compliance, ARIA labels, keyboard navigation, color contrast 4.5:1
+- `performance-budget.md` — Response time targets (< 200ms P95), bundle limits (< 250KB), DB query budgets
+
+#### Cloud Models (2 new, conditional)
+- `Llama 3.1 70B [Reasoning]` via OpenRouter (temp 0.2 for strict reasoning tasks)
+- `Mistral Large [Analysis]` via OpenRouter (temp 0.3 for analysis and synthesis)
+  - Both use existing `${OPENROUTER_API_KEY}` environment variable
+  - Available only if OpenRouter key is set in .env
+
+### Changed
+- Version bumped to 1.2.0
+- Total models: 9 local + 2 cloud conditional = 11 total available
+- Total rules: 9 existing + 5 new = 14 rules
+- Total prompts: 18 existing + 5 new = 23 prompts
+- Updated capability map in config header
+- Updated releaseUrl to point to v1.2.0
+
+### Total New Features
+- 5 new utility prompts (test generation, documentation, refactoring, migration, audit)
+- 5 new comprehensive rules (testing, documentation, deployment, accessibility, performance)
+- 2 new cloud models (Llama 3.1 70B reasoning, Mistral Large analysis)
+
+### Files Modified
+- `config.yaml` — v1.2.0, 5 prompts, 5 rules, 2 models added
+- `.continue/rules/testing-pyramid.md` — NEW (400+ lines)
+- `.continue/rules/documentation-standards.md` — NEW (500+ lines)
+- `.continue/rules/deployment-safety.md` — NEW (450+ lines)
+- `.continue/rules/accessibility.md` — NEW (500+ lines)
+- `.continue/rules/performance-budget.md` — NEW (400+ lines)
+- `docs/CHANGELOG.md` — v1.2.0 section added
+
+---
+
 ## [1.1.0] — 2026-04-09 (Inline Powers)
 
 **First v1.1.0 release — Inline code actions and utility prompts**
