@@ -1,12 +1,12 @@
-name: SmartWorkz PowerPlay — Streamlined Config
-version: 3.5.0
+name: SmartWorkz PowerPlay — Maximum Config
+version: 3.3.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.5.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.3.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -26,8 +26,8 @@ metadata:
 #  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (14)      │ Core, Security, .NET, Angular, SQL (simplified) │
-#  │ Prompts (40)    │ /play, /quick + 38 consolidated: /sec /test /db /api /arch /deploy /data /frontend + code actions + requirements chain │
+#  │ Rules (60)      │ Core, Security, .NET, Angular, SQL + 55 │
+#  │ Prompts (80)    │ /pp, /quick + 78 including /sec /test /db /api /arch /deploy /data /frontend orchestrators + domain commands + /pp-requirements chain │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -1153,6 +1153,30 @@ prompts:
       ## Suggested Refactors — SOLID violations, design patterns
       Be direct. Include code snippets for every fix.
 
+  - name: optimize-sql
+    description: "Optimise SQL stored procedure"
+    invokable: true
+    prompt: |
+      Optimise this SQL Server stored procedure:
+      1. Add SET NOCOUNT ON
+      2. Add BEGIN TRY/CATCH
+      3. Replace cursors with set-based ops
+      4. Suggest CREATE INDEX for missing indexes
+      5. Replace CTEs with temp tables for > 10k rows
+      6. Add WITH (NOLOCK) where safe
+      7. Make WHERE clauses SARGable
+      Output: complete optimised procedure + index recommendations + change log.
+
+  - name: add-tests
+    description: "Generate xUnit unit tests"
+    invokable: true
+    prompt: |
+      Generate xUnit tests with Moq and FluentAssertions.
+      Cover: happy path, edge cases, null inputs, exceptions.
+      Pattern: MethodName_Scenario_ExpectedResult.
+      Use Arrange/Act/Assert comments. Mock all externals.
+      Output complete test class — no placeholders.
+
   - name: add-docs
     description: "Add XML documentation comments"
     invokable: true
@@ -1173,6 +1197,29 @@ prompts:
       - SCSS with sw- BEM naming
       Output: compilable component + service + model files.
 
+  - name: api-endpoint
+    description: "Generate complete .NET API endpoint"
+    invokable: true
+    prompt: |
+      Generate a complete ASP.NET Core 8 endpoint:
+      - Controller + DTOs + FluentValidation
+      - Service interface + Scoped implementation
+      - Dapper repository with parameterised SQL
+      - ILogger<T> + ProblemDetails error handling
+      - DI registration comment for Program.cs
+      Output complete compilable C# files.
+
+  - name: security-scan
+    description: "Security audit — OWASP Top 10 check"
+    invokable: true
+    prompt: |
+      Security audit (OWASP Top 10):
+      Check for: SQL injection, XSS, hardcoded secrets,
+      missing auth, insecure deserialization, path traversal,
+      sensitive data in logs, CORS misconfiguration,
+      missing input validation, exposed stack traces.
+      Output: table — Severity | Line | Vulnerability | Fix Code
+
   - name: explain-deep
     description: "Deep explanation of complex code"
     invokable: true
@@ -1186,6 +1233,7 @@ prompts:
       Use ASCII diagrams for complex flows.
 
   # ── v1.1.0 Inline Actions ──────────────────────────────
+
   - name: inline-review
     description: "Inline code review — annotated issues with severity"
     invokable: true
@@ -1215,6 +1263,17 @@ prompts:
       Output: same code with // comments added.
       Never change logic, only add explanations.
 
+  - name: refactor-inline
+    description: "Refactor selected code — extract, simplify, modernize"
+    invokable: true
+    prompt: |
+      Refactor the selected code. Output ONLY the refactored code.
+      Pick the most impactful single transformation:
+      1. Extract method (if duplicated or complex)
+      2. Simplify logic (reduce nesting, early returns)
+      3. Modernize syntax (C# 12 features, modern TypeScript)
+      One transformation only. Don't change behavior.
+
   - name: add-types
     description: "Add TypeScript types or C# explicit types"
     invokable: true
@@ -1226,7 +1285,75 @@ prompts:
       Make every type as specific as possible.
 
   # ── v1.1.0 Utility Prompts ─────────────────────────────
+
+  - name: performance-check
+    description: "Identify performance issues — N+1, allocations, blocking"
+    invokable: true
+    prompt: |
+      Performance audit of selected code.
+      Check for:
+      - SQL N+1 queries, SELECT *, missing indexes
+      - Allocations in loops, large object allocations
+      - Blocking .Result, .Wait(), Thread.Sleep
+      - Unnecessary Enumerable chains
+      Output: Severity | Location | Issue | Fix Code table
+
+  - name: memory-audit
+    description: "Detect memory leaks and disposal issues"
+    invokable: true
+    prompt: |
+      Memory audit of selected code.
+      Check for:
+      - IDisposable without using statement
+      - Event handler leaks (no unsubscribe)
+      - Circular references, cached objects
+      - WeakReference misuse
+      Output: Issues found with line numbers and fixes.
+
+  - name: database-design
+    description: "Review or generate database schema"
+    invokable: true
+    prompt: |
+      Database design analysis:
+      If schema provided: review normalization, indexes, FK constraints, naming.
+      If feature described: suggest schema design, tables, relationships.
+      Output: SQL CREATE TABLE statements + index recommendations + rationale.
+
+  - name: architecture-design
+    description: "System architecture advice for the described feature"
+    invokable: true
+    prompt: |
+      Architecture design for the described feature.
+      Suggest: layer responsibilities, dependency direction, design pattern.
+      Consider: testability, scalability, maintainability.
+      Output: ASCII architecture diagram + layer descriptions + pattern rationale.
+
+  - name: refactor-large
+    description: "Plan a large refactoring — analysis then steps"
+    invokable: true
+    prompt: |
+      Large refactoring plan for selected code/feature.
+      Step 1: Analyze — what needs changing and why
+      Step 2: Plan — ordered refactoring steps with risks
+      Step 3: Structure — which files to change in what order
+      Output: numbered refactoring plan with file paths and estimated effort.
+
   # ── v1.2.0 Automation Prompts ──────────────────────────
+
+  - name: generate-tests-complete
+    description: "Generate complete test suite — unit, integration, edge cases"
+    invokable: true
+    prompt: |
+      Generate complete test suite for this code.
+      Include:
+      - Unit tests: happy path, edge cases, null inputs, exceptions
+      - Integration tests (if applicable)
+      - Boundary and special case tests
+      Use xUnit + Moq + FluentAssertions (C#) or Jasmine + SpyOn (TypeScript).
+      Pattern: MethodName_Scenario_ExpectedResult.
+      AAA comments. Mock all externals (database, HTTP, file system).
+      Output complete test file — no placeholders.
+
   - name: doc-complete
     description: "Generate complete documentation — XML docs, examples, README"
     invokable: true
@@ -1236,6 +1363,17 @@ prompts:
       2. Usage examples (2-3 realistic scenarios with code)
       3. README section: description, how to use, error handling, gotchas
       Keep logic unchanged. Output annotated code + README markdown block.
+
+  - name: refactor-module
+    description: "Analyse module for refactoring — dependency map and plan"
+    invokable: true
+    prompt: |
+      Analyse this module for refactoring opportunities.
+      Step 1: Dependency map — what this module depends on, what depends on it
+      Step 2: Issues — SOLID violations, duplication, high complexity, tight coupling
+      Step 3: Refactoring plan — ordered steps with risk and estimated effort per step
+      Step 4: File structure — which files to create/modify/delete
+      Output: structured plan with file paths, effort, and risks clearly listed.
 
   - name: migrate-version
     description: "Create migration plan for version/framework upgrade"
@@ -1266,6 +1404,7 @@ prompts:
       Be direct and specific. Include fix code for every issue. Prioritize by impact.
 
   # ── v2.0.0 Agent Prompts ──────────────────────────────
+
   - name: pr-review
     description: "Autonomous PR review — quality, security, performance, testing, docs"
     invokable: true
@@ -1278,6 +1417,46 @@ prompts:
       Step 5: Documentation — missing docs, stale comments, API changes
       Step 6: Summary — table: Category | Severity | Issue | Line | Fix
       Output: Approve if no High/Critical issues. Request changes otherwise.
+
+  - name: coverage-gaps
+    description: "Find test coverage gaps and generate test cases"
+    invokable: true
+    prompt: |
+      Analyse code coverage gaps and generate test cases:
+      Step 1: Identify untested methods and branches
+      Step 2: Prioritize by risk (security/data) > complexity > frequency
+      Step 3: For top 5 gaps: generate complete test case (AAA pattern)
+      Use xUnit + Moq + FluentAssertions (C#) or Jasmine + SpyOn (TypeScript).
+      Output: Gap analysis table + complete test cases ready to paste.
+
+  - name: security-agent
+    description: "OWASP Top 10 security audit with remediation"
+    invokable: true
+    prompt: |
+      Security audit using OWASP Top 10:
+      A1 Broken Access Control — check auth on every endpoint
+      A2 Cryptographic Failures — weak ciphers, plaintext secrets
+      A3 Injection — SQL, LDAP, OS command injection
+      A4 Insecure Design — missing rate limits, no input validation
+      A5 Misconfiguration — CORS *, debug mode, verbose errors
+      A6 Vulnerable Dependencies — outdated packages, CVEs
+      A7 Auth Failures — weak passwords, no MFA, broken sessions
+      A8 Integrity Failures — unsigned updates, insecure deserialization
+      A9 Logging Failures — no audit trail, sensitive data in logs
+      A10 SSRF — unvalidated URLs, internal network access
+      Output: Severity | Category | Issue | Line | Exact Fix Code
+
+  - name: perf-optimize
+    description: "Profile, identify bottlenecks, suggest optimizations"
+    invokable: true
+    prompt: |
+      Performance optimization for this code:
+      Step 1: Profile — identify 3 highest-impact bottlenecks
+      Step 2: Diagnose — explain WHY each is slow (with evidence)
+      Step 3: Optimize — show exact fix for each (before/after code)
+      Step 4: Estimate — improvement percentage for each fix
+      Focus: N+1 queries, allocations in loops, blocking awaits, missing indexes.
+      Output: Bottleneck table + before/after code blocks per issue.
 
   - name: workspace-learn
     description: "Analyse project conventions, detect SmartWorkz patterns, suggest top 5 relevant PowerPlay commands"
@@ -1333,6 +1512,19 @@ prompts:
       If the file already exists, prepend a ## Update — [date] section and keep prior content below it.
 
   # ── v2.1.0 Data & Observability Prompts ───────────────
+
+  - name: data-model
+    description: "Design or review database schema — normalization, indexes, constraints"
+    invokable: true
+    prompt: |
+      Design or review this database schema:
+      Step 1: Normalization — identify any 1NF/2NF/3NF violations
+      Step 2: Indexes — suggest indexes for likely WHERE/JOIN/ORDER BY columns
+      Step 3: Constraints — recommend NOT NULL, FK, UNIQUE, CHECK constraints
+      Step 4: Naming — validate table names (PascalCase), columns (PascalCase), PKs (Id)
+      Step 5: Soft delete — recommend IsDeleted + DeletedAt pattern instead of hard delete
+      Output: Corrected schema (CREATE TABLE statements) + recommended indexes + migration script skeleton.
+
   - name: observability-audit
     description: "Audit logging, tracing, metrics — find gaps and suggest fixes"
     invokable: true
@@ -1344,6 +1536,18 @@ prompts:
       Step 4: Tracing — identify missing correlation IDs and activity spans
       Step 5: Metrics — suggest counters/histograms for key operations
       Output: Table of gaps (Operation | Gap | Severity) + exact code fixes (structured log statements).
+
+  - name: api-contract
+    description: "Generate or validate OpenAPI 3.0 spec for API endpoints"
+    invokable: true
+    prompt: |
+      Generate or validate OpenAPI 3.0 spec for this code:
+      Step 1: Endpoints — list all routes with method, path, query/path parameters
+      Step 2: Request bodies — define schemas for POST/PUT/PATCH request bodies
+      Step 3: Responses — define 200, 400, 401, 403, 404, 500 response schemas
+      Step 4: Auth — document security schemes (JWT bearer token, API key, etc.)
+      Step 5: Examples — add realistic request/response examples for each endpoint
+      Output: Complete OpenAPI 3.0 YAML spec, ready to paste into swagger config or tools.
 
   - name: git-workflow
     description: "Git branch naming, commit message rewrite, squash plan"
@@ -1370,6 +1574,7 @@ prompts:
       Output: Table: Package | Current | Latest | Days Outdated | CVE | Breaking Changes | Safe to Update.
 
   # ── v2.4.0 Cloud & DevOps Prompts ─────────────────────
+
   - name: aws-design
     description: "Design AWS architecture — Lambda, S3, RDS, DynamoDB, API Gateway, CloudFront"
     invokable: true
@@ -1431,10 +1636,255 @@ prompts:
       Output: Complete Terraform .tf files or Bicep .bicep files + variables.tf + outputs.tf + backend config.
 
   # ── v2.3.0 Advanced UI Patterns Prompts ───────────────
+
+  - name: component-library
+    description: "Generate Material Design, Chakra UI, or Tailwind CSS component patterns"
+    invokable: true
+    prompt: |
+      Generate component library patterns for Material Design, Chakra UI, or Tailwind CSS:
+      Step 1: Library choice — recommend best fit (Material for admin, Chakra for flexibility, Tailwind for customization)
+      Step 2: Design tokens — color palette (60-30-10), typography scale, spacing grid, dark mode variants
+      Step 3: Component API — prop types, size/variant presets, state handling (disabled, loading, error)
+      Step 4: Theme setup — theme config or tailwind.config.js, CSS variables, light/dark support
+      Step 5: Examples — Button, Card, Form components with complete code
+      Output: Complete library setup + theme config + component implementations + usage guide.
+
+  - name: chart-design
+    description: "Design data visualizations using Recharts, D3, or Chart.js"
+    invokable: true
+    prompt: |
+      Design data visualization for this data:
+      Step 1: Chart selection — recommend type (bar, line, pie, scatter) based on data and intent
+      Step 2: Data structure — format data for chart library, handle large datasets (aggregate or virtualize)
+      Step 3: Implementation — complete chart code with Recharts/D3/Chart.js, formatted tooltips, legend
+      Step 4: Responsive — mobile-first sizing, responsive container, adaptive layout
+      Step 5: Accessibility — color contrast (WCAG AA), text alternatives (data table), no color-only meaning
+      Output: Complete chart code + data formatting + responsive CSS + accessible alternatives.
+
+  - name: table-design
+    description: "Build sortable, filterable, paginated data tables with virtualization"
+    invokable: true
+    prompt: |
+      Design data table for this data structure:
+      Step 1: Semantic HTML — <table>, <thead>, <th scope>, <tbody>, proper ARIA attributes
+      Step 2: Sorting — clickable headers, aria-sort states (ascending/descending), sorted data output
+      Step 3: Filtering — search input (debounced 300ms), filter dropdowns, active filter display, reset button
+      Step 4: Pagination — previous/next buttons, page numbers, items per page selector, result count
+      Step 5: Performance — virtualization for > 500 rows (react-window), responsive mobile layout (cards/scroll)
+      Output: Complete table component + filtering logic + pagination handler + virtualization setup.
+
+  - name: storybook-setup
+    description: "Generate Storybook component stories and configure Chromatic"
+    invokable: true
+    prompt: |
+      Generate Storybook stories and configure visual testing:
+      Step 1: Story structure — meta export with title/component, argTypes for props, default args
+      Step 2: Story variants — default, primary, secondary, danger, disabled, loading, error states
+      Step 3: a11y testing — accessibility addon setup, no WCAG AA violations, color contrast checks
+      Step 4: Interaction tests — play() function with userEvent, test clicks, form submission, keyboard
+      Step 5: Chromatic — visual regression baseline, screenshot comparison on PRs, CI integration
+      Output: Complete .stories.tsx files + storybook config + Chromatic CI setup + interaction tests.
+
+  - name: performance-audit
+    description: "Audit and optimize Core Web Vitals, bundle size, and performance budgets"
+    invokable: true
+    prompt: |
+      Performance audit and optimization:
+      Step 1: Core Web Vitals — measure LCP, INP, CLS in RUM, identify bottlenecks, set targets
+      Step 2: Bundle analysis — analyze bundle size (gzip), identify large modules, suggest code splitting
+      Step 3: Lighthouse — run in CI, target > 90 score, check performance/accessibility assertions
+      Step 4: Image optimization — WebP format, responsive srcset, lazy loading, aspect-ratio for CLS
+      Step 5: Monitoring setup — Sentry/Analytics RUM, performance budgets in CI, alerts for regressions
+      Output: Performance audit report + optimization recommendations + Lighthouse config + CI setup.
+
   # ── v2.2.0 UX Design Prompts ──────────────────────────
+
+  - name: design-component
+    description: "Generate accessible UI component with UXPro design system standards"
+    invokable: true
+    prompt: |
+      Generate a complete accessible UI component using UXPro design system:
+      Step 1: Structure — semantic HTML, accessibility-first, proper nesting
+      Step 2: Styling — 60-30-10 color rule, typography scale, 8-point grid spacing
+      Step 3: States — default, hover, active, focus (2px outline), disabled, loading
+      Step 4: Responsive — mobile-first, clamp() fluid typography, all breakpoints
+      Step 5: Accessibility — WCAG 2.1 AA contrast (4.5:1), ARIA labels, focus indicators
+      Output: Complete component code + CSS + HTML structure + accessibility checklist.
+
+  - name: design-audit
+    description: "WCAG accessibility audit of UI component or page"
+    invokable: true
+    prompt: |
+      Accessibility audit of this UI component:
+      Step 1: Contrast audit — check all text/UI elements against 4.5:1 (normal), 3:1 (large ≥18px bold), 3:1 (UI)
+      Step 2: Focus states — verify visible focus indicators, keyboard navigation, no traps
+      Step 3: ARIA — check semantic HTML, aria-label for icon buttons, aria-expanded for toggles
+      Step 4: Responsive — test at 320px, 480px, 768px, 1024px, 1280px breakpoints
+      Step 5: Motion — verify GPU acceleration (transform/opacity only), prefers-reduced-motion support
+      Output: Audit table (Issue | WCAG Level | Severity | Affected Element | Fix Code) + checklist.
+
+  - name: design-system
+    description: "Generate or analyse design tokens and system guidelines"
+    invokable: true
+    prompt: |
+      Analyse this project's design system or generate one using UXPro standards:
+      Step 1: Color palette — 60-30-10 rule, semantic tokens, light/dark variants
+      Step 2: Typography — scale (1.25 Major Third ratio), line heights, max widths (65ch body)
+      Step 3: Spacing — 8-point grid tokens (4px, 8px, 16px, 24px, 32px, 48px, 64px)
+      Step 4: Components — button hierarchy (primary, secondary, tertiary), form inputs, cards
+      Step 5: Tokens file — CSS custom properties, organized sections, ready to use
+      Output: Complete design tokens CSS file + design documentation + usage examples + Figma token format.
+
+  - name: responsive-design
+    description: "Check responsive design across all breakpoints and devices"
+    invokable: true
+    prompt: |
+      Responsive design audit of this component/layout:
+      Step 1: Mobile-first check — base styles at 320px, progressive enhancement
+      Step 2: Breakpoint testing — verify at 480px, 768px, 1024px, 1280px, 1536px
+      Step 3: Fluid scaling — check clamp() for typography, container queries where needed
+      Step 4: Touch targets — verify 44×44px minimum, 8px gaps between interactive elements
+      Step 5: Content reflow — check text wrapping, image sizing, layout shift prevention
+      Output: Breakpoint table (Breakpoint | Issues | Fix) + before/after code + performance notes.
+
+  - name: motion-design
+    description: "Audit animations for GPU acceleration, accessibility, performance"
+    invokable: true
+    prompt: |
+      Motion and animation audit:
+      Step 1: GPU acceleration — verify ONLY transform and opacity animated (never width/height/margin)
+      Step 2: Durations — check against standards (50ms instant, 100ms fast, 200ms normal, 300ms slow)
+      Step 3: Easing — verify ease-out (default), bounce (playful), ease-in (exit)
+      Step 4: Accessibility — verify prefers-reduced-motion media query support
+      Step 5: Performance — verify no layout thrashing, smooth 60fps, no jank
+      Output: Animation audit table + remediation code (before/after) + performance guidelines.
+
   # ── v2.6.0 Integration & APIs Prompts ──────────────────
+
+  - name: event-driven-design
+    description: "Design event-driven system using CQRS and event sourcing"
+    invokable: true
+    prompt: |
+      Design event-driven architecture for this system:
+      Step 1: Identify events (what happens in domain)
+      Step 2: Event sourcing — design immutable event log, replay strategy
+      Step 3: CQRS — separate write model from read model
+      Step 4: Saga pattern — multi-step workflows with compensation
+      Step 5: Consumer design — idempotent handlers, dead letter queues
+      Output: Event types, CQRS schema diagram, saga flow, consumer implementation.
+
+  - name: api-composition
+    description: "Design API composition gateway for aggregating multiple services"
+    invokable: true
+    prompt: |
+      Design API composition gateway for this system:
+      Step 1: Identify services (what backends exist)
+      Step 2: Identify queries (client needs data from multiple services)
+      Step 3: Composition strategy (parallel vs. sequential calls)
+      Step 4: Caching (which endpoints cache, how long)
+      Step 5: Resilience (circuit breaker, fallbacks, timeouts)
+      Output: Gateway endpoint designs, composition code, caching strategy.
+
+  - name: message-queue-setup
+    description: "Design message queue architecture (RabbitMQ or Kafka)"
+    invokable: true
+    prompt: |
+      Design message queue system for this system:
+      Step 1: Choose queue vs. topic (point-to-point vs. pub-sub)
+      Step 2: Design topics/exchanges (naming, routing keys)
+      Step 3: Consumer groups (how to distribute load)
+      Step 4: Dead letter queue (failure handling)
+      Step 5: Retry strategy (backoff, max retries, monitoring)
+      Output: Topic/queue definitions, consumer groups, DLQ configuration, monitoring setup.
+
+  - name: webhook-implementation
+    description: "Implement webhook system with signature verification and retries"
+    invokable: true
+    prompt: |
+      Design webhook system for this system:
+      Step 1: Webhook registration (how subscribers register)
+      Step 2: Event publishing (send webhooks asynchronously)
+      Step 3: Signature (HMAC-SHA256, verification)
+      Step 4: Retry logic (exponential backoff, max attempts, DLQ)
+      Step 5: Management (logs, history, enable/disable, manual resend)
+      Output: Webhook publisher code, subscriber verification code, management UI design.
+
+  - name: integration-test-design
+    description: "Design integration test strategy (contract tests, E2E, test data)"
+    invokable: true
+    prompt: |
+      Design integration test strategy for this system:
+      Step 1: Contract tests (API contracts, provider & consumer)
+      Step 2: E2E tests (critical workflows, Playwright/Cypress)
+      Step 3: Test data (factories, seeds, cleanup)
+      Step 4: Test environment (separate database, containers)
+      Step 5: CI/CD integration (run on commit, coverage, reports)
+      Output: Contract test examples, E2E test scenarios, test data setup, CI/CD pipeline.
+
   # ── v2.7.0 Mobile & Cross-Platform Prompts ────────────────
+
+  - name: mobile-architecture
+    description: "Design mobile app architecture (iOS, Android, React Native, Flutter)"
+    invokable: true
+    prompt: |
+      Design mobile app architecture for this system:
+      Step 1: Platform selection — native (iOS/Android), cross-platform (React Native/Flutter), web app?
+      Step 2: Architecture pattern — MVVM, Redux/Provider, offline-first data sync
+      Step 3: UI framework — SwiftUI, Jetpack Compose, React Navigation, Material 3
+      Step 4: Data layer — local database (Room, Core Data, WatermelonDB), API client, sync strategy
+      Step 5: Performance — measure startup time, memory, battery drain, frame rate
+      Output: Architecture diagram (data flow), tech stack justification, implementation roadmap.
+
+  - name: cross-platform-setup
+    description: "Setup cross-platform codebase (code sharing, platform abstraction)"
+    invokable: true
+    prompt: |
+      Setup cross-platform codebase for this system:
+      Step 1: Project structure — shared code, platform-specific modules, abstraction layer
+      Step 2: Code sharing — what can be 100% shared (business logic, networking)
+      Step 3: Platform abstraction — how to isolate platform-specific APIs (navigation, storage, camera)
+      Step 4: Build system — Xcode, Android Studio, React Native Metro, Flutter
+      Step 5: CI/CD — build for multiple platforms, automated testing per platform
+      Output: Folder structure (shared/ platform/ ui/), abstraction layer examples, build script.
+
+  - name: offline-sync
+    description: "Design offline-first data sync (local DB, event queue, conflict resolution)"
+    invokable: true
+    prompt: |
+      Design offline-first architecture for this system:
+      Step 1: Local database — which data to store locally (WatermelonDB, Room, Realm, Isar)
+      Step 2: Event log — queue changes when offline, replay when online
+      Step 3: Sync strategy — incremental sync, optimistic updates, conflict resolution (LWW, merge, prompt)
+      Step 4: Network detection — trigger sync on network restore, monitor connectivity
+      Step 5: UX — show sync status, queue size, failed changes, manual sync button
+      Output: Data flow diagram (offline/online paths), sync queue schema, conflict resolution logic.
+
+  - name: mobile-security-audit
+    description: "Audit mobile app security (credentials, network, data protection, jailbreak)"
+    invokable: true
+    prompt: |
+      Audit security of this mobile app:
+      Step 1: Credentials — where tokens/passwords stored? Secure storage (Keychain/KeyStore)?
+      Step 2: Network — HTTPS only? Certificate pinning? PKCE flow for auth?
+      Step 3: Data protection — encrypted at rest? Sensitive data logged? Screenshot protection?
+      Step 4: Platform risks — jailbreak/root detection? Debugger protection? Code obfuscation?
+      Step 5: OWASP Mobile Top 10 — verify all controls (crypto, auth, storage, network, logging)
+      Output: Security audit report (Control | Status | Gap | Risk | Remediation | Priority).
+
+  - name: app-distribution-plan
+    description: "Plan app distribution (versioning, store submission, beta testing, updates)"
+    invokable: true
+    prompt: |
+      Create app distribution plan for this system:
+      Step 1: Versioning — semantic version scheme (major.minor.patch), build number tracking
+      Step 2: Beta testing — TestFlight (iOS), internal testing (Android), duration, feedback collection
+      Step 3: Store submission — iOS App Store + Android Play Store requirements, metadata, screenshots
+      Step 4: Release process — build signing, notarization, code signing certificate management
+      Step 5: Post-launch — monitoring (crashes, ratings), update strategy (OTA, forced updates), ASO
+      Output: Release checklist, version history template, store submission checklist, monitoring dashboard.
+
   # ── v2.8.0 AI Behavior Prompts ────────────────────────
+
   - name: think-through
     description: "Force explicit chain-of-thought — decompose, state assumptions, reason, rate confidence"
     invokable: true
@@ -1499,8 +1949,71 @@ prompts:
       Short answers are fine — "too verbose", "just the code", "too simple" is enough.
 
   # ── v2.5.0 Security & Compliance Prompts ──────────────
+
+  - name: zero-trust-design
+    description: "Design zero-trust security architecture for system"
+    invokable: true
+    prompt: |
+      Design a zero-trust security architecture for this system:
+      Step 1: Identity & Access — MFA mandatory, OAuth 2.0, JWT tokens (short-lived), conditional access
+      Step 2: Authentication — verify every identity, no trust based on IP/location
+      Step 3: Authorization — least privilege RBAC, JIT elevation, audit privilege changes
+      Step 4: Network — microsegmentation, service-to-service mTLS, firewall deny-by-default
+      Step 5: Encryption — TLS 1.2+ in transit, AES-256 at rest, key rotation annually
+      Step 6: Monitoring — immutable audit logs, real-time alerts, forensic capability
+      Output: Zero-trust architecture diagram + policy matrix (identity/auth/authz/network/encryption/monitoring).
+
+  - name: compliance-audit
+    description: "Audit compliance against SOC 2, ISO 27001, HIPAA, PCI-DSS standards"
+    invokable: true
+    prompt: |
+      Audit compliance against selected framework (SOC 2, ISO 27001, HIPAA, PCI-DSS):
+      Step 1: Framework mapping — map system to framework controls/requirements
+      Step 2: Implementation gaps — identify what's implemented vs. missing
+      Step 3: Evidence gaps — identify documentation needed (policies, procedures, audit logs)
+      Step 4: Remediation plan — prioritize fixes (critical/high/medium/low)
+      Step 5: Timeline — realistic remediation schedule with owners
+      Output: Compliance audit report (Control | Status | Gap | Evidence | Remediation | Owner | Deadline).
+
+  - name: pentest-plan
+    description: "Plan penetration test — scope, methodology, timeline, reporting"
+    invokable: true
+    prompt: |
+      Create penetration test plan for this system:
+      Step 1: Scope — systems in-scope, out-of-scope, excluded tests, success criteria
+      Step 2: Rules of Engagement — authorization level, test windows, escalation contacts
+      Step 3: Methodology — NIST phases (reconnaissance → scanning → enumeration → exploitation)
+      Step 4: Testing checklist — OWASP Top 10 Web/Mobile/API, authentication, authorization, crypto
+      Step 5: Reporting — CVSS scoring, proof-of-concept (non-weaponized), remediation steps
+      Output: Formal pentest proposal (scope, ROE, timeline, methodology, success criteria, reporting format).
+
+  - name: incident-response
+    description: "Create incident response playbook and post-mortem template"
+    invokable: true
+    prompt: |
+      Create incident response playbook for this system:
+      Step 1: Severity levels — define Severity 1/2/3 (impact, response time, escalation)
+      Step 2: Detection — what to monitor, alert thresholds, triage process
+      Step 3: Response flow — declare → diagnose → mitigate → recover → communicate → review
+      Step 4: War room setup — communication channels, incident commander, roles, frequency
+      Step 5: Post-mortem — blameless template, 5 whys, action items with owners/deadlines
+      Output: Complete IR playbook + post-mortem template with examples.
+
+  - name: security-posture
+    description: "Assess overall security posture — identify priorities and gaps"
+    invokable: true
+    prompt: |
+      Assess security posture of this system:
+      Step 1: Vulnerability inventory — security controls implemented vs. missing
+      Step 2: Risk assessment — severity × likelihood matrix, business impact
+      Step 3: Threat modeling — identify attack vectors, threat actors, attack paths
+      Step 4: Compliance gaps — applicable frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS)
+      Step 5: Improvement roadmap — phased fixes (immediate, 30 days, 90 days, 6 months)
+      Output: Security posture report (Risk matrix | Threats | Controls | Gaps | Roadmap).
+
   # ── v2.9.0 Orchestrator Prompts ──────────────────────────
-  - name: play
+
+  - name: pp
     description: "PowerPlay orchestrator — describe any task in plain English and get routed to the right command"
     invokable: true
     prompt: |
@@ -1749,89 +2262,47 @@ prompts:
       If intent is unclear, ask ONE clarifying question: "Is this [option A] or [option B]?"
 
   - name: sec
-    description: "Security fast-path — consolidated orchestrator for security-scan, security-agent, zero-trust-design, compliance-audit, pentest-plan, incident-response, security-posture"
+    description: "Security fast-path — routes to scan, full audit, or architecture based on scope"
     invokable: true
     prompt: |
-      ## CONSOLIDATED COMMANDS (v3.5.0 mapping)
-      This command consolidates: /security-scan, /security-agent, /zero-trust-design, /compliance-audit, /pentest-plan, /incident-response, /security-posture
-
       Security routing for selected code or request.
 
       Determine scope and execute:
 
       **If code is selected and request doesn't mention "fix/remediate":**
-      [Consolidated from: /security-scan]
       Run OWASP Top 10 scan. Check: SQL injection, XSS, hardcoded secrets, missing auth, insecure deserialization, path traversal, sensitive data in logs, CORS misconfiguration, missing validation, exposed stack traces.
       Output: Severity | Line | Vulnerability | Fix Code
 
       **If code is selected and request says "fix/remediate/address":**
-      [Consolidated from: /security-agent]
       Full OWASP audit: A1 Broken Access | A2 Cryptographic Failures | A3 Injection | A4 Insecure Design | A5 Misconfiguration | A6 Vulnerable Deps | A7 Auth Failures | A8 Integrity | A9 Logging | A10 SSRF.
       Output: Severity | Category | Issue | Line | Exact Fix Code
 
-      **If request is "zero trust", "architecture", "design" or architecture/design-focused:**
-      [Consolidated from: /zero-trust-design]
+      **If request is architecture/design-focused:**
       Zero-trust design (5 steps): Identity & Access (MFA, OAuth, JWT) | Authentication (verify every) | Authorization (RBAC, JIT) | Network (microseg, mTLS) | Encryption (TLS 1.2+, AES-256) | Monitoring (audit logs, alerts).
       Output: Zero-trust architecture diagram + policy matrix.
 
-      **If request mentions "compliance", "SOC 2", "ISO 27001", "HIPAA", "PCI-DSS":**
-      [Consolidated from: /compliance-audit]
+      **If request mentions compliance:**
       Compliance audit (SOC 2, ISO 27001, HIPAA, PCI-DSS). Check: access controls, encryption, logging, incident response.
       Output: Gap table with severity + remediation.
 
-      **If request mentions "pentest", "penetration test", "ethical hack", "red team":**
-      [Consolidated from: /pentest-plan]
-      Create penetration test plan:
-      Step 1: Scope — systems in-scope, out-of-scope, excluded tests, success criteria
-      Step 2: Rules of Engagement — authorization level, test windows, escalation contacts
-      Step 3: Methodology — NIST phases (reconnaissance → scanning → enumeration → exploitation)
-      Step 4: Testing checklist — OWASP Top 10 Web/Mobile/API, authentication, authorization, crypto
-      Step 5: Reporting — CVSS scoring, proof-of-concept, remediation steps
-      Output: Formal pentest proposal (scope, ROE, timeline, methodology, success criteria).
-
-      **If request mentions "incident", "outage", "breach", "post-mortem", "IR playbook":**
-      [Consolidated from: /incident-response]
-      Create incident response playbook:
-      Step 1: Severity levels — define Severity 1/2/3 (impact, response time, escalation)
-      Step 2: Detection — what to monitor, alert thresholds, triage process
-      Step 3: Response flow — declare → diagnose → mitigate → recover → communicate → review
-      Step 4: War room setup — communication channels, incident commander, roles, frequency
-      Step 5: Post-mortem — blameless template, 5 whys, action items with owners/deadlines
-      Output: Complete IR playbook + post-mortem template with examples.
-
-      **If request asks for "posture", "overall security", "assessment", "priorities", "gaps", "roadmap":**
-      [Consolidated from: /security-posture]
-      Assess overall security posture:
-      Step 1: Vulnerability inventory — security controls implemented vs. missing
-      Step 2: Risk assessment — severity × likelihood matrix, business impact
-      Step 3: Threat modeling — identify attack vectors, threat actors, attack paths
-      Step 4: Compliance gaps — applicable frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS)
-      Step 5: Improvement roadmap — phased fixes (immediate, 30 days, 90 days, 6 months)
-      Output: Security posture report (Risk matrix | Threats | Controls | Gaps | Roadmap).
-
       **Otherwise:**
-      Ask: "Is this a [quick vulnerability scan] or [full audit with fixes] or [architecture design] or [compliance check] or [pentest plan] or [incident response] or [security posture]?"
+      Ask: "Is this a [quick vulnerability scan] or [full fix code generation] or [architecture design]?"
 
   - name: test
-    description: "Testing fast-path — consolidated orchestrator for add-tests, generate-tests-complete, coverage-gaps, integration-test-design"
+    description: "Testing fast-path — routes to unit tests, full suite, or coverage gaps based on scope"
     invokable: true
     prompt: |
-      ## CONSOLIDATED COMMANDS (v3.5.0 mapping)
-      This command consolidates: /add-tests, /generate-tests-complete, /coverage-gaps, /integration-test-design
-
       Testing routing for selected code or request.
 
       Determine scope and execute:
 
       **If code is small (< 50 lines) or request says "unit test/quick test":**
-      [Consolidated from: /add-tests]
       Generate xUnit tests with Moq and FluentAssertions.
       Cover: happy path, edge cases, null inputs, exceptions.
       Pattern: MethodName_Scenario_ExpectedResult.
       AAA comments. Mock all externals. Output: complete test class — no placeholders.
 
       **If code is large (> 200 lines) or request says "full suite/complete/all tests":**
-      [Consolidated from: /generate-tests-complete]
       Generate complete test suite:
       - Unit: happy path, edge cases, nulls, exceptions
       - Integration tests (if applicable)
@@ -1839,39 +2310,24 @@ prompts:
       Use xUnit + Moq + FluentAssertions. AAA comments. Mock externals. Output: complete test file.
 
       **If request says "coverage", "gaps", "what's not tested":**
-      [Consolidated from: /coverage-gaps]
       Gap analysis:
       1. Identify untested methods/branches.
       2. Prioritize by risk (security/data > complexity > frequency).
       3. For top 5 gaps, generate complete test case (AAA pattern).
       Output: Gap analysis table + 5 complete test cases ready to paste.
 
-      **If request mentions "integration", "contract", "E2E", "end-to-end", "realistic", "multiple services":**
-      [Consolidated from: /integration-test-design]
-      Design integration test strategy:
-      Step 1: Test pyramid — unit (70%), integration (20%), E2E (10%)
-      Step 2: Scope — which services/databases are involved?
-      Step 3: Test data — fixtures, mocks for external services, database setup
-      Step 4: Contract tests — verify API contracts between services
-      Step 5: Execution plan — CI/CD integration, test order, cleanup
-      Output: Integration test design + sample contract test + CI/CD hooks.
-
       **Otherwise:**
-      Ask: "Is this a [single class unit test] or [complete test suite] or [coverage gap analysis] or [integration test design]?"
+      Ask: "Is this a [single class unit test] or [complete test suite] or [coverage gap analysis]?"
 
   - name: db
-    description: "Database fast-path — consolidated orchestrator for optimize-sql, database-design, data-model"
+    description: "Database fast-path — routes to SQL optimization, schema design, or data modeling"
     invokable: true
     prompt: |
-      ## CONSOLIDATED COMMANDS (v3.5.0 mapping)
-      This command consolidates: /optimize-sql, /database-design, /data-model
-
       Database routing for selected code or request.
 
       Determine content and execute:
 
       **If request has a stored procedure or specific SQL query:**
-      [Consolidated from: /optimize-sql]
       Optimize SQL Server procedure:
       1. SET NOCOUNT ON
       2. BEGIN TRY/CATCH
@@ -1883,7 +2339,6 @@ prompts:
       Output: optimized procedure + index recommendations + change log.
 
       **If request has existing schema (CREATE TABLE statements):**
-      [Consolidated from: /database-design]
       Schema review:
       1. Normalization (1NF/2NF/3NF violations)
       2. Index recommendations (WHERE/JOIN/ORDER BY columns)
@@ -1893,19 +2348,18 @@ prompts:
       Output: corrected CREATE TABLE + index recommendations + migration skeleton.
 
       **If request is from requirements (describe the feature, no existing schema):**
-      [Consolidated from: /data-model]
-      Schema design from requirements:
-      1. Tables and relationships based on domain entities
-      2. Primary/foreign keys and their cardinality
-      3. Constraints and indexes (before/after analysis)
-      4. Normalization rationale (why each level chosen)
-      5. Soft delete and audit columns
+      Schema design from scratch:
+      1. Tables and relationships
+      2. Primary/foreign keys
+      3. Constraints and indexes
+      4. Normalization rationale
       Output: CREATE TABLE statements + index recommendations + design rationale.
 
       **Otherwise:**
-      Ask: "Is this [SQL query optimization] or [existing schema review] or [new schema design from requirements]?"
+      Ask: "Is this [SQL optimization] or [schema review] or [new schema design]?"
 
   # ── v3.3.0 Domain Shortcut Prompts ──────────────────────
+
   - name: api
     description: "API fast-path — routes to endpoint scaffold, OpenAPI spec, gateway design, or contract audit"
     invokable: true
@@ -2069,8 +2523,141 @@ prompts:
       Ask: "Is this [Angular component] or [UX/design component] or [WCAG audit] or [responsive layout]?"
 
   # ── v3.4.0 Machine Learning Domain Prompts ───────────────
+
+  - name: ml-model-design
+    description: "Design ML pipeline — algorithm selection, evaluation metrics, feature plan, data requirements"
+    invokable: true
+    prompt: |
+      Design a machine learning pipeline:
+      Step 1: Problem framing — classification/regression/clustering/ranking? Supervised/unsupervised?
+      Step 2: Algorithm selection — top 3 candidates with trade-offs (accuracy vs interpretability vs speed)
+      Step 3: Feature plan — 5-10 candidate features, types (numeric, categorical, text, datetime)
+      Step 4: Evaluation metrics — primary (AUC-ROC, F1, RMSE) + secondary + business threshold
+      Step 5: Baseline — define naive baseline to beat (majority class, mean predictor)
+      Step 6: Data requirements — minimum samples, class balance, labeling cost estimate
+      Output: ML design document (Problem | Algorithm | Features | Metrics | Baseline | Data needs).
+
+  - name: training-pipeline
+    description: "Design training pipeline — splits, feature engineering, cross-validation, model registry, retraining"
+    invokable: true
+    prompt: |
+      Design a training and validation pipeline:
+      Step 1: Data splits — 70/15/15 or time-based for temporal data
+      Step 2: Feature engineering — normalization, encoding, binning, interaction features
+      Step 3: Cross-validation — k-fold, stratified k-fold, or walk-forward for time-series
+      Step 4: Hyperparameter tuning — grid search vs Bayesian optimization, search space
+      Step 5: Model registry — MLflow or DVC versioning, artifact storage
+      Step 6: Retraining trigger — scheduled, drift-based, or performance degradation
+      Output: Pipeline design (splits + transforms + CV plan + registry + retraining trigger).
+
+  - name: mlops-setup
+    description: "Design MLOps infrastructure — MLflow, DVC, model serving, CI/CD for ML, drift monitoring"
+    invokable: true
+    prompt: |
+      Design MLOps infrastructure:
+      Step 1: Experiment tracking — MLflow setup (tracking server, artifact store, model registry)
+      Step 2: Data versioning — DVC (remote storage: S3/Azure Blob/GCS)
+      Step 3: Model serving — FastAPI + ONNX export or MLflow model server
+      Step 4: CI/CD for ML — data validation → train → eval gate → deploy if passes
+      Step 5: Monitoring — prediction drift, concept drift, latency, error rate
+      Step 6: Retraining — trigger conditions, automated data pull, canary deploy
+      Output: MLOps architecture diagram + tool config + CI/CD pipeline + monitoring checklist.
+
+  - name: model-evaluation
+    description: "Evaluate ML model — confusion matrix, AUC-ROC, bias/fairness checks, calibration"
+    invokable: true
+    prompt: |
+      Evaluate this ML model:
+      Step 1: Classification metrics — confusion matrix, precision, recall, F1, accuracy, AUC-ROC, AUC-PR
+      Step 2: Regression metrics — MAE, MSE, RMSE, R², MAPE, residual analysis
+      Step 3: Threshold analysis — precision-recall tradeoff, optimal threshold for business goal
+      Step 4: Error analysis — top 10 misclassified examples, common failure patterns
+      Step 5: Bias and fairness — performance across subgroups, disparate impact, equal opportunity
+      Step 6: Calibration — predicted probability reliability, calibration curve, Brier score
+      Output: Evaluation report (Metrics | Confusion matrix | Threshold | Bias | Recommendation).
+
+  - name: feature-engineering
+    description: "Design feature engineering — selection, normalization, encoding, leakage prevention"
+    invokable: true
+    prompt: |
+      Design feature engineering strategy:
+      Step 1: Feature inventory — raw features, types (numeric/categorical/text/datetime), missing rate
+      Step 2: Selection — correlation, feature importance (tree-based), near-zero variance removal
+      Step 3: Transforms — numeric (StandardScaler, log for skewed), categorical (OHE, target encoding)
+      Step 4: Datetime — extract hour, day-of-week, month, is_weekend, days_since_event
+      Step 5: Text — TF-IDF, sentence embeddings, or bag-of-words (based on model type)
+      Step 6: Leakage prevention — target leakage, future-date leakage, train/test contamination
+      Output: Feature plan (Feature | Type | Transform | Justification | Leakage Risk).
+
   # ── v3.4.0 Business Intelligence Domain Prompts ───────────
+
+  - name: bi-schema
+    description: "Design star/snowflake schema — fact tables, dimension tables, grain definition, SCD strategy"
+    invokable: true
+    prompt: |
+      Design an analytics schema:
+      Step 1: Grain definition — what is one row in the fact table? Define precisely.
+      Step 2: Fact table — measures (additive/semi-additive/non-additive), FK to dimensions
+      Step 3: Dimension tables — 5-8 dimensions (Date, Customer, Product, Location), SCD type per dimension
+      Step 4: Star vs snowflake — recommend based on query patterns and team SQL maturity
+      Step 5: SCD strategy — Type 1 (overwrite), Type 2 (history rows), Type 3 (previous column)
+      Step 6: Conformed dimensions — which dimensions are shared across fact tables?
+      Output: Schema diagram + CREATE TABLE statements + grain definition + SCD strategy.
+
+  - name: metric-definition
+    description: "Define KPIs and metrics — taxonomy, formulas, dimension hierarchies, aggregation rules"
+    invokable: true
+    prompt: |
+      Define metrics and KPIs:
+      Step 1: Metric taxonomy — Input, Output, or Guardrail metric?
+      Step 2: Definitions — Name | Formula | Grain | Filters | Time window | Owner
+      Step 3: Dimension hierarchies — drill-down paths (Country→Region→City, Year→Quarter→Month)
+      Step 4: Aggregation rules — SUM vs COUNT DISTINCT vs AVERAGE; handling nulls; additive vs non-additive
+      Step 5: Time intelligence — WoW/MoM/YoY, rolling windows, fiscal calendar offset
+      Step 6: Governance — who approves changes, metric registry, discrepancy handling
+      Output: Metric catalog (Name | Formula | Grain | Dimensions | Aggregation | Owner | Certified).
+
+  - name: dashboard-design
+    description: "Design analytics dashboard — layout, chart types, filter strategy, refresh cadence"
+    invokable: true
+    prompt: |
+      Design an analytics dashboard:
+      Step 1: Audience — who uses this? What decisions does it drive? Operational vs strategic?
+      Step 2: KPIs — top 3-5 headline metrics for overview, supporting detail metrics
+      Step 3: Chart types — table/bar/line/scatter/heatmap/funnel for each metric + justification
+      Step 4: Layout — header (KPI tiles), body (trend charts), detail (breakdown), filter bar
+      Step 5: Filters — global (date range, region) + local (per chart), default values
+      Step 6: Refresh — real-time (streaming), hourly, daily (overnight ELT), or on-demand
+      Output: Dashboard wireframe spec + chart-by-chart plan + filter list + refresh strategy.
+
+  - name: data-warehouse
+    description: "Design data warehouse — platform selection, medallion layers, partitioning, cost model"
+    invokable: true
+    prompt: |
+      Design a data warehouse:
+      Step 1: Platform — Redshift vs BigQuery vs Snowflake vs Azure Synapse (cost, SQL dialect, scaling)
+      Step 2: Storage layers — Bronze (raw), Silver (cleaned), Gold (aggregated) — medallion architecture
+      Step 3: Partitioning — by date/region/high-cardinality column, clustering keys
+      Step 4: Query optimization — materialized views, result caching, query routing
+      Step 5: Cost control — query cost estimation, slot/concurrency limits, storage tiering
+      Step 6: Security — column-level/row-level security, masked PII, access roles by tier
+      Output: Platform recommendation + architecture + partitioning strategy + cost model.
+
+  - name: analytics-pipeline
+    description: "Design ELT/ETL pipeline — dbt models, Airflow orchestration, data quality, lineage"
+    invokable: true
+    prompt: |
+      Design an analytics pipeline:
+      Step 1: Pattern — ETL vs ELT; justify based on DWH compute vs source system load
+      Step 2: Ingestion — source connectors (Fivetran/Airbyte/custom), CDC vs full extract, schedule
+      Step 3: Transformation — dbt models (staging → intermediate → mart) or Spark jobs
+      Step 4: Orchestration — Airflow DAG (dependencies, retry policy, SLA alerts) or dbt Cloud
+      Step 5: Data quality — dbt tests (not_null, unique, accepted_values, relationships)
+      Step 6: Lineage — dbt docs, column-level lineage, data catalog (OpenMetadata/DataHub)
+      Output: Pipeline architecture + dbt project structure + Airflow DAG sketch + quality test plan.
+
   # ── v3.4.0 ML/BI Domain Shortcuts ────────────────────────
+
   - name: ml
     description: "ML fast-path — routes to model design, evaluation, MLOps, or training pipeline"
     invokable: true
@@ -2121,171 +2708,8 @@ prompts:
       **Otherwise:**
       Ask: "Is this [analytics schema design] or [metric/KPI definition] or [dashboard design] or [ELT/ETL pipeline]?"
 
-  # ── v3.3.0 Domain Shortcut Prompts ──────────────────────
-
-  - name: api
-    description: "API fast-path — routes to endpoint scaffold, OpenAPI spec, gateway design, or contract audit"
-    invokable: true
-    prompt: |
-      API routing for selected code or request.
-
-      **If request contains "generate", "create", "scaffold", "new endpoint", "add route":**
-      Generate complete ASP.NET Core 8 endpoint:
-      - Controller + DTOs + FluentValidation
-      - Service interface + Scoped implementation
-      - Dapper repository with parameterised SQL
-      - ILogger<T> + ProblemDetails error handling
-      - DI registration comment for Program.cs
-      Output: complete compilable C# files.
-
-      **If request contains "OpenAPI", "swagger", "spec", "contract", "document the API":**
-      Generate OpenAPI 3.0 spec:
-      Step 1: Endpoints (routes, methods, parameters)
-      Step 2: Request bodies (POST/PUT/PATCH schemas)
-      Step 3: Responses (200, 400, 401, 403, 404, 500 schemas)
-      Step 4: Auth (JWT bearer / API key security schemes)
-      Step 5: Examples (realistic request/response per endpoint)
-      Output: complete OpenAPI 3.0 YAML spec.
-
-      **If request contains "gateway", "compose", "aggregate", "BFF", "multiple services":**
-      Design API composition gateway:
-      Step 1: Identify upstream services and composite queries
-      Step 2: Composition strategy (parallel vs sequential calls)
-      Step 3: Caching (per-endpoint TTL)
-      Step 4: Resilience (circuit breaker, timeout, fallback)
-      Output: gateway endpoint designs + composition code + caching strategy.
-
-      **If request contains "review", "audit", "validate", "check the API", "breaking changes":**
-      Audit existing API contract:
-      Step 1: Consistency (naming conventions, versioning)
-      Step 2: Breaking changes (removed fields, changed types)
-      Step 3: Security (authentication coverage)
-      Step 4: Standards (correct HTTP verbs/status codes)
-      Step 5: Documentation gaps (undocumented params, missing schemas)
-      Output: Audit table (Endpoint | Issue | Severity | Fix).
-
-      **Otherwise:**
-      Ask: "Is this [scaffold a new endpoint] or [generate OpenAPI spec] or [design API gateway] or [audit existing API]?"
-
-  - name: arch
-    description: "Architecture fast-path — routes to feature design, module refactor, or system redesign"
-    invokable: true
-    prompt: |
-      Architecture routing for selected code or request.
-
-      **If request contains "design", "plan", "feature", "new module", "how should I structure":**
-      Feature-level architecture design:
-      Apply: PowerPlay rules (Controller→Service→Repository, DI, FluentValidation boundary).
-      Output: ASCII architecture diagram + layer descriptions + pattern rationale + DI registration sketch.
-
-      **If code is selected and request contains "refactor", "clean up", "reorganise", "module", "extract":**
-      Module-level refactoring plan:
-      Step 1: Dependency map (what this module depends on, what depends on it)
-      Step 2: Issues (SOLID violations, duplication, high complexity, tight coupling)
-      Step 3: Plan (ordered steps with risk and estimated effort)
-      Step 4: File structure (files to create/modify/delete)
-      Output: structured plan with file paths, effort, and risks.
-
-      **If request contains "system", "large", "whole app", "migration", "redesign":**
-      System-level redesign plan:
-      Step 1: Analyze (bounded contexts, coupling, scaling limits)
-      Step 2: Plan (strangler fig vs big bang vs parallel run — justify)
-      Step 3: Structure (service/file change order)
-      Step 4: Migration path (current → target without downtime)
-      Output: numbered plan with paths, risk levels, and effort estimates.
-
-      **Otherwise:**
-      Ask: "Is this [feature architecture design] or [module refactor plan] or [full system redesign]?"
-
-  - name: deploy
-    description: "Deployment fast-path — routes to Docker, Kubernetes, IaC, AWS, or Azure"
-    invokable: true
-    prompt: |
-      Deployment routing for selected code or request.
-
-      **If request contains "Docker", "container", "Dockerfile", "containerise", "image":**
-      Generate containerization setup:
-      Step 1: Multi-stage Dockerfile (builder + runtime, minimize image size)
-      Step 2: Docker Compose (app, database, cache, nginx services)
-      Step 3: Volumes (persistent data, dev hot-reload)
-      Step 4: Security (non-root user, secrets via .env)
-      Output: Dockerfile + docker-compose.yml + .dockerignore + local dev guide.
-
-      **If request contains "Kubernetes", "K8s", "manifest", "Helm", "cluster", "pod":**
-      Generate Kubernetes manifests:
-      Step 1: Namespace isolation (dev/staging/production)
-      Step 2: Deployments (replicas, resource limits, liveness/readiness probes)
-      Step 3: Services (ClusterIP internal, LoadBalancer/Ingress external)
-      Step 4: ConfigMaps + HPA (auto-scaling on CPU/memory)
-      Output: YAML manifests (namespace, deployment, service, ingress, hpa).
-
-      **If request contains "Terraform", "Bicep", "IaC", "infrastructure as code", "provision":**
-      Generate Infrastructure as Code:
-      Step 1: Provider setup (AWS/Azure, remote state)
-      Step 2: Modules (network, compute, database, storage)
-      Step 3: Variables (input vars with validation, environment overrides)
-      Step 4: Outputs (reference created resources)
-      Output: complete .tf or .bicep files + variables + outputs + backend config.
-
-      **If request contains "AWS", "Lambda", "S3", "CloudFront", "RDS", "ECS":**
-      Design AWS architecture (Compute → Database → API layer → Storage → Monitoring).
-      Output: architecture diagram + resource list + cost estimate + security checklist.
-
-      **If request contains "Azure", "App Service", "Functions", "AKS", "CosmosDB":**
-      Generate Azure deployment (Compute → Database → Networking → Security → Monitoring).
-      Output: Bicep infrastructure code + deployment guide + cost estimate.
-
-      **Otherwise:**
-      Ask: "Is this [Docker] or [Kubernetes] or [Terraform/Bicep IaC] or [AWS] or [Azure]?"
-
-  - name: data
-    description: "Data fast-path — routes to SQL optimization, schema review, or data model design"
-    invokable: true
-    prompt: |
-      Data routing for selected code or request.
-
-      **If a stored procedure or SQL query is selected or pasted:**
-      Optimize SQL Server procedure: SET NOCOUNT ON, TRY/CATCH, cursors→set-ops, indexes, NOLOCK, SARGable WHERE.
-      Output: optimized procedure + index recommendations + change log.
-
-      **If request contains CREATE TABLE statements or "review this schema", "existing schema":**
-      Schema review: normalization (1NF/2NF/3NF), indexes, constraints (NOT NULL/FK/UNIQUE), naming (PascalCase), soft delete.
-      Output: corrected CREATE TABLE + index recommendations + migration skeleton.
-
-      **If request is from plain-language requirements (no existing SQL, describes a feature):**
-      Schema design from requirements: tables, relationships, PKs/FKs, constraints, indexes, normalization rationale.
-      Output: CREATE TABLE statements + index recommendations + design rationale.
-
-      **Otherwise:**
-      Ask: "Is this [SQL query optimization] or [existing schema review] or [new schema design from requirements]?"
-
-  - name: frontend
-    description: "Frontend fast-path — routes to Angular component, UX component, WCAG audit, or responsive layout"
-    invokable: true
-    prompt: |
-      Frontend routing for selected code or request.
-
-      **If request contains "Angular", "component", "standalone", "form", "service", "inject":**
-      Generate complete Angular 17+ standalone component:
-      inject(), OnPush, standalone: true, Typed FormGroup<T>, Service interface + impl, DevExtreme HTML, SCSS with sw- BEM.
-      Output: compilable component + service + model files.
-
-      **If request contains "design", "UX", "UI component", "accessible component", "pattern":**
-      Generate accessible UI component (60-30-10 color, 8-point grid, all states, WCAG 2.1 AA 4.5:1 contrast, ARIA).
-      Output: component code + CSS + accessibility checklist.
-
-      **If request contains "WCAG", "accessibility audit", "a11y", "contrast", "screen reader":**
-      WCAG audit: contrast → focus states → ARIA → responsive (320px-1280px) → motion (prefers-reduced-motion).
-      Output: audit table (Issue | WCAG Level | Severity | Element | Fix Code).
-
-      **If request contains "responsive", "layout", "breakpoint", "mobile", "grid", "flex":**
-      Responsive layout review: mobile-first → breakpoints (480/768/1024/1280/1536px) → fluid scaling → touch targets (44px) → layout shift.
-      Output: breakpoint table (Breakpoint | Issues | Fix) + before/after code.
-
-      **Otherwise:**
-      Ask: "Is this [Angular component] or [UX/design component] or [WCAG audit] or [responsive layout]?"
-
   # ── v3.0.0 Requirements Phase Agents ─────────────────
+
   - name: requirements-to-specs
     description: "Convert business requirement to complete technical specification (6-step analysis)"
     invokable: true
@@ -2749,6 +3173,7 @@ prompts:
         **VERDICT: BLOCKED** — Return to Product Owner. Specific actions required: [list them].
 
   # ── v3.1.0 Requirements Chain Orchestrator ───────────
+
   - name: pp-requirements
     description: "Full requirements chain — all 4 phases (spec → criteria → risk → review) in one pass with shared memory"
     invokable: true
@@ -2905,8 +3330,6 @@ prompts:
       - **NO-GO**: Go/No-Go is NO-GO or Review Verdict is BLOCKED
         "Do not proceed. Blocking conditions: [list]. Required actions: [list]."
         Suggested next: return to Product Owner with Open Blockers list
-
-
 
 experimental:
   readResponseToCursor: false

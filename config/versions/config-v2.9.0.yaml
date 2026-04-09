@@ -1,0 +1,1886 @@
+name: SmartWorkz PowerPlay — Maximum Config
+version: 2.9.0
+schema: v1
+
+# Release metadata (updated per version)
+metadata:
+  releaseDate: "2026-04-09"
+  lastUpdated: "2026-04-09"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.9.0"
+  wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
+  changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
+  supportedContinueVersions: ">=0.8.0"
+  author: "SmartWorkz Dev"
+  license: "MIT"
+
+# ╔══════════════════════════════════════════════════════╗
+# ║  SMARTWORKZ POWERPLAY — Continue.dev Elite Config    ║
+# ║  Cursor-level AI. Windsurf-level agents. Zero cost.  ║
+# ╚══════════════════════════════════════════════════════╝
+#
+#  CAPABILITY MAP:
+#  ┌─────────────────┬────────────────────────────────────┐
+#  │ Chat / Reason   │ Qwen 3.5 9B, DeepSeek R1 8B + 2 new │
+#  │ Fast Apply      │ Qwen Coder (KapilDev) maxTok=16384  │
+#  │ Autocomplete    │ Qwen Coder — debounce 400ms         │
+#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter)        │
+#  │ Cloud (14 total)│ Llama 3.1 70B, Mistral Large, Claude Haiku, DeepSeek V3, Qwen3 235B │
+#  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
+#  │ Rules (57)      │ Core, Security, .NET, Angular, SQL + 49 (agents, data, obs, UX, components, charts, tables, storybook, perf, aws, azure, docker, iac, cicd, security, integration, mobile) │
+#  │ Prompts (70)    │ /review +62 including 40 agent commands │
+#  └─────────────────┴────────────────────────────────────┘
+
+defaultCompletionOptions:
+  maxTokens: 4096
+  temperature: 0.3
+
+# ─────────────────────────────────────────────────────────
+# RULES — system instructions for ALL chat/agent/edit
+# Equivalent to Cursor's .cursorrules
+# ─────────────────────────────────────────────────────────
+rules:
+  - name: smartworkz-core
+    alwaysApply: true
+    rule: |
+      You are an expert AI assistant embedded in SmartWorkz Technologies.
+      Stack: .NET 8, ASP.NET Core, Angular 17+, SQL Server 2022, Azure DevOps, AWS.
+      Always:
+        - Use C# 12 features (primary constructors, collection expressions)
+        - Prefer async/await with CancellationToken parameters
+        - Use ILogger<T>, never Console.Write
+        - Angular: standalone components, inject(), OnPush, typed forms
+      Never:
+        - Leave TODO comments in generated code
+        - Use Thread.Sleep — always Task.Delay
+        - Expose raw exceptions to API consumers
+        - Hardcode secrets or connection strings
+
+  - name: dotnet-rules
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      .NET/C# standards:
+      - Controllers: [ApiController] + [Route("api/v1/[controller]")] — no business logic
+      - Services: interface + Scoped implementation
+      - Repositories: Dapper with parameterised queries only
+      - Validation: FluentValidation at controller boundary
+      - Errors: ProblemDetails RFC 7807
+      - All DB calls must be async with Async suffix
+      - Enable nullable reference types (#nullable enable)
+      - XML docs required on all public members
+
+  - name: angular-rules
+    globs: ["**/*.ts", "**/*.html"]
+    alwaysApply: false
+    rule: |
+      Angular 17+ standards:
+      - Standalone components only — no NgModules for new code
+      - inject() not constructor injection
+      - ChangeDetectionStrategy.OnPush everywhere
+      - Signals preferred over BehaviorSubject for local state
+      - DevExtreme: DxDataGrid/DxTreeList — explicit column definitions always
+      - Typed reactive forms: FormGroup<T>
+      - HTTP: typed responses, takeUntilDestroyed()
+      - Routes: lazy-loaded with loadComponent
+
+  - name: sql-rules
+    globs: ["**/*.sql"]
+    alwaysApply: false
+    rule: |
+      SQL Server standards:
+      - SET NOCOUNT ON at top of every stored procedure
+      - Parameterised queries only — never string concatenation
+      - WITH (NOLOCK) on read-heavy SELECTs
+      - Temp tables over CTEs for > 10k rows
+      - BEGIN TRY / BEGIN CATCH on all procedures
+      - Set-based operations over cursors always
+      - SARGable WHERE clauses (no functions wrapping columns)
+
+  - name: security-always
+    alwaysApply: true
+    rule: |
+      Security (applied everywhere):
+      - Never hardcode secrets, API keys, connection strings
+      - Parameterised queries only — flag string concatenation
+      - Sanitise all user input before use
+      - Flag any code logging passwords, tokens, or PII
+      - Angular: use DomSanitizer — never bypass security
+
+  - name: performance-audit
+    globs: ["**/*.cs", "**/*.ts", "**/*.sql"]
+    alwaysApply: false
+    rule: |
+      Performance standards:
+      - SQL: Avoid N+1 queries, SELECT specific columns, add indexes, parameterised only
+      - C#: Use async/await, minimize allocations, use Span<T> for perf-critical code
+      - TypeScript: Lazy-load modules, OnPush change detection, signals over subscriptions
+      - General: Profile before optimizing, use benchmarks, avoid premature optimization
+
+  - name: memory-management
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      Memory management standards:
+      - using statement for all IDisposable, IAsyncDisposable
+      - Unsubscribe from events in Dispose or use weak event pattern
+      - No circular references or event handler leaks
+      - WeakReference for caches, not strong references
+      - Profile for memory leaks: unregistered event handlers, unreleased resources
+
+  - name: async-best-practices
+    globs: ["**/*.cs", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Async/await standards:
+      - Never use .Result or .Wait() — always await
+      - CancellationToken on all async methods
+      - ConfigureAwait(false) in libraries (C#)
+      - No async/await in constructors — use factory or separate Init method
+      - Never fire-and-forget: if you Task.Run, always await or .ContinueWith() error handling
+
+  - name: error-handling-advanced
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      Error handling standards:
+      - Custom exception hierarchy — never throw base Exception
+      - HTTP: ProblemDetails RFC 7807 format for errors
+      - Structured logging: correlation IDs, context, severity
+      - Polly for resilience: retry policies, circuit breakers, timeouts
+      - Never expose raw stack traces to API clients
+      - Log with ILogger<T>, never Console — include context
+
+  # ── v1.2.0 Rules ───────────────────────────────────────
+
+  - name: testing-pyramid
+    globs: ["**/*Tests.cs", "**/*.spec.ts", "**/*.test.ts"]
+    alwaysApply: false
+    rule: |
+      Testing pyramid standards:
+      - 70% unit tests (fast, focused, isolated)
+      - 20% integration tests (realistic, slower)
+      - 10% e2e tests (slow, full workflow)
+      - Mock at infrastructure boundary only, not internal business logic
+      - AAA pattern (Arrange/Act/Assert) always
+      - Test names describe scenario and expected result
+      - No testing logic in production code
+
+  - name: documentation-standards
+    globs: ["**/*.cs", "**/*.ts", "**/*.md"]
+    alwaysApply: false
+    rule: |
+      Documentation standards:
+      - C#: XML docs on all public members (<summary>, <param>, <returns>, <exception>, <example>)
+      - TypeScript: JSDoc on all exported functions (/** @param, @returns, @throws */)
+      - README in each major folder (purpose, usage, key classes/functions)
+      - No undocumented public API
+      - Update docs when code changes
+      - Examples in docs must be runnable
+
+  - name: deployment-safety
+    globs: ["**/appsettings*.json", "**/Dockerfile", "**/*.yml", "**/*.yaml"]
+    alwaysApply: false
+    rule: |
+      Deployment safety standards:
+      - Environment-specific config in appsettings.{env}.json only
+      - No secrets in source code (API keys, passwords, connection strings)
+      - Health check endpoints (/health) required
+      - Dockerfile: non-root user, minimal image, security scan
+      - CI gate: all checks must pass before merge
+      - Pre-deploy: run integration tests in staging
+      - Rollback plan documented for major changes
+
+  - name: accessibility
+    globs: ["**/*.html", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Accessibility standards (WCAG 2.1 AA):
+      - ARIA labels on all interactive elements (buttons, inputs, modals)
+      - Keyboard navigation: Tab, Enter, Escape must work
+      - Color contrast 4.5:1 (text/background)
+      - No content conveyed by color alone
+      - Focus indicators visible and clear
+      - Angular: use ARIA roles, test with screen readers
+      - Images: alt text describing content, not "image" or "picture"
+
+  - name: performance-budget
+    globs: ["**/*.cs", "**/*.ts", "**/*.sql"]
+    alwaysApply: false
+    rule: |
+      Performance budget standards:
+      - API response time < 200ms (95th percentile)
+      - Initial bundle size < 1MB (gzipped)
+      - SQL queries < 100ms (95th percentile)
+      - Maximum 5 database calls per request
+      - Images: WebP format, compressed, responsive sizes
+      - No N+1 queries
+      - No blocking operations (always async)
+      - Profile before optimizing, use benchmarks
+
+  # ── v2.0.0 Agent Rules ────────────────────────────────
+
+  - name: agent-behavior
+    alwaysApply: false
+    rule: |
+      Multi-step autonomous agent behavior:
+      - Plan before executing (show plan, get approval for unsafe operations)
+      - Verify each step before proceeding (no blind forward motion)
+      - Surface blockers immediately (don't hallucinate file paths)
+      - Leave audit trail (explain reasoning, show evidence)
+      - Preserve user intent (don't reinterpret requests)
+      See .continue/rules/agent-behavior.md for detailed patterns.
+
+  - name: pr-standards
+    globs: ["**/*.cs", "**/*.ts", "**/*.md", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Pull request standards:
+      - Maximum 400 lines of changes per PR
+      - One feature/fix per PR (not multiple unrelated changes)
+      - Linked to ticket (issue number in title)
+      - Tests included and passing (coverage >= 80%)
+      - CHANGELOG updated if user-facing
+      - Description explains: What | Why | How | Testing
+      See .continue/rules/pr-standards.md for detailed standards.
+
+  - name: code-review-standards
+    globs: ["**/*.cs", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Code review mindset and severity levels:
+      - Assume good intent, ask questions before critiquing
+      - Use severity levels: 🔴 Critical, 🟠 High, 🟡 Medium, 🔵 Low
+      - Be specific: show problem AND fix
+      - Approve when: tests pass, coverage maintained, no Critical issues
+      - Praise good code, bikeshed sparingly
+      See .continue/rules/code-review-standards.md for detailed guidelines.
+
+  - name: ci-cd-standards
+    globs: ["**/*.yml", "**/*.yaml", "**/Dockerfile"]
+    alwaysApply: false
+    rule: |
+      CI/CD pipeline standards and gates:
+      - Lint → Test → Build → Security Scan → Coverage Check → Deploy
+      - Hard blocks: linter fails, tests fail, coverage decreases, security vulns
+      - Secrets in CI/CD environ, never hardcoded
+      - Auto-deploy to staging, manual approval for production
+      - Rollback triggers: error rate > 5%, response time > 2x baseline
+      See .continue/rules/ci-cd-standards.md for full pipeline details.
+
+  - name: workspace-conventions
+    alwaysApply: false
+    rule: |
+      Project-specific conventions and architectural patterns:
+      - Naming: PascalCase files, camelCase functions, UPPER_SNAKE_CASE constants
+      - Services: interface + DI, no direct instantiation
+      - Repositories: parameterized queries always, no SQL injection
+      - Tests: AAA pattern (Arrange/Act/Assert), 80%+ coverage target
+      - Errors: custom exceptions, not generic Error()
+      See .continue/rules/workspace-conventions.md for full project conventions.
+
+  # ── v2.4.0 Cloud & DevOps Rules ───────────────────────
+
+  - name: aws-patterns
+    globs: ["**/*.ts", "**/*.js", "**/*.py", "**/*.yaml", "**/*.yml", "**/*.json", "**/*.tf"]
+    alwaysApply: false
+    rule: |
+      AWS architecture patterns and best practices:
+      - Lambda: Cold start optimization, connection pooling, structured logging, error handling, async with DLQ
+      - RDS: Multi-AZ Aurora, automated backups, IAM auth, connection pooling (RDS Proxy), monitoring
+      - DynamoDB: On-demand or auto-scaling, TTL for cleanup, GSI for queries, PITR enabled, partition key design
+      - API Gateway: Request validation, throttling, WAF, CORS restricted, security headers, logging
+      - CloudFront: Origin Access Identity (S3 only), cache policies, security headers, compression, access logging
+      - IAM: Least privilege roles per service, no root access, MFA, credentials rotated, audit with CloudTrail
+      See .continue/rules/aws-patterns.md for complete AWS standards.
+
+  - name: azure-deployment
+    globs: ["**/*.ts", "**/*.js", "**/*.cs", "**/*.yaml", "**/*.yml", "**/*.json", "**/*.bicep"]
+    alwaysApply: false
+    rule: |
+      Azure deployment patterns and best practices:
+      - App Service: Health check endpoint, auto-scaling, deployment slots (blue-green), HTTPS only, Managed Identity
+      - Azure Functions: Consumption Plan for bursty, Premium Plan for VPC, timeout configured, durable functions for long operations
+      - SQL Database: TDE enabled, Elastic Pools for cost, Always Encrypted for PII, auditing enabled, automated backups
+      - Cosmos DB: Partition key design, TTL for cleanup, change feed for events, auto-scaling, global replication
+      - Application Insights: Custom metrics/events, dependency tracking, alerts configured, structured logging
+      - Key Vault: All secrets stored, Managed Identity access, soft delete, access logging, rotation policy
+      See .continue/rules/azure-deployment.md for complete Azure standards.
+
+  - name: docker-kubernetes
+    globs: ["**/Dockerfile*", "**/*.dockerfile", "**/docker-compose*.yml", "**/*.yaml", "**/*.yml", "**/.dockerignore"]
+    alwaysApply: false
+    rule: |
+      Docker and Kubernetes standards:
+      - Dockerfile: Multi-stage builds, specific base version (not latest), minimal layers, non-root user, health check
+      - Docker Compose: Named volumes, service networking, resource limits, health checks, .env for secrets
+      - Kubernetes: Deployments (not bare Pods), resource requests/limits, liveness/readiness probes, ConfigMaps/Secrets separation
+      - Security: securityContext (non-root), RBAC, network policies, private registries, image scanning
+      - Scaling: HPA configured, pod disruption budgets, anti-affinity for reliability
+      - Networking: Services for DNS, Ingress for routing, network policies for isolation
+      See .continue/rules/docker-kubernetes.md for Docker/K8s patterns.
+
+  - name: infrastructure-iac
+    globs: ["**/*.tf", "**/*.json", "**/*.bicep", "**/*.yaml", "**/*.yml", "**/terraform/**", "**/cloudformation/**"]
+    alwaysApply: false
+    rule: |
+      Infrastructure as Code standards (Terraform, CloudFormation, Bicep):
+      - Terraform: Remote state (S3/Terraform Cloud), state locking, modules for reusability, version pins, workspaces per environment
+      - CloudFormation: YAML format, nested stacks, change sets for review, parameter validation, mappings for regions
+      - Bicep: Symbolic names, metadata documentation, module organization, parameter decorators
+      - State management: Encryption at rest, versioning, access control, no local state, regular backups
+      - Secrets: External storage (Secrets Manager/Key Vault), never in code/state, regular rotation
+      - GitOps: All changes via CI/CD, PR approvals required, tags for releases, audit trail
+      See .continue/rules/infrastructure-iac.md for IaC standards.
+
+  - name: ci-cd-automation
+    globs: [".github/workflows/**", ".azure-pipelines/**", "**/*.yml", "**/*.yaml", "**/Jenkinsfile", "**/deploy/**"]
+    alwaysApply: false
+    rule: |
+      CI/CD automation standards (GitHub Actions, Azure Pipelines):
+      - GitHub Actions: Workflow matrix for multi-version testing, cache dependencies, status checks on PRs, job separation (lint/test/build/deploy)
+      - Azure Pipelines: Multi-stage (build/test/deploy), template reuse, approval gates, variable groups for secrets
+      - Deployment: Blue-green deployments, health checks, automated rollback, smoke tests, canary/rolling updates
+      - Testing: Unit, integration, security tests before deploy, coverage reports, artifact archiving
+      - Secrets: GitHub Secrets, Azure variable groups, no hardcoded credentials, regular rotation
+      - Monitoring: Post-deploy health checks, metrics monitoring, deployment alerts, audit logs
+      See .continue/rules/ci-cd-automation.md for CI/CD standards.
+
+  # ── v2.3.0 Advanced UI Patterns Rules ─────────────────
+
+  - name: component-patterns
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.js", "**/*.css", "**/*.scss"]
+    alwaysApply: false
+    rule: |
+      Component library patterns (Material Design, Chakra UI, Tailwind):
+      - Material Design 3: Elevation, 8dp grid, ripple effects, semantic colors
+      - Chakra UI: Design tokens, Box/Flex/Grid, responsive syntax [mobile, tablet, desktop], dark mode
+      - Tailwind CSS: Utility-first, custom theme tokens, dark: prefix, responsive prefixes (sm:, md:, lg:)
+      - Component API: Typed props, size/variant presets, disabled/loading/error states, ref forwarding
+      - Theme customization: Single design system, CSS variables or theme tokens, light/dark support
+      See .continue/rules/component-patterns.md for library patterns.
+
+  - name: data-visualization
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.js", "**/*.html"]
+    alwaysApply: false
+    rule: |
+      Data visualization standards (charts, dashboards, D3):
+      - Chart selection: Bar (categories), Line (trends), Pie (proportions ≤5 slices), Scatter (correlation)
+      - Recharts: Responsive containers, labeled axes, legend, formatted tooltips, no 3D effects
+      - Dashboard layout: 3-column grid (desktop), metrics cards, time range picker, refresh button
+      - D3.js: Use for custom interactive visualizations, scales for coordinate mapping, enter/update/exit
+      - Accessibility: Text alternatives (data table), sufficient contrast, legends, no color-only meaning
+      - Performance: Lazy-load chart libraries, aggregate data if > 1000 points, canvas for > 10k points
+      See .continue/rules/data-visualization.md for chart patterns.
+
+  - name: table-patterns
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.js", "**/*.html"]
+    alwaysApply: false
+    rule: |
+      Data table patterns (sorting, filtering, pagination):
+      - Semantic HTML: <table>, <thead>, <th scope="col">, <tbody>, aria-sort on headers
+      - Sorting: Clickable column headers, aria-sort (ascending/descending/none)
+      - Filtering: Debounced search (300ms), status/date filters, active filter badges, reset button
+      - Pagination: Client-side for < 1000 rows, server-side for >= 1000, prev/next, page numbers, goto input
+      - Items per page: Selector (10, 25, 50, 100), show total count ("X of Y results")
+      - Virtualization: Use react-window for > 500 rows (only render visible rows)
+      - Responsive: Horizontal scroll or card layout on mobile
+      See .continue/rules/table-patterns.md for table implementation.
+
+  - name: storybook-standards
+    globs: ["**/*.stories.tsx", "**/*.stories.jsx", "**/*.stories.ts", "**/*.stories.js", "**/storybook/**"]
+    alwaysApply: false
+    rule: |
+      Storybook component documentation standards:
+      - Story structure: One file per component, default export with title/component, decorators for layout
+      - ArgTypes: Prop documentation with control types (select, boolean, text), descriptions
+      - Variants: Create stories for each state (default, primary, secondary, danger, disabled, loading, error)
+      - Accessibility: a11y addon enabled, no WCAG AA violations, test color contrast, keyboard nav
+      - Chromatic: Visual regression testing on every story variant, screenshot baselines
+      - Interaction testing: play() function with userEvent for clicks, form submission, keyboard nav
+      - Documentation: DocBlock comments, usage examples, component purpose, design system links
+      See .continue/rules/storybook-standards.md for story patterns.
+
+  - name: performance-monitoring
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.js", "**/*.json"]
+    alwaysApply: false
+    rule: |
+      Web performance monitoring standards:
+      - Core Web Vitals: LCP < 2.5s, INP < 200ms, CLS < 0.1 (measure in RUM, set alerts)
+      - Performance budgets: Bundle < 250KB (gzip), set in CI, fail build if exceeded
+      - Lighthouse: Run in CI on every PR, target > 90 score, assertions for performance/accessibility
+      - Image optimization: WebP + JPEG fallback, responsive srcset, lazy load, aspect-ratio to prevent CLS
+      - Code splitting: Dynamic imports by route, lazy-load heavy libraries (D3, editors), no blocking JS
+      - Monitoring: Sentry, Google Analytics RUM, track metrics in analytics, set up alerts
+      - Low-end testing: Profile on slow 4G, mid-range device, monitor main thread < 50ms tasks
+      See .continue/rules/performance-monitoring.md for monitoring setup.
+
+  # ── v2.2.0 UX Design Rules ────────────────────────────
+
+  - name: ux-design-system
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.css", "**/*.scss"]
+    alwaysApply: false
+    rule: |
+      UI/UX design system standards:
+      - Color: 60-30-10 rule, semantic tokens (primary, secondary, success, danger)
+      - Typography: 1.25 Major Third scale, 1.5-1.75 line height, 65ch max width
+      - Spacing: 8-point grid (4px, 8px, 16px, 24px, 32px, 48px, 64px)
+      - Responsive: Mobile-first, breakpoints 320px/480px/768px/1024px/1280px
+      - Components: Button hierarchy (primary, secondary, tertiary, destructive)
+      - Dark mode: Semantic tokens for light/dark variants
+      See .continue/rules/ux-design-system.md for complete design system.
+
+  - name: accessibility-wcag
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.html"]
+    alwaysApply: false
+    rule: |
+      WCAG 2.1 AA accessibility standards:
+      - Contrast: 4.5:1 normal text, 3:1 large text (≥18px bold), 3:1 UI components
+      - Focus: Visible focus indicators on ALL interactive elements (2px outline, 2px offset)
+      - Keyboard: Full keyboard navigation, no keyboard traps, skip links
+      - ARIA: Semantic HTML (<button>, <nav>, <main>), aria-label for icons, aria-expanded
+      - Touch: 44×44px minimum target size, 8px gaps between targets
+      - Color: Never convey information by color alone, use patterns/text/icons
+      See .continue/rules/accessibility-wcag.md for WCAG checklist.
+
+  - name: responsive-mobile-first
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.css", "**/*.scss"]
+    alwaysApply: false
+    rule: |
+      Mobile-first responsive design standards:
+      - Base styles: Start at 320px (mobile), progressive enhancement
+      - Breakpoints: 480px (small), 768px (tablet), 1024px (lg), 1280px (xl), 1536px (2xl)
+      - Fluid typography: Use clamp() for smooth scaling across viewport sizes
+      - Container widths: Mobile 100% + padding, Desktop max-width 1280px centered
+      - Images: Responsive images with srcset, WebP format, lazy loading, aspect-ratio
+      - Layout shift: Avoid with aspect-ratio, reserved space for ads/images
+      See .continue/rules/responsive-mobile-first.md for responsive patterns.
+
+  - name: animation-motion
+    globs: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.css"]
+    alwaysApply: false
+    rule: |
+      Animation and motion standards:
+      - GPU acceleration: ONLY animate transform and opacity (never width, height, margin)
+      - Durations: instant=50ms, fast=100ms, normal=200ms, slow=300ms, slower=500ms
+      - Easing: ease-out (default), ease-in (exit), bounce (playful)
+      - Accessibility: Always support prefers-reduced-motion media query
+      - Performance: No layout thrashing, smooth 60fps animations
+      - Micro-interactions: Loading states, transitions, hover effects
+      See .continue/rules/animation-motion.md for motion guidelines.
+
+  - name: design-tokens
+    globs: ["**/*.css", "**/*.scss", "**/tokens/*"]
+    alwaysApply: false
+    rule: |
+      Design tokens and CSS variables standards:
+      - Token structure: Colors, spacing, typography, shadows, border radius
+      - CSS custom properties: --color-primary, --spacing-base, --font-scale, --shadow-lg
+      - Dark mode: Paired tokens (--bg-primary light/dark, --text-primary light/dark)
+      - Naming: Semantic (primary, secondary, danger), not color-based (blue-500)
+      - Format: CSS file with organized sections, documented with comments
+      - Usage: Use tokens in all components, sync with design tools (Figma)
+      See .continue/rules/design-tokens.md for token standards.
+
+  # ── v2.1.0 Data & Observability Rules ──────────────────
+
+  - name: database-design
+    globs: ["**/*.sql", "**/Migrations/**", "**/*Migration*.cs", "**/DbContext*.cs"]
+    alwaysApply: false
+    rule: |
+      Database schema design standards:
+      - Normalization: 1NF, 2NF, 3NF (no transitive dependencies)
+      - Naming: PascalCase tables/columns, Primary key = Id, Foreign key = [Table]Id
+      - Indexes: Foreign keys, WHERE columns, JOIN columns, ORDER BY columns
+      - Constraints: NOT NULL on required, UNIQUE on unique data, CHECK for valid values
+      - Soft delete: IsDeleted (BIT) + DeletedAt (nullable DATETIME), never hard delete
+      - Migrations: reversible, safe (add nullable, backfill, then add NOT NULL)
+      See .continue/rules/database-design.md for complete schema standards.
+
+  - name: observability-standards
+    globs: ["**/*.cs", "**/*.ts", "**/appsettings*.json"]
+    alwaysApply: false
+    rule: |
+      Observability standards — logging, tracing, metrics:
+      - Structured logging: ILogger<T>, key=value format (not string interpolation)
+      - Never log secrets: passwords, tokens, API keys, PII
+      - Correlation ID on all logs (request tracing end-to-end)
+      - Metrics: track key business operations + system health (latency, errors)
+      - Health checks: /health (liveness), /health/ready (readiness + dependencies)
+      - Log levels: Debug (dev only), Info (user events), Warn (unexpected but handled), Error (needs attention)
+      See .continue/rules/observability-standards.md for full standards.
+
+  - name: api-versioning
+    globs: ["**/*Controller*.cs", "**/*.ts", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      API versioning and breaking change management:
+      - Version in URL: /api/v1/, /api/v2/ (never query string)
+      - Backward compatible: add fields/endpoints, don't remove (breaking = major version bump)
+      - Deprecation: 6-month notice (Deprecation header), migration guide, 410 Gone after sunset
+      - Non-breaking: add optional params, add response fields, add endpoints
+      - Breaking requires: new major version + migration documentation
+      See .continue/rules/api-versioning.md for full versioning strategy.
+
+  - name: input-validation
+    globs: ["**/*.cs", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Input validation and sanitization standards:
+      - Validate at boundaries: API controllers, message handlers (not in business logic)
+      - Use declarative validators: FluentValidation (C#), Zod (TypeScript)
+      - Parameterized queries always: never string concatenation in SQL
+      - HTML encoding: safe rendering in views (prevent XSS)
+      - File uploads: validate size, MIME type, magic bytes; random filenames; outside web root
+      - Reject invalid early: never pass unvalidated data to services/database
+      See .continue/rules/input-validation.md for validation patterns.
+
+  - name: git-workflow
+    alwaysApply: false
+    rule: |
+      Git workflow standards — branch naming, commits, merge strategy:
+      - Branch names: feature/123-description, fix/456-description (lowercase, hyphens, ticket ID)
+      - Commits: Conventional Commits format: feat(scope): subject, explain WHY in body
+      - Granularity: one logical change per commit (git bisect safe)
+      - Merge strategy: squash features before merge to main, merge commit for multi-commit work
+      - Never rebase public branches (breaks others' history)
+      - Conflict resolution: test after merging (understand both sides)
+      See .continue/rules/git-workflow.md for complete git standards.
+
+  # ── v2.5.0 Security & Compliance Rules ────────────────────
+
+  - name: zero-trust-security
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.tf", "**/*.bicep", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Zero-trust security assumes every access request is potentially compromised.
+      Always:
+        - Verify every identity (MFA mandatory, never trust source IP)
+        - Authenticate before authorizing (OAuth 2.0, PKCE, JWT short-lived tokens)
+        - Encrypt all data in transit (TLS 1.2+) and at rest (AES-256)
+        - Segment networks (microsegmentation, no flat networks)
+        - Log and monitor all access (immutable audit trails)
+        - Apply least privilege (minimum permissions needed)
+        - Assume breach mentality (defense in depth)
+      Never:
+        - Trust network perimeter (assume compromised)
+        - Use single-factor authentication
+        - Allow unencrypted internal traffic
+        - Grant broad "admin" permissions
+      See .continue/rules/zero-trust-security.md for full architecture.
+
+  - name: secrets-rotation
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.tf", "**/*.bicep", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Secrets (API keys, passwords, tokens) are attack targets. Rotate automatically, store securely, audit access.
+      Always:
+        - Store secrets in vault (AWS Secrets Manager, Azure Key Vault)
+        - Never commit secrets to git (use .gitignore, .env not committed)
+        - Use managed identity instead of credentials when possible
+        - Encrypt secrets at rest and in transit
+        - Audit all secret access (who, when, what)
+        - Rotate automatically (every 30-90 days)
+        - Maintain version history (last 3 versions)
+      Never:
+        - Hardcode secrets in code
+        - Store secrets in config files
+        - Commit .env files with real secrets
+        - Use same secret across environments
+      See .continue/rules/secrets-rotation.md for rotation automation.
+
+  - name: compliance-standards
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.tf", "**/*.bicep", "**/*.md", "**/*.yaml"]
+    alwaysApply: false
+    rule: |
+      Compliance frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS) establish security and privacy controls.
+      Always:
+        - Document all policies, procedures, and evidence
+        - Maintain audit logs (1+ year retention)
+        - Implement controls systematically (map to framework requirements)
+        - Schedule annual independent audits (SOC 2 Type II)
+        - Address audit findings (remediate within SLA)
+        - Track non-conformities and remediation (ISO 27001)
+      Never:
+        - Skip documentation (auditors verify everything)
+        - Ignore audit findings
+        - Make exceptions to controls
+      See .continue/rules/compliance-standards.md for SOC 2, ISO 27001, HIPAA, PCI-DSS details.
+
+  - name: penetration-testing
+    globs: ["**/*.md", "**/*.yaml", "**/*.yml", "**/*.tf"]
+    alwaysApply: false
+    rule: |
+      Penetration testing systematically identifies security weaknesses before attackers do.
+      Always:
+        - Define scope clearly (systems in/out of scope)
+        - Obtain written authorization (signed Rules of Engagement)
+        - Follow NIST phases (reconnaissance → scanning → enumeration → exploitation)
+        - Test OWASP Top 10 vulnerabilities (Web, Mobile, API)
+        - Document findings with CVSS scores
+        - Provide clear remediation steps (actionable, specific)
+        - Assign remediation owners with deadlines
+        - Re-test to confirm fixes
+      Never:
+        - Test without authorization (illegal)
+        - Exceed scope (test only in-scope systems)
+        - Disclose findings before remediation window closes
+      See .continue/rules/penetration-testing.md for planning and methodology.
+
+  - name: incident-response
+    globs: ["**/*.md", "**/*.yaml", "**/*.yml", "**/*.tf"]
+    alwaysApply: false
+    rule: |
+      Security incidents are inevitable. Respond quickly, communicate clearly, investigate thoroughly.
+      Always:
+        - Follow IR playbook (don't improvise)
+        - Establish incident commander (single decision maker)
+        - Document timeline of events (evidence preservation)
+        - Communicate status regularly (internal + external)
+        - Isolate affected systems (prevent spread)
+        - Schedule post-mortem within 48 hours (blameless, systems-focused)
+        - Create action items with owners & deadlines
+        - Share findings widely (learn as organization)
+      Never:
+        - Panic or make hasty decisions
+        - Delete logs (destroy evidence)
+        - Blame individuals (focus on systems)
+        - Skip the post-mortem
+      See .continue/rules/incident-response.md for playbooks and post-mortem templates.
+
+  # ── v2.6.0 Integration & APIs Rules ─────────────────────
+
+  - name: event-driven-architecture
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.tf", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Event-driven systems decouple services via events (immutable facts).
+      Always:
+        - Use event sourcing (append-only event log, replay for state)
+        - Implement CQRS (separate read model from write model)
+        - Design idempotent handlers (same event processed twice = same result)
+        - Handle eventual consistency (accept temporary lag)
+        - Use saga pattern for multi-step processes (compensating transactions)
+        - Implement event deduplication (prevent duplicate processing)
+      Never:
+        - Mix events and commands (event = fact, command = request)
+        - Update event log (immutable append-only)
+        - Assume synchronous consistency
+      See .continue/rules/event-driven-architecture.md for patterns.
+
+  - name: api-gateway-patterns
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      API gateways route requests, compose responses, rate limit, cache, secure.
+      Always:
+        - Route by path, method, header (service discovery)
+        - Compose responses from multiple services (parallel calls)
+        - Rate limit per user & endpoint (sliding window, Redis-backed)
+        - Cache GET responses (reduce backend load)
+        - Version APIs (/api/v1, /api/v2, maintain backward compat)
+        - Add security headers (CORS, CSP, HSTS, X-Frame-Options)
+      Never:
+        - Expose backend services directly
+        - Add business logic (belongs in services)
+        - Store state (gateways are stateless)
+      See .continue/rules/api-gateway-patterns.md for composition.
+
+  - name: message-queue-patterns
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Message queues enable async communication (RabbitMQ, Kafka).
+      Always:
+        - Use queues for tasks (point-to-point), topics for events (pub-sub)
+        - Implement dead letter queue (handle failures)
+        - Use durable queues (survive broker restart)
+        - Retry with exponential backoff (1s, 2s, 4s, 8s, 16s)
+        - Make handlers idempotent (safe to process same message twice)
+        - Use consumer groups (distribute load)
+        - Set message TTL (prevent infinite queuing)
+      Never:
+        - Lose messages (configure durability)
+        - Process messages out of order (use partition keys)
+        - Retry forever (set max retries: 5)
+      See .continue/rules/message-queue-patterns.md for RabbitMQ/Kafka.
+
+  - name: webhook-standards
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Webhooks push events to subscribers (real-time integrations).
+      Always:
+        - Use HTTPS only (encrypted delivery)
+        - Sign with HMAC-SHA256 (prevent spoofing)
+        - Include timestamp & event ID (prevent replay, detect duplicates)
+        - Retry with exponential backoff (max 5 retries)
+        - Provide webhook logs/history (delivery status)
+        - Disable after max retries (alert subscriber)
+        - Verify signature on subscriber side (constant-time comparison)
+      Never:
+        - Send webhooks over HTTP
+        - Skip signature verification
+        - Retry forever (DoS vector)
+      See .continue/rules/webhook-standards.md for implementation.
+
+  - name: integration-testing
+    globs: ["**/*.cs", "**/*.ts", "**/*.js", "**/*.yaml", "**/*.yml"]
+    alwaysApply: false
+    rule: |
+      Integration tests validate components working together.
+      Always:
+        - Use contract testing (APIs honor contracts)
+        - Test E2E workflows (critical paths)
+        - Use real/test databases (not mocks)
+        - Test data in version control (factories, seeds)
+        - Clean up after tests (isolation)
+        - Run integration tests in CI/CD (every commit)
+        - Maintain ~70% unit, ~20% integration, ~10% E2E tests
+      Never:
+        - Mock databases in integration tests
+        - Skip integration tests
+        - Use production data in tests
+      See .continue/rules/integration-testing.md for contract testing.
+
+  # ── v2.7.0 Mobile & Cross-Platform Rules ────────────────
+
+  - name: mobile-development
+    globs: ["**/*.swift", "**/*.kt", "**/*.tsx", "**/*.dart", "**/*.ts", "**/*.js"]
+    alwaysApply: false
+    rule: |
+      Mobile app standards for iOS (Swift), Android (Kotlin), React Native, Flutter.
+      Always:
+        - Use platform-native patterns (SwiftUI, Jetpack Compose, React Navigation)
+        - Store credentials in secure storage (Keychain, KeyStore, secure_storage)
+        - Test on real devices + simulators (different perf profiles)
+        - Optimize for battery + memory (lazy load, memoize, unsubscribe)
+        - Use async/await (no blocking calls, Thread.sleep, UIViewController.present synchronously)
+        - Handle offline gracefully (local DB, sync queue, conflict resolution)
+        - Never hardcode API keys, secrets, or configuration
+      Never:
+        - Store tokens/passwords in plaintext SharedPreferences/AsyncStorage
+        - Make synchronous network calls (blocks UI)
+        - Log PII, tokens, passwords
+        - Ignore memory leaks (retain cycles, unmanaged listeners)
+      See .continue/rules/mobile-development.md for platform-specific standards.
+
+  - name: cross-platform-design
+    globs: ["**/*.tsx", "**/*.ts", "**/*.dart", "**/*.js"]
+    alwaysApply: false
+    rule: |
+      Cross-platform design: write once, respect platform conventions.
+      Always:
+        - Use platform abstraction layer (no Platform.OS scattered in components)
+        - Adapt UI per platform (iOS: stack nav + swipe back, Android: tabs + back button)
+        - Use design tokens (colors, spacing adapt per platform)
+        - Test on 2+ platforms + screen sizes (responsive + adaptive)
+        - Follow each platform's HIG (Human Interface Guidelines)
+      Never:
+        - Hardcode platform checks in business logic
+        - Use web UI patterns on mobile (hover states, right-click)
+        - Assume same screen size (mobile portrait ≠ tablet landscape)
+      See .continue/rules/cross-platform-design.md for architecture patterns.
+
+  - name: offline-first
+    globs: ["**/*.swift", "**/*.kt", "**/*.tsx", "**/*.dart", "**/*.ts", "**/*.js"]
+    alwaysApply: false
+    rule: |
+      Offline-first: app works without network, syncs when available.
+      Always:
+        - Load from local DB first (don't wait for network)
+        - Queue changes locally when offline (event log, transaction log)
+        - Sync in background (don't block user)
+        - Handle conflicts (latest-write-wins, merge, user prompt)
+        - Use soft deletes (IsDeleted + DeletedAt, enable recovery)
+        - Show sync status to user (synced ✓, syncing ↻, offline ⚠)
+        - Encrypt local database if storing PII
+      Never:
+        - Block on network in main thread
+        - Hard-delete immediately (prevents sync/recovery)
+        - Lose queued changes on app restart (persist event log)
+      See .continue/rules/offline-first.md for sync strategies.
+
+  - name: mobile-security
+    globs: ["**/*.swift", "**/*.kt", "**/*.tsx", "**/*.dart", "**/*.ts", "**/*.js"]
+    alwaysApply: false
+    rule: |
+      Mobile security: devices are threatened (lost, rooted, jailbroken).
+      Always:
+        - Store credentials in native secure storage (Keychain, KeyStore)
+        - Use OAuth 2.0 + PKCE (not password flow, not implicit)
+        - HTTPS only, never HTTP (no exceptions)
+        - Implement certificate pinning for sensitive APIs
+        - Expire tokens (1hr access, 7d refresh)
+        - Detect jailbreak/root (deny access or warn)
+        - Obfuscate code (ProGuard, R8, link-time optimization)
+        - Don't log sensitive data (PII, tokens, passwords)
+      Never:
+        - Store passwords (use OAuth, SSO)
+        - Hardcode API keys (use remote config)
+        - Mix HTTP and HTTPS
+        - Skip certificate validation
+        - Log debug info to device (screenshot capture risk)
+      See .continue/rules/mobile-security.md for credential + network standards.
+
+  - name: app-distribution
+    globs: ["**/*.swift", "**/*.kt", "**/*.tsx", "**/*.dart", "**/*.ts", "**/*.js", "*.gradle", "*.plist", "*.pbxproj"]
+    alwaysApply: false
+    rule: |
+      App distribution: signing, submission, beta testing, versioning.
+      Always:
+        - Use semantic versioning (MAJOR.MINOR.PATCH)
+        - Sign releases with appropriate certificates (iOS: distribution, Android: upload key)
+        - Beta test 48+ hours before submission (TestFlight, internal testing)
+        - Include privacy policy URL, accurate description, screenshots
+        - Monitor crashes, ratings, user feedback post-launch
+        - Plan update strategy (OTA, forced updates only for critical security)
+        - Test on actual devices before submission (not simulator)
+      Never:
+        - Increment version after submission without changes
+        - Hardcode API keys in release builds
+        - Submit untested builds
+        - Use test/development certificates for production
+      See .continue/rules/app-distribution.md for store submission + versioning.
+
+# ─────────────────────────────────────────────────────────
+# MODELS
+# ─────────────────────────────────────────────────────────
+models:
+  # ── Local Chat — Dhoni GPU ─────────────────────────────
+
+  - name: Qwen 3.5 9B [Local Chat]
+    provider: openai
+    model: dhoni-qwen
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    chatOptions:
+      baseSystemMessage: |
+        Senior .NET/Angular architect. Be concise. Use code blocks.
+        Never repeat questions back. Get straight to the solution.
+      baseAgentSystemMessage: |
+        Autonomous coding agent. Think step-by-step. Use tools to read
+        files before editing. Verify logic before finishing.
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: DeepSeek R1 8B [Reasoning]
+    provider: openai
+    model: dhoni-deepseek
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.1
+
+  - name: Phi4 Mini [Fast]
+    provider: openai
+    model: dhoni-phi
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 2048
+      temperature: 0.4
+
+  # ── Fast Apply — KapilDev GPU ──────────────────────────
+  # CRITICAL FIX: maxTokens=16384 prevents mid-file truncation
+  # temperature=0.05 prevents hallucinated code deletion
+
+  - name: Qwen Coder [Apply]
+    provider: openai
+    model: kapil-qwen-coder
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [apply, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: DeepSeek Coder 6.7B [Edit]
+    provider: openai
+    model: kapil-deepseek-coder
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [edit, chat]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  # ── Cloud Fallback — OpenRouter Free ──────────────────
+
+  - name: GPT OSS 120B [Cloud]
+    provider: openai
+    model: openai/gpt-oss-120b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: MiniMax M2.5 [Cloud]
+    provider: openai
+    model: minimax/minimax-m2.5:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 4096
+      temperature: 0.7
+
+  - name: Qwen3 Coder [Cloud Edit]
+    provider: openai
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Gemma 4 26B [Cloud]
+    provider: openai
+    model: google/gemma-4-26b-a4b-it:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  # ── v1.2.0 New Models ──────────────────────────────────
+
+  - name: Llama 3.1 70B [Reasoning]
+    provider: openai
+    model: meta-llama/llama-3.1-70b-instruct:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.2
+
+  - name: Mistral Large [Analysis]
+    provider: openai
+    model: mistralai/mistral-large:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  # ── v2.0.0 Agent Models ────────────────────────────────
+
+  - name: Claude 3.5 Haiku [Fast Agent]
+    provider: openai
+    model: anthropic/claude-3-5-haiku:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.1
+
+  - name: DeepSeek V3 [Coder]
+    provider: openai
+    model: deepseek/deepseek-chat:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.2
+
+  # ── v2.1.0 Agent Models ────────────────────────────────
+
+  - name: Qwen3 235B [Deep Analysis]
+    provider: openai
+    model: qwen/qwen3-235b-a22b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.2
+
+  # ── Embeddings ─────────────────────────────────────────
+
+  - name: NVIDIA Nemotron Embed
+    provider: openai
+    model: llama-nemotron-embed-vl-1b-v2
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [embed]
+
+# ─────────────────────────────────────────────────────────
+# TAB AUTOCOMPLETE — explicit top-level required v0.9+
+# ─────────────────────────────────────────────────────────
+tabAutocompleteModel:
+  provider: openai
+  model: kapil-qwen-coder
+  apiBase: http://rohit:4000/v1
+  apiKey: ${DHONI_API_KEY}
+
+tabAutocompleteOptions:
+  debounceDelay: 400            # Prevents mid-block interruption
+  maxPromptTokens: 1500
+  prefixPercentage: 0.75
+  multilineCompletions: "auto"
+  useCache: true
+  useOtherFiles: true           # Cross-file context like Copilot
+
+# ─────────────────────────────────────────────────────────
+# EMBEDDINGS — explicit top-level required
+# ─────────────────────────────────────────────────────────
+embeddingsProvider:
+  provider: openai
+  model: llama-nemotron-embed-vl-1b-v2
+  apiBase: https://openrouter.ai/api/v1
+  apiKey: ${OPENROUTER_API_KEY}
+
+# ─────────────────────────────────────────────────────────
+# MCP SERVERS — Agent mode tools (Cursor/Windsurf-equivalent)
+# Only active in Agent mode
+# ─────────────────────────────────────────────────────────
+# MCP SERVERS
+# Note: Git, FileSystem, and Playwright are built-in to Continue.dev
+# No need to install separately via npm
+# See: docs/reference/setup/MCP-SERVERS-SETUP.md for detailed setup
+
+mcpServers: []
+# Built-in providers available:
+# - @git (read/write git operations)
+# - @filesystem (read/write files)
+# - @docs (search documentation)
+# - @terminal (shell commands)
+# - @codebase (search codebase)
+#
+# Use in chat with: @provider-name
+
+# ─────────────────────────────────────────────────────────
+# CONTEXT PROVIDERS — @-mentions in chat
+# ─────────────────────────────────────────────────────────
+contextProviders:
+  - name: code
+    params:
+      nRetrieveFiles: 15
+  - name: codebase
+    params:
+      nRetrieve: 30
+      nFinal: 8
+      useReranking: false
+  - name: docs
+    params: {}
+  - name: diff
+    params: {}
+  - name: terminal
+    params: {}
+  - name: problems
+    params: {}
+  - name: folder
+    params: {}
+  - name: file
+    params: {}
+  - name: currentFile
+    params: {}
+  - name: repo-map
+    params: {}
+  - name: open
+    params: {}
+
+# ─────────────────────────────────────────────────────────
+# DOCS INDEXING — @docs targets for semantic search
+# ─────────────────────────────────────────────────────────
+docs:
+  - name: Continue.dev
+    startUrl: https://docs.continue.dev/intro
+  - name: ASP.NET Core 8
+    startUrl: https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core
+  - name: Angular 17
+    startUrl: https://angular.dev/overview
+  - name: DevExtreme
+    startUrl: https://js.devexpress.com/Documentation/ApiReference/
+  - name: Dapper
+    startUrl: https://www.learndapper.com/
+  - name: FluentValidation
+    startUrl: https://docs.fluentvalidation.net/en/latest/
+
+# ─────────────────────────────────────────────────────────
+# PROMPTS — /slash commands
+# ─────────────────────────────────────────────────────────
+prompts:
+  - name: review
+    description: "Full code review — bugs, patterns, security"
+    invokable: true
+    prompt: |
+      Perform a thorough code review. Structure as:
+      ## Summary — one sentence
+      ## Issues Found — table: Severity | Line | Issue | Fix
+      ## Security Concerns — SQL injection, XSS, exposed secrets, auth
+      ## Performance Notes — N+1, blocking calls, missing indexes
+      ## Suggested Refactors — SOLID violations, design patterns
+      Be direct. Include code snippets for every fix.
+
+  - name: optimize-sql
+    description: "Optimise SQL stored procedure"
+    invokable: true
+    prompt: |
+      Optimise this SQL Server stored procedure:
+      1. Add SET NOCOUNT ON
+      2. Add BEGIN TRY/CATCH
+      3. Replace cursors with set-based ops
+      4. Suggest CREATE INDEX for missing indexes
+      5. Replace CTEs with temp tables for > 10k rows
+      6. Add WITH (NOLOCK) where safe
+      7. Make WHERE clauses SARGable
+      Output: complete optimised procedure + index recommendations + change log.
+
+  - name: add-tests
+    description: "Generate xUnit unit tests"
+    invokable: true
+    prompt: |
+      Generate xUnit tests with Moq and FluentAssertions.
+      Cover: happy path, edge cases, null inputs, exceptions.
+      Pattern: MethodName_Scenario_ExpectedResult.
+      Use Arrange/Act/Assert comments. Mock all externals.
+      Output complete test class — no placeholders.
+
+  - name: add-docs
+    description: "Add XML documentation comments"
+    invokable: true
+    prompt: |
+      Add XML docs to all public members:
+      <summary>, <param>, <returns>, <exception>, <remarks>.
+      Add <example> for utility methods. Keep logic unchanged.
+
+  - name: ng-component
+    description: "Generate Angular standalone component"
+    invokable: true
+    prompt: |
+      Generate a complete Angular 17+ standalone component:
+      - inject(), OnPush, standalone: true
+      - Typed FormGroup<T> if form needed
+      - Service interface + implementation
+      - DevExtreme HTML template
+      - SCSS with sw- BEM naming
+      Output: compilable component + service + model files.
+
+  - name: api-endpoint
+    description: "Generate complete .NET API endpoint"
+    invokable: true
+    prompt: |
+      Generate a complete ASP.NET Core 8 endpoint:
+      - Controller + DTOs + FluentValidation
+      - Service interface + Scoped implementation
+      - Dapper repository with parameterised SQL
+      - ILogger<T> + ProblemDetails error handling
+      - DI registration comment for Program.cs
+      Output complete compilable C# files.
+
+  - name: security-scan
+    description: "Security audit — OWASP Top 10 check"
+    invokable: true
+    prompt: |
+      Security audit (OWASP Top 10):
+      Check for: SQL injection, XSS, hardcoded secrets,
+      missing auth, insecure deserialization, path traversal,
+      sensitive data in logs, CORS misconfiguration,
+      missing input validation, exposed stack traces.
+      Output: table — Severity | Line | Vulnerability | Fix Code
+
+  - name: explain-deep
+    description: "Deep explanation of complex code"
+    invokable: true
+    prompt: |
+      Explain this code:
+      1. Problem it solves
+      2. Step-by-step logic
+      3. Key design decisions
+      4. Potential failure modes
+      5. How to improve it
+      Use ASCII diagrams for complex flows.
+
+  # ── v1.1.0 Inline Actions ──────────────────────────────
+
+  - name: inline-review
+    description: "Inline code review — annotated issues with severity"
+    invokable: true
+    prompt: |
+      Quick inline review of selected code.
+      Format: Severity | Line | Issue | Fix Code
+      Keep it tight — one issue per row, no explanations.
+      Severity: Critical | Warning | Info
+      Include specific line numbers and code snippets.
+
+  - name: quick-fix
+    description: "Auto-fix the selected code — apply best practices"
+    invokable: true
+    prompt: |
+      Fix the selected code. Output ONLY the corrected code block.
+      No explanation, no comments, just the fixed code.
+      Apply: proper naming, async/await, error handling, nullable types, IDisposable.
+      Make it production-ready in one pass.
+
+  - name: explain-inline
+    description: "Explain selected code with inline comments"
+    invokable: true
+    prompt: |
+      Add // comments to explain the selected code.
+      One comment per meaningful line.
+      Tone: explain to a junior developer.
+      Output: same code with // comments added.
+      Never change logic, only add explanations.
+
+  - name: refactor-inline
+    description: "Refactor selected code — extract, simplify, modernize"
+    invokable: true
+    prompt: |
+      Refactor the selected code. Output ONLY the refactored code.
+      Pick the most impactful single transformation:
+      1. Extract method (if duplicated or complex)
+      2. Simplify logic (reduce nesting, early returns)
+      3. Modernize syntax (C# 12 features, modern TypeScript)
+      One transformation only. Don't change behavior.
+
+  - name: add-types
+    description: "Add TypeScript types or C# explicit types"
+    invokable: true
+    prompt: |
+      Add types to the selected code.
+      TypeScript: replace 'any', add param/return types, add generic constraints.
+      C#: replace 'var' with explicit types, add nullable annotations (#nullable enable).
+      Output: typed code only, no explanation.
+      Make every type as specific as possible.
+
+  # ── v1.1.0 Utility Prompts ─────────────────────────────
+
+  - name: performance-check
+    description: "Identify performance issues — N+1, allocations, blocking"
+    invokable: true
+    prompt: |
+      Performance audit of selected code.
+      Check for:
+      - SQL N+1 queries, SELECT *, missing indexes
+      - Allocations in loops, large object allocations
+      - Blocking .Result, .Wait(), Thread.Sleep
+      - Unnecessary Enumerable chains
+      Output: Severity | Location | Issue | Fix Code table
+
+  - name: memory-audit
+    description: "Detect memory leaks and disposal issues"
+    invokable: true
+    prompt: |
+      Memory audit of selected code.
+      Check for:
+      - IDisposable without using statement
+      - Event handler leaks (no unsubscribe)
+      - Circular references, cached objects
+      - WeakReference misuse
+      Output: Issues found with line numbers and fixes.
+
+  - name: database-design
+    description: "Review or generate database schema"
+    invokable: true
+    prompt: |
+      Database design analysis:
+      If schema provided: review normalization, indexes, FK constraints, naming.
+      If feature described: suggest schema design, tables, relationships.
+      Output: SQL CREATE TABLE statements + index recommendations + rationale.
+
+  - name: architecture-design
+    description: "System architecture advice for the described feature"
+    invokable: true
+    prompt: |
+      Architecture design for the described feature.
+      Suggest: layer responsibilities, dependency direction, design pattern.
+      Consider: testability, scalability, maintainability.
+      Output: ASCII architecture diagram + layer descriptions + pattern rationale.
+
+  - name: refactor-large
+    description: "Plan a large refactoring — analysis then steps"
+    invokable: true
+    prompt: |
+      Large refactoring plan for selected code/feature.
+      Step 1: Analyze — what needs changing and why
+      Step 2: Plan — ordered refactoring steps with risks
+      Step 3: Structure — which files to change in what order
+      Output: numbered refactoring plan with file paths and estimated effort.
+
+  # ── v1.2.0 Automation Prompts ──────────────────────────
+
+  - name: generate-tests-complete
+    description: "Generate complete test suite — unit, integration, edge cases"
+    invokable: true
+    prompt: |
+      Generate complete test suite for this code.
+      Include:
+      - Unit tests: happy path, edge cases, null inputs, exceptions
+      - Integration tests (if applicable)
+      - Boundary and special case tests
+      Use xUnit + Moq + FluentAssertions (C#) or Jasmine + SpyOn (TypeScript).
+      Pattern: MethodName_Scenario_ExpectedResult.
+      AAA comments. Mock all externals (database, HTTP, file system).
+      Output complete test file — no placeholders.
+
+  - name: doc-complete
+    description: "Generate complete documentation — XML docs, examples, README"
+    invokable: true
+    prompt: |
+      Generate complete documentation for this code:
+      1. XML docs on all public members (<summary>, <param>, <returns>, <exception>, <example>)
+      2. Usage examples (2-3 realistic scenarios with code)
+      3. README section: description, how to use, error handling, gotchas
+      Keep logic unchanged. Output annotated code + README markdown block.
+
+  - name: refactor-module
+    description: "Analyse module for refactoring — dependency map and plan"
+    invokable: true
+    prompt: |
+      Analyse this module for refactoring opportunities.
+      Step 1: Dependency map — what this module depends on, what depends on it
+      Step 2: Issues — SOLID violations, duplication, high complexity, tight coupling
+      Step 3: Refactoring plan — ordered steps with risk and estimated effort per step
+      Step 4: File structure — which files to create/modify/delete
+      Output: structured plan with file paths, effort, and risks clearly listed.
+
+  - name: migrate-version
+    description: "Create migration plan for version/framework upgrade"
+    invokable: true
+    prompt: |
+      Create a migration plan for the described version or framework upgrade.
+      Step 1: Breaking changes — what will break, why, impact assessment
+      Step 2: Migration steps — ordered, safe, incremental steps
+      Step 3: Code changes — before/after examples for key patterns
+      Step 4: Testing plan — how to verify migration succeeded, integration test steps
+      Output: numbered migration guide with code examples and safety notes.
+
+  - name: audit-all
+    description: "Full audit — security, performance, quality, coverage, docs"
+    invokable: true
+    prompt: |
+      Full audit of selected code across all dimensions.
+      ## Security (OWASP Top 10)
+      Table: Severity | Issue | Fix Code | Recommendation
+      ## Performance
+      Table: Issue | Impact | Fix | Estimated Improvement
+      ## Code Quality
+      SOLID violations, complexity, duplication, naming, patterns
+      ## Test Coverage
+      What's missing, high-value tests to add, coverage gap estimate
+      ## Documentation
+      What's undocumented, examples missing
+      Be direct and specific. Include fix code for every issue. Prioritize by impact.
+
+  # ── v2.0.0 Agent Prompts ──────────────────────────────
+
+  - name: pr-review
+    description: "Autonomous PR review — quality, security, performance, testing, docs"
+    invokable: true
+    prompt: |
+      Autonomous PR review of this diff or selection:
+      Step 1: Code quality — complexity, duplication, SOLID, naming conventions
+      Step 2: Security — OWASP Top 10, injection risks, secrets, auth
+      Step 3: Performance — N+1 queries, allocations in loops, blocking awaits
+      Step 4: Testing — coverage gaps, test quality, edge cases missing
+      Step 5: Documentation — missing docs, stale comments, API changes
+      Step 6: Summary — table: Category | Severity | Issue | Line | Fix
+      Output: Approve if no High/Critical issues. Request changes otherwise.
+
+  - name: coverage-gaps
+    description: "Find test coverage gaps and generate test cases"
+    invokable: true
+    prompt: |
+      Analyse code coverage gaps and generate test cases:
+      Step 1: Identify untested methods and branches
+      Step 2: Prioritize by risk (security/data) > complexity > frequency
+      Step 3: For top 5 gaps: generate complete test case (AAA pattern)
+      Use xUnit + Moq + FluentAssertions (C#) or Jasmine + SpyOn (TypeScript).
+      Output: Gap analysis table + complete test cases ready to paste.
+
+  - name: security-agent
+    description: "OWASP Top 10 security audit with remediation"
+    invokable: true
+    prompt: |
+      Security audit using OWASP Top 10:
+      A1 Broken Access Control — check auth on every endpoint
+      A2 Cryptographic Failures — weak ciphers, plaintext secrets
+      A3 Injection — SQL, LDAP, OS command injection
+      A4 Insecure Design — missing rate limits, no input validation
+      A5 Misconfiguration — CORS *, debug mode, verbose errors
+      A6 Vulnerable Dependencies — outdated packages, CVEs
+      A7 Auth Failures — weak passwords, no MFA, broken sessions
+      A8 Integrity Failures — unsigned updates, insecure deserialization
+      A9 Logging Failures — no audit trail, sensitive data in logs
+      A10 SSRF — unvalidated URLs, internal network access
+      Output: Severity | Category | Issue | Line | Exact Fix Code
+
+  - name: perf-optimize
+    description: "Profile, identify bottlenecks, suggest optimizations"
+    invokable: true
+    prompt: |
+      Performance optimization for this code:
+      Step 1: Profile — identify 3 highest-impact bottlenecks
+      Step 2: Diagnose — explain WHY each is slow (with evidence)
+      Step 3: Optimize — show exact fix for each (before/after code)
+      Step 4: Estimate — improvement percentage for each fix
+      Focus: N+1 queries, allocations in loops, blocking awaits, missing indexes.
+      Output: Bottleneck table + before/after code blocks per issue.
+
+  - name: workspace-learn
+    description: "Analyse project conventions and generate summary"
+    invokable: true
+    prompt: |
+      Analyse this codebase and produce a project conventions summary:
+      1. Naming conventions (files, classes, methods, variables)
+      2. Folder structure and module boundaries
+      3. Recurring patterns (repository, service, component patterns)
+      4. Error handling approach
+      5. Testing approach (framework, patterns, coverage targets)
+      6. Key architectural decisions (layering, DI, state management)
+      Output: Markdown summary suitable for onboarding new developers.
+      Save to: docs/WORKSPACE_CONVENTIONS.md
+
+  # ── v2.1.0 Data & Observability Prompts ───────────────
+
+  - name: data-model
+    description: "Design or review database schema — normalization, indexes, constraints"
+    invokable: true
+    prompt: |
+      Design or review this database schema:
+      Step 1: Normalization — identify any 1NF/2NF/3NF violations
+      Step 2: Indexes — suggest indexes for likely WHERE/JOIN/ORDER BY columns
+      Step 3: Constraints — recommend NOT NULL, FK, UNIQUE, CHECK constraints
+      Step 4: Naming — validate table names (PascalCase), columns (PascalCase), PKs (Id)
+      Step 5: Soft delete — recommend IsDeleted + DeletedAt pattern instead of hard delete
+      Output: Corrected schema (CREATE TABLE statements) + recommended indexes + migration script skeleton.
+
+  - name: observability-audit
+    description: "Audit logging, tracing, metrics — find gaps and suggest fixes"
+    invokable: true
+    prompt: |
+      Audit observability in this code:
+      Step 1: Logging gaps — identify missing log statements for errors and critical paths
+      Step 2: Log quality — check for structured logging (key=value), not string interpolation
+      Step 3: Sensitive data — flag any PII, secrets, tokens being logged
+      Step 4: Tracing — identify missing correlation IDs and activity spans
+      Step 5: Metrics — suggest counters/histograms for key operations
+      Output: Table of gaps (Operation | Gap | Severity) + exact code fixes (structured log statements).
+
+  - name: api-contract
+    description: "Generate or validate OpenAPI 3.0 spec for API endpoints"
+    invokable: true
+    prompt: |
+      Generate or validate OpenAPI 3.0 spec for this code:
+      Step 1: Endpoints — list all routes with method, path, query/path parameters
+      Step 2: Request bodies — define schemas for POST/PUT/PATCH request bodies
+      Step 3: Responses — define 200, 400, 401, 403, 404, 500 response schemas
+      Step 4: Auth — document security schemes (JWT bearer token, API key, etc.)
+      Step 5: Examples — add realistic request/response examples for each endpoint
+      Output: Complete OpenAPI 3.0 YAML spec, ready to paste into swagger config or tools.
+
+  - name: git-workflow
+    description: "Git branch naming, commit message rewrite, squash plan"
+    invokable: true
+    prompt: |
+      Git workflow assistance:
+      Step 1: Branch name — suggest branch name from ticket/description (feature/123-title)
+      Step 2: Commits — rewrite staged commit messages to Conventional Commits format
+               (feat(scope): description | fix(scope): description | chore: description)
+      Step 3: Squash plan — identify which commits should be squashed before merge
+      Step 4: Conflict guidance — explain merge conflicts and resolution strategy
+      Output: Suggested branch name + rewritten commit messages + squash plan (commit 1 pick, 2-3 squash, 4 pick).
+
+  - name: dep-update
+    description: "Audit dependencies, identify outdated packages, CVEs, safe update path"
+    invokable: true
+    prompt: |
+      Dependency audit and update guidance:
+      Step 1: Outdated — list packages behind latest stable version
+      Step 2: CVE check — flag packages with known security vulnerabilities
+      Step 3: Breaking changes — for each outdated package, identify breaking changes
+      Step 4: Safe update path — ordered update steps (patch → minor → major if needed)
+      Step 5: Test plan — what to test after each update (unit tests, integration tests)
+      Output: Table: Package | Current | Latest | Days Outdated | CVE | Breaking Changes | Safe to Update.
+
+  # ── v2.4.0 Cloud & DevOps Prompts ─────────────────────
+
+  - name: aws-design
+    description: "Design AWS architecture — Lambda, S3, RDS, DynamoDB, API Gateway, CloudFront"
+    invokable: true
+    prompt: |
+      Design AWS architecture for this application:
+      Step 1: Serverless decision — Lambda vs containers vs managed services (App Runner, Fargate)
+      Step 2: Database choice — RDS (relational), DynamoDB (NoSQL), or specialized (ElastiCache, Redshift)
+      Step 3: API layer — API Gateway + Lambda or ALB + instances, rate limiting, WAF
+      Step 4: Storage — S3 for static assets, CloudFront for CDN, versioning and lifecycle policies
+      Step 5: Monitoring — CloudWatch metrics/logs, X-Ray tracing, alarms for critical metrics
+      Output: AWS architecture diagram + resource list + estimated costs + security checklist.
+
+  - name: azure-setup
+    description: "Generate Azure deployment — App Service, Functions, SQL Database, monitoring setup"
+    invokable: true
+    prompt: |
+      Generate Azure deployment configuration:
+      Step 1: Compute choice — App Service, Azure Functions, Container Instances, App Service Environment
+      Step 2: Database — Azure SQL Database, Cosmos DB, MySQL/PostgreSQL managed
+      Step 3: Networking — Virtual Network, private endpoints, Application Gateway, WAF
+      Step 4: Security — Managed Identity, Key Vault, TLS/HTTPS, encryption at rest
+      Step 5: Monitoring — Application Insights setup, metric alerts, log queries
+      Output: Bicep infrastructure code + deployment guide + cost estimation.
+
+  - name: docker-containerize
+    description: "Generate Dockerfile and Docker Compose for containerization"
+    invokable: true
+    prompt: |
+      Generate containerization setup:
+      Step 1: Multi-stage Dockerfile — separate builder and runtime, minimize image size
+      Step 2: Docker Compose — define app, database, cache, nginx services
+      Step 3: Volumes — persistent data, code hot-reload for development
+      Step 4: Networking — service-to-service DNS, health checks
+      Step 5: Security — non-root user, secrets via .env, no hardcoded credentials
+      Output: Dockerfile + docker-compose.yml + .dockerignore + local development guide.
+
+  - name: kubernetes-deploy
+    description: "Generate Kubernetes manifests — deployments, services, ingress, ConfigMaps, Secrets"
+    invokable: true
+    prompt: |
+      Generate Kubernetes deployment manifests:
+      Step 1: Namespace — isolation for environment (dev, staging, production)
+      Step 2: Deployments — replicas, resource requests/limits, liveness/readiness probes
+      Step 3: Services — ClusterIP for internal, LoadBalancer/Ingress for external
+      Step 4: ConfigMaps — non-secret configuration (environment variables)
+      Step 5: HPA — auto-scaling based on CPU/memory metrics
+      Output: YAML manifests (namespace, deployment, service, ingress, hpa) + Helm chart structure.
+
+  - name: iac-generate
+    description: "Generate Terraform or Bicep infrastructure code"
+    invokable: true
+    prompt: |
+      Generate Infrastructure as Code:
+      Step 1: Provider setup — AWS/Azure configuration, remote state (S3/Terraform Cloud)
+      Step 2: Modules — network, compute, database, storage modules
+      Step 3: Variables — input variables with validation, environment-specific overrides
+      Step 4: State management — encryption, locking, backup configuration
+      Step 5: Outputs — reference created resources, export for other stacks
+      Output: Complete Terraform .tf files or Bicep .bicep files + variables.tf + outputs.tf + backend config.
+
+  # ── v2.3.0 Advanced UI Patterns Prompts ───────────────
+
+  - name: component-library
+    description: "Generate Material Design, Chakra UI, or Tailwind CSS component patterns"
+    invokable: true
+    prompt: |
+      Generate component library patterns for Material Design, Chakra UI, or Tailwind CSS:
+      Step 1: Library choice — recommend best fit (Material for admin, Chakra for flexibility, Tailwind for customization)
+      Step 2: Design tokens — color palette (60-30-10), typography scale, spacing grid, dark mode variants
+      Step 3: Component API — prop types, size/variant presets, state handling (disabled, loading, error)
+      Step 4: Theme setup — theme config or tailwind.config.js, CSS variables, light/dark support
+      Step 5: Examples — Button, Card, Form components with complete code
+      Output: Complete library setup + theme config + component implementations + usage guide.
+
+  - name: chart-design
+    description: "Design data visualizations using Recharts, D3, or Chart.js"
+    invokable: true
+    prompt: |
+      Design data visualization for this data:
+      Step 1: Chart selection — recommend type (bar, line, pie, scatter) based on data and intent
+      Step 2: Data structure — format data for chart library, handle large datasets (aggregate or virtualize)
+      Step 3: Implementation — complete chart code with Recharts/D3/Chart.js, formatted tooltips, legend
+      Step 4: Responsive — mobile-first sizing, responsive container, adaptive layout
+      Step 5: Accessibility — color contrast (WCAG AA), text alternatives (data table), no color-only meaning
+      Output: Complete chart code + data formatting + responsive CSS + accessible alternatives.
+
+  - name: table-design
+    description: "Build sortable, filterable, paginated data tables with virtualization"
+    invokable: true
+    prompt: |
+      Design data table for this data structure:
+      Step 1: Semantic HTML — <table>, <thead>, <th scope>, <tbody>, proper ARIA attributes
+      Step 2: Sorting — clickable headers, aria-sort states (ascending/descending), sorted data output
+      Step 3: Filtering — search input (debounced 300ms), filter dropdowns, active filter display, reset button
+      Step 4: Pagination — previous/next buttons, page numbers, items per page selector, result count
+      Step 5: Performance — virtualization for > 500 rows (react-window), responsive mobile layout (cards/scroll)
+      Output: Complete table component + filtering logic + pagination handler + virtualization setup.
+
+  - name: storybook-setup
+    description: "Generate Storybook component stories and configure Chromatic"
+    invokable: true
+    prompt: |
+      Generate Storybook stories and configure visual testing:
+      Step 1: Story structure — meta export with title/component, argTypes for props, default args
+      Step 2: Story variants — default, primary, secondary, danger, disabled, loading, error states
+      Step 3: a11y testing — accessibility addon setup, no WCAG AA violations, color contrast checks
+      Step 4: Interaction tests — play() function with userEvent, test clicks, form submission, keyboard
+      Step 5: Chromatic — visual regression baseline, screenshot comparison on PRs, CI integration
+      Output: Complete .stories.tsx files + storybook config + Chromatic CI setup + interaction tests.
+
+  - name: performance-audit
+    description: "Audit and optimize Core Web Vitals, bundle size, and performance budgets"
+    invokable: true
+    prompt: |
+      Performance audit and optimization:
+      Step 1: Core Web Vitals — measure LCP, INP, CLS in RUM, identify bottlenecks, set targets
+      Step 2: Bundle analysis — analyze bundle size (gzip), identify large modules, suggest code splitting
+      Step 3: Lighthouse — run in CI, target > 90 score, check performance/accessibility assertions
+      Step 4: Image optimization — WebP format, responsive srcset, lazy loading, aspect-ratio for CLS
+      Step 5: Monitoring setup — Sentry/Analytics RUM, performance budgets in CI, alerts for regressions
+      Output: Performance audit report + optimization recommendations + Lighthouse config + CI setup.
+
+  # ── v2.2.0 UX Design Prompts ──────────────────────────
+
+  - name: design-component
+    description: "Generate accessible UI component with UXPro design system standards"
+    invokable: true
+    prompt: |
+      Generate a complete accessible UI component using UXPro design system:
+      Step 1: Structure — semantic HTML, accessibility-first, proper nesting
+      Step 2: Styling — 60-30-10 color rule, typography scale, 8-point grid spacing
+      Step 3: States — default, hover, active, focus (2px outline), disabled, loading
+      Step 4: Responsive — mobile-first, clamp() fluid typography, all breakpoints
+      Step 5: Accessibility — WCAG 2.1 AA contrast (4.5:1), ARIA labels, focus indicators
+      Output: Complete component code + CSS + HTML structure + accessibility checklist.
+
+  - name: design-audit
+    description: "WCAG accessibility audit of UI component or page"
+    invokable: true
+    prompt: |
+      Accessibility audit of this UI component:
+      Step 1: Contrast audit — check all text/UI elements against 4.5:1 (normal), 3:1 (large ≥18px bold), 3:1 (UI)
+      Step 2: Focus states — verify visible focus indicators, keyboard navigation, no traps
+      Step 3: ARIA — check semantic HTML, aria-label for icon buttons, aria-expanded for toggles
+      Step 4: Responsive — test at 320px, 480px, 768px, 1024px, 1280px breakpoints
+      Step 5: Motion — verify GPU acceleration (transform/opacity only), prefers-reduced-motion support
+      Output: Audit table (Issue | WCAG Level | Severity | Affected Element | Fix Code) + checklist.
+
+  - name: design-system
+    description: "Generate or analyse design tokens and system guidelines"
+    invokable: true
+    prompt: |
+      Analyse this project's design system or generate one using UXPro standards:
+      Step 1: Color palette — 60-30-10 rule, semantic tokens, light/dark variants
+      Step 2: Typography — scale (1.25 Major Third ratio), line heights, max widths (65ch body)
+      Step 3: Spacing — 8-point grid tokens (4px, 8px, 16px, 24px, 32px, 48px, 64px)
+      Step 4: Components — button hierarchy (primary, secondary, tertiary), form inputs, cards
+      Step 5: Tokens file — CSS custom properties, organized sections, ready to use
+      Output: Complete design tokens CSS file + design documentation + usage examples + Figma token format.
+
+  - name: responsive-design
+    description: "Check responsive design across all breakpoints and devices"
+    invokable: true
+    prompt: |
+      Responsive design audit of this component/layout:
+      Step 1: Mobile-first check — base styles at 320px, progressive enhancement
+      Step 2: Breakpoint testing — verify at 480px, 768px, 1024px, 1280px, 1536px
+      Step 3: Fluid scaling — check clamp() for typography, container queries where needed
+      Step 4: Touch targets — verify 44×44px minimum, 8px gaps between interactive elements
+      Step 5: Content reflow — check text wrapping, image sizing, layout shift prevention
+      Output: Breakpoint table (Breakpoint | Issues | Fix) + before/after code + performance notes.
+
+  - name: motion-design
+    description: "Audit animations for GPU acceleration, accessibility, performance"
+    invokable: true
+    prompt: |
+      Motion and animation audit:
+      Step 1: GPU acceleration — verify ONLY transform and opacity animated (never width/height/margin)
+      Step 2: Durations — check against standards (50ms instant, 100ms fast, 200ms normal, 300ms slow)
+      Step 3: Easing — verify ease-out (default), bounce (playful), ease-in (exit)
+      Step 4: Accessibility — verify prefers-reduced-motion media query support
+      Step 5: Performance — verify no layout thrashing, smooth 60fps, no jank
+      Output: Animation audit table + remediation code (before/after) + performance guidelines.
+
+  # ── v2.6.0 Integration & APIs Prompts ──────────────────
+
+  - name: event-driven-design
+    description: "Design event-driven system using CQRS and event sourcing"
+    invokable: true
+    prompt: |
+      Design event-driven architecture for this system:
+      Step 1: Identify events (what happens in domain)
+      Step 2: Event sourcing — design immutable event log, replay strategy
+      Step 3: CQRS — separate write model from read model
+      Step 4: Saga pattern — multi-step workflows with compensation
+      Step 5: Consumer design — idempotent handlers, dead letter queues
+      Output: Event types, CQRS schema diagram, saga flow, consumer implementation.
+
+  - name: api-composition
+    description: "Design API composition gateway for aggregating multiple services"
+    invokable: true
+    prompt: |
+      Design API composition gateway for this system:
+      Step 1: Identify services (what backends exist)
+      Step 2: Identify queries (client needs data from multiple services)
+      Step 3: Composition strategy (parallel vs. sequential calls)
+      Step 4: Caching (which endpoints cache, how long)
+      Step 5: Resilience (circuit breaker, fallbacks, timeouts)
+      Output: Gateway endpoint designs, composition code, caching strategy.
+
+  - name: message-queue-setup
+    description: "Design message queue architecture (RabbitMQ or Kafka)"
+    invokable: true
+    prompt: |
+      Design message queue system for this system:
+      Step 1: Choose queue vs. topic (point-to-point vs. pub-sub)
+      Step 2: Design topics/exchanges (naming, routing keys)
+      Step 3: Consumer groups (how to distribute load)
+      Step 4: Dead letter queue (failure handling)
+      Step 5: Retry strategy (backoff, max retries, monitoring)
+      Output: Topic/queue definitions, consumer groups, DLQ configuration, monitoring setup.
+
+  - name: webhook-implementation
+    description: "Implement webhook system with signature verification and retries"
+    invokable: true
+    prompt: |
+      Design webhook system for this system:
+      Step 1: Webhook registration (how subscribers register)
+      Step 2: Event publishing (send webhooks asynchronously)
+      Step 3: Signature (HMAC-SHA256, verification)
+      Step 4: Retry logic (exponential backoff, max attempts, DLQ)
+      Step 5: Management (logs, history, enable/disable, manual resend)
+      Output: Webhook publisher code, subscriber verification code, management UI design.
+
+  - name: integration-test-design
+    description: "Design integration test strategy (contract tests, E2E, test data)"
+    invokable: true
+    prompt: |
+      Design integration test strategy for this system:
+      Step 1: Contract tests (API contracts, provider & consumer)
+      Step 2: E2E tests (critical workflows, Playwright/Cypress)
+      Step 3: Test data (factories, seeds, cleanup)
+      Step 4: Test environment (separate database, containers)
+      Step 5: CI/CD integration (run on commit, coverage, reports)
+      Output: Contract test examples, E2E test scenarios, test data setup, CI/CD pipeline.
+
+  # ── v2.7.0 Mobile & Cross-Platform Prompts ────────────────
+
+  - name: mobile-architecture
+    description: "Design mobile app architecture (iOS, Android, React Native, Flutter)"
+    invokable: true
+    prompt: |
+      Design mobile app architecture for this system:
+      Step 1: Platform selection — native (iOS/Android), cross-platform (React Native/Flutter), web app?
+      Step 2: Architecture pattern — MVVM, Redux/Provider, offline-first data sync
+      Step 3: UI framework — SwiftUI, Jetpack Compose, React Navigation, Material 3
+      Step 4: Data layer — local database (Room, Core Data, WatermelonDB), API client, sync strategy
+      Step 5: Performance — measure startup time, memory, battery drain, frame rate
+      Output: Architecture diagram (data flow), tech stack justification, implementation roadmap.
+
+  - name: cross-platform-setup
+    description: "Setup cross-platform codebase (code sharing, platform abstraction)"
+    invokable: true
+    prompt: |
+      Setup cross-platform codebase for this system:
+      Step 1: Project structure — shared code, platform-specific modules, abstraction layer
+      Step 2: Code sharing — what can be 100% shared (business logic, networking)
+      Step 3: Platform abstraction — how to isolate platform-specific APIs (navigation, storage, camera)
+      Step 4: Build system — Xcode, Android Studio, React Native Metro, Flutter
+      Step 5: CI/CD — build for multiple platforms, automated testing per platform
+      Output: Folder structure (shared/ platform/ ui/), abstraction layer examples, build script.
+
+  - name: offline-sync
+    description: "Design offline-first data sync (local DB, event queue, conflict resolution)"
+    invokable: true
+    prompt: |
+      Design offline-first architecture for this system:
+      Step 1: Local database — which data to store locally (WatermelonDB, Room, Realm, Isar)
+      Step 2: Event log — queue changes when offline, replay when online
+      Step 3: Sync strategy — incremental sync, optimistic updates, conflict resolution (LWW, merge, prompt)
+      Step 4: Network detection — trigger sync on network restore, monitor connectivity
+      Step 5: UX — show sync status, queue size, failed changes, manual sync button
+      Output: Data flow diagram (offline/online paths), sync queue schema, conflict resolution logic.
+
+  - name: mobile-security-audit
+    description: "Audit mobile app security (credentials, network, data protection, jailbreak)"
+    invokable: true
+    prompt: |
+      Audit security of this mobile app:
+      Step 1: Credentials — where tokens/passwords stored? Secure storage (Keychain/KeyStore)?
+      Step 2: Network — HTTPS only? Certificate pinning? PKCE flow for auth?
+      Step 3: Data protection — encrypted at rest? Sensitive data logged? Screenshot protection?
+      Step 4: Platform risks — jailbreak/root detection? Debugger protection? Code obfuscation?
+      Step 5: OWASP Mobile Top 10 — verify all controls (crypto, auth, storage, network, logging)
+      Output: Security audit report (Control | Status | Gap | Risk | Remediation | Priority).
+
+  - name: app-distribution-plan
+    description: "Plan app distribution (versioning, store submission, beta testing, updates)"
+    invokable: true
+    prompt: |
+      Create app distribution plan for this system:
+      Step 1: Versioning — semantic version scheme (major.minor.patch), build number tracking
+      Step 2: Beta testing — TestFlight (iOS), internal testing (Android), duration, feedback collection
+      Step 3: Store submission — iOS App Store + Android Play Store requirements, metadata, screenshots
+      Step 4: Release process — build signing, notarization, code signing certificate management
+      Step 5: Post-launch — monitoring (crashes, ratings), update strategy (OTA, forced updates), ASO
+      Output: Release checklist, version history template, store submission checklist, monitoring dashboard.
+
+  # ── v2.5.0 Security & Compliance Prompts ──────────────
+
+  - name: zero-trust-design
+    description: "Design zero-trust security architecture for system"
+    invokable: true
+    prompt: |
+      Design a zero-trust security architecture for this system:
+      Step 1: Identity & Access — MFA mandatory, OAuth 2.0, JWT tokens (short-lived), conditional access
+      Step 2: Authentication — verify every identity, no trust based on IP/location
+      Step 3: Authorization — least privilege RBAC, JIT elevation, audit privilege changes
+      Step 4: Network — microsegmentation, service-to-service mTLS, firewall deny-by-default
+      Step 5: Encryption — TLS 1.2+ in transit, AES-256 at rest, key rotation annually
+      Step 6: Monitoring — immutable audit logs, real-time alerts, forensic capability
+      Output: Zero-trust architecture diagram + policy matrix (identity/auth/authz/network/encryption/monitoring).
+
+  - name: compliance-audit
+    description: "Audit compliance against SOC 2, ISO 27001, HIPAA, PCI-DSS standards"
+    invokable: true
+    prompt: |
+      Audit compliance against selected framework (SOC 2, ISO 27001, HIPAA, PCI-DSS):
+      Step 1: Framework mapping — map system to framework controls/requirements
+      Step 2: Implementation gaps — identify what's implemented vs. missing
+      Step 3: Evidence gaps — identify documentation needed (policies, procedures, audit logs)
+      Step 4: Remediation plan — prioritize fixes (critical/high/medium/low)
+      Step 5: Timeline — realistic remediation schedule with owners
+      Output: Compliance audit report (Control | Status | Gap | Evidence | Remediation | Owner | Deadline).
+
+  - name: pentest-plan
+    description: "Plan penetration test — scope, methodology, timeline, reporting"
+    invokable: true
+    prompt: |
+      Create penetration test plan for this system:
+      Step 1: Scope — systems in-scope, out-of-scope, excluded tests, success criteria
+      Step 2: Rules of Engagement — authorization level, test windows, escalation contacts
+      Step 3: Methodology — NIST phases (reconnaissance → scanning → enumeration → exploitation)
+      Step 4: Testing checklist — OWASP Top 10 Web/Mobile/API, authentication, authorization, crypto
+      Step 5: Reporting — CVSS scoring, proof-of-concept (non-weaponized), remediation steps
+      Output: Formal pentest proposal (scope, ROE, timeline, methodology, success criteria, reporting format).
+
+  - name: incident-response
+    description: "Create incident response playbook and post-mortem template"
+    invokable: true
+    prompt: |
+      Create incident response playbook for this system:
+      Step 1: Severity levels — define Severity 1/2/3 (impact, response time, escalation)
+      Step 2: Detection — what to monitor, alert thresholds, triage process
+      Step 3: Response flow — declare → diagnose → mitigate → recover → communicate → review
+      Step 4: War room setup — communication channels, incident commander, roles, frequency
+      Step 5: Post-mortem — blameless template, 5 whys, action items with owners/deadlines
+      Output: Complete IR playbook + post-mortem template with examples.
+
+  - name: security-posture
+    description: "Assess overall security posture — identify priorities and gaps"
+    invokable: true
+    prompt: |
+      Assess security posture of this system:
+      Step 1: Vulnerability inventory — security controls implemented vs. missing
+      Step 2: Risk assessment — severity × likelihood matrix, business impact
+      Step 3: Threat modeling — identify attack vectors, threat actors, attack paths
+      Step 4: Compliance gaps — applicable frameworks (SOC 2, ISO 27001, HIPAA, PCI-DSS)
+      Step 5: Improvement roadmap — phased fixes (immediate, 30 days, 90 days, 6 months)
+      Output: Security posture report (Risk matrix | Threats | Controls | Gaps | Roadmap).
+
+experimental:
+  readResponseToCursor: false
