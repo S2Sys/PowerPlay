@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv config-v1.0.0.yaml config/versions/)",
+      "Bash(mv config-upgraded.yaml config/versions/)",
+      "Bash(mv README.md docs/)",
+      "Bash(mv CHANGELOG.md docs/)",
+      "Bash(mv SECURITY.md docs/)",
+      "Bash(mv IMPLEMENTATION_SUMMARY.md docs/)",
+      "Bash(mv QUICK_REFERENCE.md docs/guides/)",
+      "Bash(mv STRUCTURE.md docs/guides/)",
+      "Bash(mv VERSIONING_STRATEGY.md docs/guides/)",
+      "Bash(mv RELEASE_CHECKLIST.md docs/reference/)",
+      "Bash(mv NEXT_RELEASE_TEMPLATE.md docs/reference/)"
+    ]
+  }
+}
