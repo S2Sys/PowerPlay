@@ -967,12 +967,14 @@ models:
 
 # ─────────────────────────────────────────────────────────
 # TAB AUTOCOMPLETE — explicit top-level required v0.9+
+# Uses OpenRouter free models as fallback (always available)
+# If local GPU is available, it will be preferred in chat
 # ─────────────────────────────────────────────────────────
 tabAutocompleteModel:
   provider: openai
-  model: kapil-qwen-coder
-  apiBase: http://rohit:4000/v1
-  apiKey: ${DHONI_API_KEY}
+  model: qwen/qwen3-coder:free
+  apiBase: https://openrouter.ai/api/v1
+  apiKey: ${OPENROUTER_API_KEY}
 
 tabAutocompleteOptions:
   debounceDelay: 400            # Prevents mid-block interruption
