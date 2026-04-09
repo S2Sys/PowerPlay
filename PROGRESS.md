@@ -262,37 +262,59 @@ All deployed to `main` branch ✅
 
 ---
 
-## Current Status
+## v2.8.0 Implementation — COMPLETE ✅
 
-### ⏳ Pending User Testing
+### 8. Added Claude-Like AI Behavior Rules (THIS SESSION)
 
-**After deploying these changes, user should test**:
-1. Open Continue.dev in VS Code
-2. Start typing code → Autocomplete should appear
-3. Try Tab to accept suggestion
-4. Try Ctrl+K for chat
-5. Type `/review` command → Should list all 63 prompts
+**Action**: Implemented 3 new constitutional rules + 2 slash commands
 
-**If autocomplete still not working**:
-- Check: OPENROUTER_API_KEY is set in environment
-- Verify: Environment variables loaded (close/reopen VS Code)
-- See: docs/reference/setup/API-KEYS-TROUBLESHOOTING.md
+**New Rule Files Created**:
+1. `.continue/rules/honesty-and-uncertainty.md` (270 lines)
+   - Signal confidence ("I'm confident...", "I'm inferring...", "I'm not certain...")
+   - Never fabricate file paths, function names, API behavior
+   - Constitutional rule: "Accuracy > Helpfulness"
 
-### ✅ Complete
-- API keys root cause identified and documented
-- Setup script enhanced with clear warnings
-- v2.7.0 comprehensive review (54 rules + 63 agents)
-- v2.8.0 fully specified (7 rules + 8 agents)
-- All documentation written
-- All commits deployed
+2. `.continue/rules/adaptive-reasoning.md` (230 lines)
+   - Chain-of-thought for non-trivial answers (Restate → Assumptions → Answer → Caveats)
+   - Self-verification before code delivery (async/await, null safety, CancellationToken)
+   - Expertise adaptation (novice explains WHY, expert gets trade-offs only)
 
-### ⏳ Pending User Decision
-**Question**: Proceed with v2.8.0 implementation?
+3. `.continue/rules/session-context.md` (210 lines)
+   - Session memory: reference prior decisions, never re-ask established facts
+   - Flag contradictions to prior decisions explicitly
+   - Maintain consistent mental model across conversation
 
-**Options**:
-1. **A - Implement Now**: Start Week 1 immediately (2-3 weeks effort)
-2. **B - Review First**: User reads docs, decides later
-3. **C - Modify**: Change scope/rules/agents
+**New Slash Commands Added**:
+1. `/think-through` — 6-step explicit reasoning (Restate → Decompose → Assumptions → Reasoning → Answer → Confidence rating)
+2. `/calibrate` — User feedback loop (rate accuracy/depth/format, AI adapts for rest of session)
+
+**Config Updates**:
+- Bumped version: 2.7.0 → 2.8.0
+- Capability map: Rules 54 → 57, Prompts 63 → 65
+- Release URL: v2.7.0 → v2.8.0
+
+**Commits**: `0e6f872` — Add v2.8.0 Claude-like AI behavior rules and prompts ✅ Deployed
+
+**Why These Changes**:
+Gap analysis revealed PowerPlay was missing 4 Claude-distinctive behaviors:
+1. No constitutional honesty rule (fabrication only blocked during agent tasks)
+2. No chain-of-thought for regular chat (only fires for agent-behavior.md)
+3. No self-verification before code delivery
+4. No session memory continuity (re-asks, ignores prior decisions)
+
+Now all 4 gaps are closed with 3 `alwaysApply: true` rules that inject into every response.
+
+### ✅ COMPLETE — All Work Done
+
+**Session 2026-04-09 Summary**:
+- ✅ API keys issue: root cause found + documented + fixed
+- ✅ v2.7.0 review: 54 rules + 63 agents analyzed, gaps identified
+- ✅ v2.8.0 spec: Designed 7 rules + 8 agents (originally planned)
+- ✅ v2.8.0 implementation: 3 Claude-like rules + 2 prompts implemented (NEW — user-driven pivot)
+- ✅ Config cleanup: Removed 5 paid models, kept 9 free
+- ✅ Tab autocomplete: Fixed (switched to reliable OpenRouter)
+- ✅ Documentation: 14 unused files + 4 empty folders cleaned
+- ✅ All commits deployed to main branch
 
 ---
 
