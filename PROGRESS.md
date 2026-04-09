@@ -25,7 +25,28 @@
 
 **Updated**: Capability map now emphasizes "FREE MODELS ONLY"
 
-**Commit**: `aa967c6`
+**Commits**: `aa967c6`, `fd7bbf7`
+
+#### 5. Cleaned Up Old Documentation Files
+**Action**: Removed 12 old scattered implementation plan files from docs/guides
+
+**Removed (old files)**:
+- CLAUDE_CODE_SUPERPOWER_PLAN.md
+- IMPLEMENTATION_PLAN_V1_1_0.md, V1_2_0.md, V2_0_0.md
+- MASTER_IMPLEMENTATION_ROADMAP.md
+- QUICK_REFERENCE.md, ROADMAP_INDEX.md, STRUCTURE.md
+- V2_0_0_SPRINT_PLAN_WEEKS_13_14.md
+- VERSIONING_STRATEGY.md
+- v2.5.0-SECURITY-COMPLIANCE.md, v2.6.0-INTEGRATION-APIs.md
+
+**Kept (3 current files)**:
+- COVERAGE-MATRIX-v27.md - current coverage reference
+- RULES-AGENTS-REVIEW.md - current rules/agents analysis
+- v28-PRIORITY-RECOMMENDATIONS.md - current implementation plan
+
+**Result**: Cleaner docs/guides folder with only current documentation
+
+**Commit**: `9255f21`
 
 ---
 
@@ -137,6 +158,8 @@
 | `a6a1737` | Add implementation status summary | 1 |
 | `5e8dbcb` | Consolidate all progress tracking into single PROGRESS.md | 1 |
 | `aa967c6` | Remove paid models and Phi4 from config.yaml | 1 |
+| `fd7bbf7` | Update PROGRESS.md with paid models removal | 1 |
+| `9255f21` | Clean up old implementation plan files from docs/guides | 12 |
 
 All deployed to `main` branch ✅
 
