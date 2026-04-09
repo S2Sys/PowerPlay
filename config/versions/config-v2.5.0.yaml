@@ -854,45 +854,20 @@ embeddingsProvider:
 # MCP SERVERS — Agent mode tools (Cursor/Windsurf-equivalent)
 # Only active in Agent mode
 # ─────────────────────────────────────────────────────────
-mcpServers:
-  # Git — read log, diff, blame, branch info
-  - name: Git
-    type: stdio
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-git", "--repository", "."]
+# MCP SERVERS
+# Note: Git, FileSystem, and Playwright are built-in to Continue.dev
+# No need to install separately via npm
+# See: docs/reference/setup/MCP-SERVERS-SETUP.md for detailed setup
 
-  # File System — read/write/create files autonomously
-  - name: FileSystem
-    type: stdio
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
-
-  # Continue Docs — search Continue documentation from chat
-  - name: Continue Docs
-    type: stdio
-    command: npx
-    args: ["-y", "@continuedev/continue-docs-mcp"]
-
-  # SQLite — query local dev databases (ExamPrep, SmartWorkz dev)
-  - name: SQLite Dev DB
-    type: stdio
-    command: npx
-    args: ["-y", "mcp-sqlite", "./dev.db"]
-
-  # Playwright — browser agent: scrape docs, test UI, fill forms
-  - name: Playwright Browser
-    type: stdio
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-playwright"]
-
-  # Azure DevOps — uncomment with your PAT when needed
-  # - name: Azure DevOps
-  #   type: stdio
-  #   command: npx
-  #   args: ["-y", "azure-devops-mcp"]
-  #   env:
-  #     AZURE_DEVOPS_ORG_URL: "https://dev.azure.com/your-org"
-  #     AZURE_DEVOPS_TOKEN: "your-pat-here"
+mcpServers: []
+# Built-in providers available:
+# - @git (read/write git operations)
+# - @filesystem (read/write files)
+# - @docs (search documentation)
+# - @terminal (shell commands)
+# - @codebase (search codebase)
+#
+# Use in chat with: @provider-name
 
 # ─────────────────────────────────────────────────────────
 # CONTEXT PROVIDERS — @-mentions in chat
