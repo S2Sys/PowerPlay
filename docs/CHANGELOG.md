@@ -13,6 +13,46 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.3.0] — 2026-04-10 (Advanced UI Patterns & Performance)
+
+**Advanced UI release — Component libraries, data visualization, tables, Storybook, performance monitoring**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/component-library` — Generate Material Design, Chakra UI, or Tailwind CSS component patterns
+- `/chart-design` — Design data visualizations with Recharts, D3, or Chart.js
+- `/table-design` — Build sortable, filterable, paginated data tables with virtualization
+- `/storybook-setup` — Generate Storybook stories and configure Chromatic visual testing
+- `/performance-audit` — Audit Core Web Vitals, bundle size, performance budgets, and optimize
+
+#### Rules (5 new)
+- `component-patterns.md` — Material Design 3, Chakra UI, Tailwind CSS patterns, component API design, theming
+- `data-visualization.md` — Chart selection (bar/line/pie/scatter), Recharts/D3 patterns, dashboards, accessibility
+- `table-patterns.md` — Semantic HTML tables, sorting, filtering, pagination, virtualization for large datasets
+- `storybook-standards.md` — Story structure, ArgsTable, accessibility testing (a11y), Chromatic integration, interaction tests
+- `performance-monitoring.md` — Core Web Vitals (LCP/INP/CLS), performance budgets, Lighthouse, bundle analysis, RUM setup
+
+### Changed
+- Version bumped to 2.3.0
+- Models: 14 (unchanged)
+- Rules: 29 → 34 total (+5 advanced UI rules)
+- Prompts: 38 → 43 total (+5 advanced UI prompts)
+- Updated capability map in config.yaml header
+
+### Files Modified
+- `config.yaml` — version 2.3.0, 5 new rules, 5 new prompts
+- `.continue/rules/component-patterns.md` — NEW (500+ lines)
+- `.continue/rules/data-visualization.md` — NEW (450+ lines)
+- `.continue/rules/table-patterns.md` — NEW (400+ lines)
+- `.continue/rules/storybook-standards.md` — NEW (350+ lines)
+- `.continue/rules/performance-monitoring.md` — NEW (400+ lines)
+
+### Summary
+v2.3.0 completes the advanced UI layer with component library patterns (Material/Chakra/Tailwind), data visualization (charts, dashboards), complex tables (sorting/filtering/pagination/virtualization), Storybook component documentation with Chromatic, and web performance monitoring (Core Web Vitals, Lighthouse, performance budgets). Frontend teams now have end-to-end coverage from design systems to deployment.
+
+---
+
 ## [2.2.0] — 2026-04-10 (UX Design Agent Suite)
 
 **UX Design release — Complete design system, accessibility audits, responsive design, animations, design tokens**
