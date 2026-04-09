@@ -34,7 +34,8 @@
       "Bash(awk 'NR>=1066 && NR<=1832 && /^  - name:/' \"s:/Code101/PowerPlay/config.yaml\")",
       "Bash(wc -l \"s:/Code101/PowerPlay/.continue/rules/\"*.md)",
       "Read(//^prompts:$/,/**)",
-      "Bash(grep -n \"^\\\\s*- name: sec$\\\\|^\\\\s*- name: test$\\\\|^\\\\s*- name: db$\\\\|^\\\\s*- name: pp$\\\\|^\\\\s*- name: quick$\" \"s:/Code101/PowerPlay/config.yaml\")"
+      "Bash(grep -n \"^\\\\s*- name: sec$\\\\|^\\\\s*- name: test$\\\\|^\\\\s*- name: db$\\\\|^\\\\s*- name: pp$\\\\|^\\\\s*- name: quick$\" \"s:/Code101/PowerPlay/config.yaml\")",
+      "Bash(grep -E \"^-.*\\\\.md$\")"
     ],
     "additionalDirectories": [
       "\\dev",

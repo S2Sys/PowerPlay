@@ -2,11 +2,11 @@
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
-[![Version: 2.7.0](https://img.shields.io/badge/version-2.7.0-blue)](./CHANGELOG.md)
+[![Version: 3.2.0](https://img.shields.io/badge/version-3.2.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)]()
 [![Stack: .NET + Angular + Mobile](https://img.shields.io/badge/stack-.NET%20%2B%20Angular%20%2B%20Mobile-blueviolet)]()
-[![Rules: 54](https://img.shields.io/badge/rules-54-brightgreen)]()
-[![Prompts: 63](https://img.shields.io/badge/prompts-63-brightgreen)]()
+[![Rules: 60](https://img.shields.io/badge/rules-60-brightgreen)]()
+[![Prompts: 75](https://img.shields.io/badge/prompts-75-brightgreen)]()
 [![Latest Release](https://img.shields.io/github/v/release/SmartWorkz-Dev/PowerPlay)](https://github.com/SmartWorkz-Dev/PowerPlay/releases)
 
 ---
@@ -41,7 +41,8 @@ This script will:
 1. Close VS Code completely
 2. Reopen VS Code
 3. Open Continue.dev (Ctrl+L)
-4. Type "/" → See 58+ prompts ✅
+4. Type "/" → See 75+ prompts ✅
+5. Try: /pp or /quick or /sec or /test or /db for smart routing
 ```
 
 **See also**: [Setup Guide](./reference/setup/SETUP-ENVIRONMENT.md) for detailed setup guide
@@ -149,7 +150,7 @@ This script will:
 - **mobile-security**: Credential storage, OAuth 2.0, certificate pinning, jailbreak detection
 - **app-distribution**: App store submission, versioning, beta testing, signing, monitoring
 
-### Prompts (63 Commands)
+### Prompts (75 Commands)
 
 **Core Commands (10)**
 ```
@@ -254,6 +255,43 @@ This script will:
 /app-distribution-plan Plan app distribution (versioning, store submission, monitoring)
 ```
 
+**v2.8.0 AI Behavior & Session Context (Session Rules)**
+- **honesty-and-uncertainty**: Signal confidence, never fabricate paths/functions
+- **adaptive-reasoning**: Chain-of-thought for non-trivial answers
+- **session-context**: Reference prior decisions, flag contradictions, no re-asking
+
+**v2.9.0 Orchestrator Commands (5)**
+```
+/pp              Master orchestrator — describe task in plain English → auto-routes + executes
+/quick           Fast-path router — quick fixes/reviews/tests, immediate execution
+/sec             Security fast-path — routes to scan/audit/design/compliance
+/test            Testing fast-path — routes to unit/full suite/coverage gaps
+/db              Database fast-path — routes to SQL optimization/schema review/design
+```
+
+**v3.0.0 Requirements Phase Commands (4)**
+```
+/requirements-to-specs    Convert business requirement → technical spec (REQ-F/NF + open questions)
+/acceptance-criteria      Convert spec → Gherkin criteria (Given/When/Then + test cases)
+/risk-assessment          Assess feasibility → Risk register + Go/No-Go decision
+/requirements-review      Quality audit → Completeness/Clarity/Testability/Traceability verdict
+```
+
+**v3.0.0 Requirements Phase Rules (2)**
+- **requirements-elicitation**: User story format, INVEST principles, Gherkin acceptance criteria
+- **feasibility-assessment**: 3-dimension analysis (Technical/Resource/Timeline), risk tiers, spike decisions
+
+**v3.1.0 Shared Memory Orchestrator (1)**
+```
+/pp-requirements  Execute full 4-phase requirements chain end-to-end
+```
+
+**v3.2.0 Orchestrator Hardening**
+- Tiebreaker rule for `/pp` (explicit precedence when 2+ keywords match)
+- Fallback clause for non-engineering requests
+- Auto-cascade NEXT PHASE suggestions in requirements agents
+- `/pentest-plan` and `/incident-response` now routable via `/pp`
+
 ### Built-in Context Providers (Available by Default)
 All of these are built-in to Continue.dev — no installation needed:
 - **@git**: Read/write git logs, diffs, blame, branches
@@ -287,6 +325,11 @@ All of these are built-in to Continue.dev — no installation needed:
 | [**Architecture Guide**](./guides/release/DOCUMENTATION_ARCHITECTURE.md) | Documentation structure |
 
 ### By Version
+- [v3.2.0 — Orchestrator Gap Fixes](./reference/release/CHANGELOG.md#320--2026-04-09-orchestrator-gap-fixes)
+- [v3.1.0 — Shared Memory Orchestrator](./reference/release/CHANGELOG.md#310--2026-04-09-shared-memory-orchestrator)
+- [v3.0.0 — Requirements Phase](./reference/release/CHANGELOG.md#300--2026-04-09-requirements-phase)
+- [v2.9.0 — Orchestrator System](./reference/release/CHANGELOG.md#290--2026-04-09-orchestrator-system)
+- [v2.8.0 — AI Behavior Rules](./reference/release/CHANGELOG.md#280--2026-04-09-ai-behavior-rules)
 - [v2.7.0 — Mobile & Cross-Platform](./releases/v2.7.0/IMPLEMENTATION_SUMMARY.md)
 - [v2.6.0 — Integration & APIs](./releases/v2.6.0/IMPLEMENTATION_SUMMARY.md)
 - [v2.5.0 — Security & Compliance](./releases/v2.5.0/IMPLEMENTATION_SUMMARY.md)
@@ -314,32 +357,59 @@ All of these are built-in to Continue.dev — no installation needed:
 
 See [CHANGELOG](./CHANGELOG.md) for all releases and migration guides.
 
-**Latest Version**: [v2.7.0](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.7.0) (Mobile & Cross-Platform)
+**Latest Version**: [v3.2.0](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.2.0) (Orchestrator Gap Fixes)
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-SmartWorkz PowerStack
-├── config.yaml (9 models + 5 rules + 10 prompts)
-│   ├── Local Models (Dhoni GPU: 5)
-│   ├── Cloud Fallbacks (OpenRouter: 4)
-│   └── Embeddings (NVIDIA Nemotron)
-├── Rules Engine
-│   ├── Apply on: smartworkz-core (always)
-│   ├── Apply on: .NET files (**/*.cs)
-│   ├── Apply on: Angular files (**/*.ts, **/*.html)
-│   ├── Apply on: SQL files (**/*.sql)
-│   └── Apply always: security-always
+SmartWorkz PowerPlay v3.2.0
+├── config.yaml (9 free models + 60 rules + 75 prompts)
+│   ├── Local Models (4): Qwen 3.5 9B, DeepSeek R1 8B, Qwen Coder, DeepSeek Coder
+│   ├── Cloud Fallbacks (5): GPT-OSS 120B, Qwen3 Coder, MiniMax M2.5, Gemma 4, Llama 3.1
+│   └── Embeddings: NVIDIA Nemotron (free)
+│
+├── Rules Engine (60 rules by domain)
+│   ├── Core (6): smartworkz-core, dotnet, angular, sql, security, testing
+│   ├── v2.0-v2.7 Domain Rules (49): agents, PRs, observability, UX, cloud, security, mobile
+│   ├── v2.8.0 AI Behavior (3): honesty, adaptive-reasoning, session-context
+│   ├── v3.0.0 Requirements (2): requirements-elicitation, feasibility-assessment
+│   └── v2.9.0 Routing Intelligence (1): routing-intelligence (for /pp decision tree)
+│
+├── Orchestrators (v2.9.0+)
+│   ├── /pp — Master orchestrator (natural language → command routing)
+│   ├── /quick, /sec, /test, /db — Fast-path routers (scope-aware)
+│   ├── /pp-requirements — 4-phase requirements mega-agent
+│   └── Routing Table (30+ categories, tiebreaker rule, fallback handling)
+│
+├── Requirements Phase Agents (v3.0.0+)
+│   ├── Phase 1: /requirements-to-specs (requirement → tech spec)
+│   ├── Phase 2: /acceptance-criteria (spec → Gherkin criteria)
+│   ├── Phase 3: /risk-assessment (feasibility → risk register)
+│   └── Phase 4: /requirements-review (quality audit → verdict)
+│   └── HANDOFF BLOCKS carry context between phases
+│
+├── Domain Commands (63 specialized)
+│   ├── Code Review (8): /review, /inline-review, /pr-review, /audit-all, etc.
+│   ├── Testing (5): /add-tests, /generate-tests-complete, /coverage-gaps, etc.
+│   ├── Database (5): /optimize-sql, /database-design, /data-model, etc.
+│   ├── Security (5): /security-scan, /security-agent, /zero-trust-design, etc.
+│   ├── Cloud & DevOps (5): /aws-design, /azure-setup, /docker-containerize, etc.
+│   ├── And 35 more specialized commands...
+│   └── All discoverable via /pp natural language routing
+│
 ├── MCP Servers (Agent tools)
-│   ├── Git (read operations)
-│   ├── FileSystem (autonomous read/write)
-│   ├── SQLite (dev database queries)
+│   ├── Git (read/write logs, diffs, branches)
+│   ├── FileSystem (autonomous read/write/create)
+│   ├── SQLite (database queries)
 │   ├── Playwright (browser automation)
 │   └── Continue Docs (semantic search)
+│
 └── Context Providers (@ mentions)
-    └── 11 providers for codebase awareness
+    ├── @git, @filesystem, @codebase, @file, @terminal
+    ├── @docs, @diff, @problems, @folder, @currentFile, @repo-map, @open
+    └── 11 total providers for codebase awareness
 ```
 
 ---

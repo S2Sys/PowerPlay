@@ -7,13 +7,82 @@ Versioning: [Semantic Versioning](https://semver.org/)
 ## [Unreleased]
 
 ### Planned
-- [ ] v2.8.0 — Additional domains (Machine Learning, BI/Analytics, or expansions)
+- [ ] v3.3.0 — Domain shortcuts (/api, /arch, /deploy), three-tier scope picker, cross-SDLC spanning
 - [ ] Config validation tool
 - [ ] Claude API model support
 
 ---
 
-## [2.7.0] — 2026-04-09 (Mobile & Cross-Platform)
+## [3.2.0] — 2026-04-09 (Orchestrator Gap Fixes)
+
+**Orchestrator refinement release — Tiebreaker rule, orphaned command routing, fallback handling, auto-cascade NEXT PHASE**
+
+### Added
+
+#### Tiebreaker Rule for `/pp`
+- Explicit precedence order when 2+ keywords match equally:
+  1. Security (vulnerability, injection, XSS, OWASP, breach, exploit)
+  2. Requirements (requirement, spec, story, criteria, risk, feasibility)
+  3. Testing (test, spec, coverage)
+  4. Database (SQL, query, schema, procedure)
+  5. Performance (slow, N+1, optimize, bottleneck)
+  6. Code Review (default for code with no other signal)
+- Prevents silent first-match-wins behavior
+- Clarifying question if still ambiguous after precedence
+
+#### Orphaned Command Routing
+- `/pentest-plan` now routable via `/pp` (keywords: pentest, penetration test, ethical hack, red team)
+- `/incident-response` now routable via `/pp` (keywords: incident, outage, breach, post-mortem, IR playbook)
+- Previously unreachable, now discoverable through natural language
+
+#### Fallback Clause in `/pp`
+- If request matches no software engineering category:
+  - Responds with: "I specialise in software engineering tasks..."
+  - Does NOT attempt to answer unrelated requests (recipes, trivia, creative writing)
+  - Guides user to rephrase in relevant domain
+
+#### Auto-Cascade NEXT PHASE Suggestions
+- Each requirements phase agent suggests next phase with copy-paste instructions:
+  - `/requirements-to-specs` → suggests `/acceptance-criteria`
+  - `/acceptance-criteria` → suggests `/risk-assessment`
+  - `/risk-assessment` → suggests `/requirements-review`
+  - `/requirements-review` → suggests implementation commands (/api-endpoint, /database-design, /architecture-design)
+- Reduces context switching, improves workflow continuity
+- Users see exactly what to run next and what to paste
+
+### Changed
+- Version bumped to 3.2.0
+- Models: 9 (unchanged, free models only)
+- Rules: 60 (unchanged)
+- Prompts: 75 (unchanged, no new commands)
+- `/pp` Step 2 SELECT: Added tiebreaker rule (lines 2032-2040)
+- `/pp` routing table: Added 2 rows for pentest/incident commands (after line 2021)
+- `/pp` Step 4: Added fallback clause for non-engineering requests (after line 2139)
+- Capability map: Updated notation "free models only"
+
+### Files Modified
+- `config.yaml` — version 3.2.0, tiebreaker rule, routing rows, fallback clause, NEXT PHASE lines (5 edits)
+- `PROGRESS.md` — Added v3.2.0 section with 4 gap fixes documented
+
+### Removed
+- No rules or commands removed
+
+### Documentation
+- `wiki/03-Orchestrator-Modes-v3.2.0.md` — Complete guide to all modes, tiebreaker examples, workflows
+- `CHANGELOG.md` — This entry
+
+### Summary
+v3.2.0 fixes 4 high-priority orchestrator gaps identified in post-release audit of v3.1.0:
+1. **Tiebreaker missing** — `test this SQL` ambiguously routed between /test and /db; now deterministic via precedence
+2. **Orphaned commands** — /pentest-plan and /incident-response unreachable; now routable
+3. **No fallback** — Non-engineering requests silently ignored; now guided with helpful message
+4. **No auto-cascade** — Requirements phases had no next-step guidance; now each suggests what to run + context to paste
+
+No new functionality added. Pure orchestration hardening: deterministic routing, complete coverage, clear fallbacks, workflow continuity.
+
+---
+
+## [3.1.0] — 2026-04-09 (Shared Memory Orchestrator)
 
 **Mobile & Cross-Platform release — iOS, Android, React Native, Flutter, offline-first sync, app distribution**
 
