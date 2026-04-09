@@ -15,15 +15,16 @@
     .\setup-powerplay.ps1 -Version 2.7.0
 #>
 
-# Set execution policy
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
-
 param(
     [ValidateSet("2.4.0", "2.5.0", "2.6.0", "2.7.0")]
     [string]$Version = "2.7.0",
 
     [switch]$SkipVSCodeRestart = $false
 )
+
+# Set execution policy (AFTER param block)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
+Unblock-File -Path $PSCommandPath -ErrorAction SilentlyContinue
 
 Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║  PowerPlay Setup Script v$Version        ║" -ForegroundColor Cyan
@@ -242,7 +243,7 @@ Write-Host "  [C] Clear Continue.dev cache"
 Write-Host "  [X] Exit"
 Write-Host ""
 
-$choice = Read-Host "Select option (R/O/C/X)" -ErrorAction SilentlyContinue
+$choice = Read-Host "Select option (R/O/C/X)"
 
 switch ($choice.ToUpper()) {
     'R' {
@@ -252,7 +253,7 @@ switch ($choice.ToUpper()) {
             Start-Sleep -Seconds 2
             Write-Host "Relaunching VS Code..." -ForegroundColor Yellow
             try {
-                & "code" -ErrorAction Stop
+                & code
                 Write-Host "✅ VS Code relaunched successfully" -ForegroundColor Green
             }
             catch {
