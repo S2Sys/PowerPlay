@@ -13,6 +13,47 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.2.0] — 2026-04-10 (UX Design Agent Suite)
+
+**UX Design release — Complete design system, accessibility audits, responsive design, animations, design tokens**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/design-component` — Generate accessible UI component with UXPro design system standards
+- `/design-audit` — WCAG 2.1 AA accessibility audit with exact fixes
+- `/design-system` — Generate design tokens and design system guidelines
+- `/responsive-design` — Test responsive design across all breakpoints
+- `/motion-design` — Audit animations for GPU acceleration and accessibility
+
+#### Rules (5 new)
+- `ux-design-system.md` — Design system: colors (60-30-10), typography (1.25 ratio), spacing (8pt grid), responsive, components
+- `accessibility-wcag.md` — WCAG 2.1 AA: contrast (4.5:1), focus indicators, keyboard nav, ARIA, touch targets (44×44px)
+- `responsive-mobile-first.md` — Mobile-first: base styles (320px), breakpoints, fluid typography (clamp), responsive images
+- `animation-motion.md` — GPU acceleration (transform/opacity only), durations (50-500ms), easing, prefers-reduced-motion
+- `design-tokens.md` — CSS variables: semantic naming, dark mode tokens, token structure, Figma sync
+
+### Changed
+- Version bumped to 2.2.0
+- Models: 14 (unchanged)
+- Rules: 24 → 29 total (+5 UX rules)
+- Prompts: 33 → 38 total (+5 UX prompts)
+- Updated capability map in config.yaml header
+- Updated releaseUrl to v2.2.0
+
+### Files Modified
+- `config.yaml` — version 2.2.0, 5 new rules, 5 new prompts
+- `.continue/rules/ux-design-system.md` — NEW (350+ lines)
+- `.continue/rules/accessibility-wcag.md` — NEW (400+ lines)
+- `.continue/rules/responsive-mobile-first.md` — NEW (350+ lines)
+- `.continue/rules/animation-motion.md` — NEW (350+ lines)
+- `.continue/rules/design-tokens.md` — NEW (300+ lines)
+
+### Summary
+v2.2.0 completes the design capability gap with comprehensive UX design agent rules covering design systems, accessibility (WCAG AA), responsive design, animations, and design tokens. Frontend developers now have complete AI-powered design support.
+
+---
+
 ## [2.1.0] — 2026-04-09 (Data, Observability & API Standards)
 
 **Data & Observability release — Database design standards, structured logging, API versioning, input validation, git workflow**
