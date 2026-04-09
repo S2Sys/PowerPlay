@@ -2,11 +2,11 @@
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
-[![Version: 2.6.0](https://img.shields.io/badge/version-2.6.0-blue)](./CHANGELOG.md)
+[![Version: 2.7.0](https://img.shields.io/badge/version-2.7.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)]()
-[![Stack: .NET + Angular](https://img.shields.io/badge/stack-.NET%20%2B%20Angular-blueviolet)]()
-[![Rules: 49](https://img.shields.io/badge/rules-49-brightgreen)]()
-[![Prompts: 58](https://img.shields.io/badge/prompts-58-brightgreen)]()
+[![Stack: .NET + Angular + Mobile](https://img.shields.io/badge/stack-.NET%20%2B%20Angular%20%2B%20Mobile-blueviolet)]()
+[![Rules: 54](https://img.shields.io/badge/rules-54-brightgreen)]()
+[![Prompts: 63](https://img.shields.io/badge/prompts-63-brightgreen)]()
 [![Latest Release](https://img.shields.io/github/v/release/SmartWorkz-Dev/PowerPlay)](https://github.com/SmartWorkz-Dev/PowerPlay/releases)
 
 ---
@@ -108,7 +108,7 @@ This script will:
 - **input-validation**: Validation at boundaries, parameterized queries, sanitization
 - **git-workflow**: Branch naming, Conventional Commits, squash strategy, conflict resolution
 
-### Prompts (33 Commands)
+### Prompts (63 Commands)
 
 **Core Commands (10)**
 ```
@@ -157,6 +157,33 @@ This script will:
 /api-contract        Generate OpenAPI 3.0 spec for API endpoints
 /git-workflow        Git branch naming, commit rewrite, squash plan
 /dep-update          Audit dependencies (outdated, CVE, safe update path)
+```
+
+**v2.5.0 Security & Compliance Commands (5)**
+```
+/zero-trust-design   Design zero-trust security architecture
+/compliance-audit    Audit compliance against SOC 2, ISO 27001, HIPAA, PCI-DSS
+/pentest-plan        Plan penetration test (scope, methodology, reporting)
+/incident-response   Create incident response playbook & post-mortem template
+/security-posture    Assess overall security posture & gaps
+```
+
+**v2.6.0 Integration & APIs Commands (5)**
+```
+/event-driven-design Design event-driven system (CQRS, sagas, event sourcing)
+/api-composition     Design API composition gateway (aggregation, caching, resilience)
+/message-queue-setup Design message queue architecture (RabbitMQ/Kafka)
+/webhook-implementation Implement webhook system with retries & signatures
+/integration-test-design Design integration test strategy (contract tests, E2E)
+```
+
+**v2.7.0 Mobile & Cross-Platform Commands (5)**
+```
+/mobile-architecture Design mobile app architecture (iOS, Android, React Native, Flutter)
+/cross-platform-setup Setup cross-platform codebase with abstraction layers
+/offline-sync        Design offline-first data sync (local DB, event queue)
+/mobile-security-audit Audit mobile app security (credentials, network, data)
+/app-distribution-plan Plan app distribution (versioning, store submission, monitoring)
 ```
 
 ### MCP Servers (5 Tools)
@@ -213,7 +240,7 @@ This script will:
 
 See [CHANGELOG](./CHANGELOG.md) for all releases and migration guides.
 
-**Latest Version**: [v1.0.1](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v1.0.1) (Security patch)
+**Latest Version**: [v2.7.0](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.7.0) (Mobile & Cross-Platform)
 
 ---
 
@@ -375,7 +402,7 @@ Issues? Feature requests? Open an issue or discussion:
 
 **Built with ❤️ by SmartWorkz Dev**
 
-*Current: [v1.0.1](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v1.0.1) | Updated: 2026-04-09*
+*Current: [v2.7.0](https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.7.0) | Updated: 2026-04-09*
 
 **[View All Releases →](https://github.com/SmartWorkz-Dev/PowerPlay/releases)**
 

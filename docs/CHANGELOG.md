@@ -7,9 +7,53 @@ Versioning: [Semantic Versioning](https://semver.org/)
 ## [Unreleased]
 
 ### Planned
-- [ ] v2.7.0 — Mobile & Cross-Platform (iOS, Android, React Native, offline-first)
+- [ ] v2.8.0 — Additional domains (Machine Learning, BI/Analytics, or expansions)
 - [ ] Config validation tool
 - [ ] Claude API model support
+
+---
+
+## [2.7.0] — 2026-04-09 (Mobile & Cross-Platform)
+
+**Mobile & Cross-Platform release — iOS, Android, React Native, Flutter, offline-first sync, app distribution**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/mobile-architecture` — Design mobile app architecture (native vs. cross-platform)
+- `/cross-platform-setup` — Setup cross-platform codebase with platform abstraction layer
+- `/offline-sync` — Design offline-first data sync (local DB, event queue, conflict resolution)
+- `/mobile-security-audit` — Audit mobile app security (credentials, network, data, jailbreak detection)
+- `/app-distribution-plan` — Plan app distribution (versioning, store submission, beta testing, monitoring)
+
+#### Rules (5 new)
+- `mobile-development.md` — iOS (Swift, SwiftUI), Android (Kotlin, Jetpack), React Native, Flutter standards
+- `cross-platform-design.md` — Platform abstraction layer, UI adaptation per platform, design tokens
+- `offline-first.md` — Local-first data store, event logs, sync strategies, conflict resolution
+- `mobile-security.md` — Credentials storage, OAuth 2.0 + PKCE, HTTPS, certificate pinning, jailbreak detection
+- `app-distribution.md` — App store submission, versioning, signing, beta testing, monitoring
+
+### Changed
+- Version bumped to 2.7.0
+- Models: 14 (unchanged)
+- Rules: 49 → 54 total (+5 mobile rules)
+- Prompts: 58 → 63 total (+5 mobile prompts)
+- Updated capability map: Rules (54), Prompts (63)
+
+### Files Modified
+- `config.yaml` — version 2.7.0, 5 new rules, 5 new prompts
+- `.continue/rules/mobile-development.md` — NEW (800+ lines)
+- `.continue/rules/cross-platform-design.md` — NEW (600+ lines)
+- `.continue/rules/offline-first.md` — NEW (700+ lines)
+- `.continue/rules/mobile-security.md` — NEW (650+ lines)
+- `.continue/rules/app-distribution.md` — NEW (650+ lines)
+- `docs/v2.7.0/V2_7_0_IMPLEMENTATION_SUMMARY.md` — NEW
+- `config/versions/config-v2.7.0.yaml` — Archived
+
+### Documentation
+- Complete implementation summary: platforms (iOS/Android/RN/Flutter), architecture patterns, sync strategies
+- 5 new rule files with code examples, best practices, checklists
+- Updated README: version 2.7.0, 63 prompts, mobile stack
 
 ---
 
