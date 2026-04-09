@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Advanced form with complex field dependencies and validation - UXPro Pattern Example">
+  <title>Advanced Form Dependencies - UXPro v2.4.0</title>
+  <style>
+    /* ============================================
+       Design Tokens & Variables
+       ============================================ */
+    :root {
+      /* Color Palette - Light Mode */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f8f9fa;
+      --color-text-primary: #1a1a1a;
+      --color-text-secondary: #666666;
+      --color-border: #e0e0e0;
+      --color-focus: #0066cc;
+      --color-focus-outline: #0066cc;
+      --color-success: #28a745;
+      --color-error: #dc3545;
+      --color-error-bg: #f8d7da;
+      --color-error-border: #f5c6cb;
+      --color-disabled: #6c757d;
+      --color-input-bg: #ffffff;
+      --color-input-border: #cccccc;
+
+      /* Typography */
+      --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-size-base: 1rem;
+      --font-size-sm: 0.875rem;
+      --font-size-lg: 1.125rem;
+      --line-height-base: 1.5;
+
+      /* Spacing */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+
+      /* Border Radius */
+      --border-radius-sm: 0.25rem;
+      --border-radius-md: 0.375rem;
+      --border-radius-lg: 0.5rem;
+
+      /* Transitions */
+      --transition-duration: 300ms;
+      --transition-timing: ease-in-out;
+
+      /* Touch Target */
+      --touch-target-min: 48px;
+    }
+
+    /* ============================================
+       Dark Mode
+       ============================================ */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg-primary: #1a1a1a;
+        --color-bg-secondary: #2d2d2d;
+        --color-text-primary: #f0f0f0;
+        --color-text-secondary: #b0b0b0;
+        --color-border: #404040;
+        --color-focus: #4da3ff;
+        --color-focus-outline: #4da3ff;
+        --color-success: #51cf66;
+        --color-error: #ff6b6b;
+        --color-error-bg: #5c2e2e;
+        --color-error-border: #7a3a3a;
+        --color-disabled: #878e96;
+        --color-input-bg: #2d2d2d;
+        --color-input-border: #505050;
+      }
+    }
+
+    /* ============================================
+       Global Styles
+       ============================================ */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--spacing-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-base);
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-primary);
+      transition: background-color var(--transition-duration) var(--transition-timing),
+                  color var(--transition-duration) var(--transition-timing);
+    }
+
+    /* ============================================
+       Container & Layout
+       ============================================ */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: var(--spacing-lg);
+    }
+
+    h1 {
+      margin: 0 0 var(--spacing-md) 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 var(--spacing-md) 0;
+      color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       Form Styles
+       ============================================ */
+    form {
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-xl);
+    }
+
+    /* ============================================
+       Error Summary
+       ============================================ */
+    #errorSummary {
+      display: none;
+      background-color: var(--color-error-bg);
+      border: 1px solid var(--color-error-border);
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    #errorSummary.show {
+      display: block;
+    }
+
+    #errorSummary h2 {
+      margin: 0 0 var(--spacing-md) 0;
+      font-size: var(--font-size-lg);
+      color: var(--color-error);
+    }
+
+    #errorSummary ul {
+      margin: 0;
+      padding-left: var(--spacing-lg);
+      list-style: disc;
+    }
+
+    #errorSummary li {
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-error);
+    }
+
+    #errorSummary a {
+      color: var(--color-error);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #errorSummary a:hover {
+      text-decoration: none;
+    }
+
+    /* ============================================
+       Fieldset & Legend
+       ============================================ */
+    fieldset {
+      margin: 0 0 var(--spacing-lg) 0;
+      padding: var(--spacing-lg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-bg-primary);
+    }
+
+    legend {
+      padding: 0 var(--spacing-sm);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    /* ============================================
+       Form Groups
+       ============================================ */
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: var(--spacing-sm);
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .required::after {
+      content: ' *';
+      color: var(--color-error);
+    }
+
+    /* ============================================
+       Input Fields
+       ============================================ */
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      display: block;
+      width: 100%;
+      padding: var(--spacing-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-base);
+      color: var(--color-text-primary);
+      background-color: var(--color-input-bg);
+      border: 2px solid var(--color-input-border);
+      border-radius: var(--border-radius-md);
+      transition: border-color var(--transition-duration) var(--transition-timing),
+                  box-shadow var(--transition-duration) var(--transition-timing);
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="date"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--color-focus);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="date"]:focus,
+      input[type="number"]:focus,
+      select:focus,
+      textarea:focus {
+        box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.1);
+      }
+    }
+
+    input:disabled,
+    select:disabled {
+      background-color: var(--color-bg-secondary);
+      color: var(--color-disabled);
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       Error States
+       ============================================ */
+    .form-group.has-error input,
+    .form-group.has-error select {
+      border-color: var(--color-error);
+    }
+
+    .error-message {
+      display: none;
+      margin-top: var(--spacing-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-error);
+    }
+
+    .form-group.has-error .error-message {
+      display: block;
+    }
+
+    /* ============================================
+       Conditional Fields
+       ============================================ */
+    .conditional-section {
+      display: none;
+    }
+
+    .conditional-section.show {
+      display: block;
+    }
+
+    /* ============================================
+       Array Fields Container
+       ============================================ */
+    .field-array {
+      margin-top: var(--spacing-lg);
+    }
+
+    .array-item {
+      background-color: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      position: relative;
+    }
+
+    .array-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .array-item-title {
+      font-weight: 600;
+      font-size: var(--font-size-lg);
+    }
+
+    /* ============================================
+       Buttons
+       ============================================ */
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: var(--touch-target-min);
+      min-height: var(--touch-target-min);
+      padding: var(--spacing-md) var(--spacing-lg);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: background-color var(--transition-duration) var(--transition-timing),
+                  color var(--transition-duration) var(--transition-timing),
+                  box-shadow var(--transition-duration) var(--transition-timing);
+    }
+
+    button:focus {
+      outline: 3px solid var(--color-focus-outline);
+      outline-offset: 2px;
+    }
+
+    /* Primary Button */
+    .btn-primary {
+      background-color: var(--color-focus);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #0052a3;
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+    }
+
+    /* Secondary Button */
+    .btn-secondary {
+      background-color: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--color-border);
+    }
+
+    /* Danger Button */
+    .btn-danger {
+      background-color: var(--color-error);
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background-color: #c82333;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Success Button */
+    .btn-success {
+      background-color: var(--color-success);
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background-color: #218838;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Disabled */
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       Button Groups
+       ============================================ */
+    .button-group {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+
+    .button-group.full-width button {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    /* ============================================
+       Array Item Actions
+       ============================================ */
+    .array-item-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-lg);
+    }
+
+    .array-item-actions button {
+      flex: 1;
+    }
+
+    /* ============================================
+       Add Button
+       ============================================ */
+    .btn-add {
+      width: 100%;
+      margin-top: var(--spacing-lg);
+    }
+
+    /* ============================================
+       Success Message
+       ============================================ */
+    .success-message {
+      display: none;
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      color: var(--color-success);
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .success-message {
+        background-color: #2d5a3d;
+        border-color: #3d7a52;
+        color: var(--color-success);
+      }
+    }
+
+    /* ============================================
+       Responsive Design
+       ============================================ */
+    @media (max-width: 768px) {
+      body {
+        padding: var(--spacing-sm);
+      }
+
+      .container {
+        padding: var(--spacing-md);
+      }
+
+      form {
+        padding: var(--spacing-lg);
+      }
+
+      fieldset {
+        padding: var(--spacing-md);
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+      }
+
+      .array-item-actions {
+        flex-direction: column;
+      }
+
+      .array-item-actions button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      form {
+        padding: var(--spacing-md);
+      }
+
+      fieldset {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+      }
+
+      .form-group {
+        margin-bottom: var(--spacing-md);
+      }
+
+      button {
+        min-width: 100%;
+        width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+      }
+
+      .array-item {
+        padding: var(--spacing-md);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Registration Form</h1>
+    <p>Complete registration with user type-specific fields and validation.</p>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message" role="alert" aria-live="polite">
+      <strong>Success!</strong> Your registration has been submitted successfully.
+    </div>
+
+    <!-- Error Summary -->
+    <div id="errorSummary" role="alert" aria-live="assertive" aria-atomic="true">
+      <h2>Please fix the following errors:</h2>
+      <ul id="errorList"></ul>
+    </div>
+
+    <!-- Main Form -->
+    <form id="registrationForm" novalidate>
+      <!-- User Type Selection (Always Visible) -->
+      <fieldset>
+        <legend>Account Type</legend>
+        <div class="form-group">
+          <label for="userType" class="required">User Type</label>
+          <select id="userType" name="userType" required aria-describedby="userType-error">
+            <option value="">-- Select User Type --</option>
+            <option value="individual">Individual</option>
+            <option value="business">Business</option>
+            <option value="organization">Organization</option>
+          </select>
+          <div id="userType-error" class="error-message"></div>
+        </div>
+      </fieldset>
+
+      <!-- Individual Section -->
+      <fieldset id="individualSection" class="conditional-section">
+        <legend>Individual Information</legend>
+
+        <div class="form-group">
+          <label for="ssn" class="required">Social Security Number</label>
+          <input
+            type="text"
+            id="ssn"
+            name="ssn"
+            placeholder="123-45-6789"
+            aria-describedby="ssn-error"
+            data-validate="ssn"
+          >
+          <div id="ssn-error" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="dob" class="required">Date of Birth</label>
+          <input
+            type="date"
+            id="dob"
+            name="dob"
+            aria-describedby="dob-error"
+            data-validate="required"
+          >
+          <div id="dob-error" class="error-message"></div>
+        </div>
+      </fieldset>
+
+      <!-- Business Section -->
+      <fieldset id="businessSection" class="conditional-section">
+        <legend>Business Information</legend>
+
+        <div class="form-group">
+          <label for="ein" class="required">Employer Identification Number (EIN)</label>
+          <input
+            type="text"
+            id="ein"
+            name="ein"
+            placeholder="12-1234567"
+            aria-describedby="ein-error"
+            data-validate="ein"
+          >
+          <div id="ein-error" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="companySize" class="required">Company Size</label>
+          <select
+            id="companySize"
+            name="companySize"
+            aria-describedby="companySize-error"
+            data-validate="required"
+          >
+            <option value="">-- Select Size --</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="50+">50+ employees</option>
+          </select>
+          <div id="companySize-error" class="error-message"></div>
+        </div>
+      </fieldset>
+
+      <!-- Organization Section -->
+      <fieldset id="organizationSection" class="conditional-section">
+        <legend>Organization Information</legend>
+
+        <div class="form-group">
+          <label for="orgEin" class="required">Employer Identification Number (EIN)</label>
+          <input
+            type="text"
+            id="orgEin"
+            name="orgEin"
+            placeholder="12-1234567"
+            aria-describedby="orgEin-error"
+            data-validate="ein"
+          >
+          <div id="orgEin-error" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="nonprofit" class="required">Non-profit Status</label>
+          <select
+            id="nonprofit"
+            name="nonprofit"
+            aria-describedby="nonprofit-error"
+            data-validate="required"
+          >
+            <option value="">-- Select Status --</option>
+            <option value="yes">Yes, Non-profit</option>
+            <option value="no">No, For-profit</option>
+          </select>
+          <div id="nonprofit-error" class="error-message"></div>
+        </div>
+
+        <!-- Board Members Array -->
+        <div class="form-group">
+          <label class="required">Board Members (Minimum 3 Required)</label>
+          <div id="boardMembersArray" class="field-array">
+            <!-- Board member items will be added here dynamically -->
+          </div>
+          <button type="button" class="btn-primary btn-add" id="addBoardMemberBtn">
+            + Add Board Member
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- Form Actions -->
+      <div class="button-group full-width">
+        <button type="submit" class="btn-success">Submit Registration</button>
+        <button type="reset" class="btn-secondary">Clear Form</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    /* ============================================
+       Utility Functions
+       ============================================ */
+
+    // Debounce function for validation and storage
+    function debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Get all form errors
+    function getFormErrors() {
+      const errors = {};
+      const form = document.getElementById('registrationForm');
+      const userType = form.elements['userType'].value;
+
+      // Validate user type
+      if (!userType) {
+        errors['userType'] = 'Please select a user type';
+      }
+
+      // Validate visible fields based on user type
+      if (userType === 'individual') {
+        const ssn = form.elements['ssn'].value.trim();
+        const dob = form.elements['dob'].value;
+
+        if (!ssn) {
+          errors['ssn'] = 'Social Security Number is required';
+        } else if (!isValidSSN(ssn)) {
+          errors['ssn'] = 'SSN must be in format: 123-45-6789';
+        }
+
+        if (!dob) {
+          errors['dob'] = 'Date of Birth is required';
+        }
+      } else if (userType === 'business') {
+        const ein = form.elements['ein'].value.trim();
+        const companySize = form.elements['companySize'].value;
+
+        if (!ein) {
+          errors['ein'] = 'EIN is required';
+        } else if (!isValidEIN(ein)) {
+          errors['ein'] = 'EIN must be in format: 12-1234567';
+        }
+
+        if (!companySize) {
+          errors['companySize'] = 'Company size is required';
+        }
+      } else if (userType === 'organization') {
+        const orgEin = form.elements['orgEin'].value.trim();
+        const nonprofit = form.elements['nonprofit'].value;
+        const boardMembers = document.querySelectorAll('.array-item');
+
+        if (!orgEin) {
+          errors['orgEin'] = 'EIN is required';
+        } else if (!isValidEIN(orgEin)) {
+          errors['orgEin'] = 'EIN must be in format: 12-1234567';
+        }
+
+        if (!nonprofit) {
+          errors['nonprofit'] = 'Non-profit status is required';
+        }
+
+        if (boardMembers.length < 3) {
+          errors['boardMembers'] = `Minimum 3 board members required (currently ${boardMembers.length})`;
+        }
+
+        // Validate each board member
+        boardMembers.forEach((item, index) => {
+          const nameInput = item.querySelector('input[data-field="name"]');
+          const emailInput = item.querySelector('input[data-field="email"]');
+
+          if (!nameInput.value.trim()) {
+            errors[`boardMember${index}Name`] = `Board member ${index + 1} name is required`;
+          }
+
+          if (!emailInput.value.trim()) {
+            errors[`boardMember${index}Email`] = `Board member ${index + 1} email is required`;
+          } else if (!isValidEmail(emailInput.value.trim())) {
+            errors[`boardMember${index}Email`] = `Board member ${index + 1} email is invalid`;
+          }
+        });
+      }
+
+      return errors;
+    }
+
+    // Validation helpers
+    function isValidSSN(value) {
+      return /^\d{3}-\d{2}-\d{4}$/.test(value);
+    }
+
+    function isValidEIN(value) {
+      return /^\d{2}-\d{7}$/.test(value);
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    // Update error display for a field
+    function updateFieldError(fieldId, errorMessage) {
+      const field = document.getElementById(fieldId);
+      if (!field) return;
+
+      const fieldGroup = field.closest('.form-group');
+      const errorElement = document.getElementById(fieldId + '-error');
+
+      if (!fieldGroup || !errorElement) return;
+
+      if (errorMessage) {
+        fieldGroup.classList.add('has-error');
+        errorElement.textContent = errorMessage;
+      } else {
+        fieldGroup.classList.remove('has-error');
+        errorElement.textContent = '';
+      }
+    }
+
+    // Update error summary using safe DOM methods
+    function updateErrorSummary(errors) {
+      const summary = document.getElementById('errorSummary');
+      const errorList = document.getElementById('errorList');
+
+      // Clear all field errors first
+      document.querySelectorAll('.form-group').forEach(group => {
+        group.classList.remove('has-error');
+      });
+      document.querySelectorAll('.error-message').forEach(msg => {
+        msg.textContent = '';
+      });
+
+      // Clear error list
+      while (errorList.firstChild) {
+        errorList.removeChild(errorList.firstChild);
+      }
+
+      // Apply new errors
+      Object.entries(errors).forEach(([fieldId, message]) => {
+        if (fieldId.includes('boardMember')) {
+          return;
+        }
+        updateFieldError(fieldId, message);
+      });
+
+      // Update summary display using safe DOM methods
+      if (Object.keys(errors).length > 0) {
+        Object.entries(errors).forEach(([fieldId, message]) => {
+          const li = document.createElement('li');
+
+          if (fieldId === 'boardMembers') {
+            li.textContent = message;
+          } else {
+            const link = document.createElement('a');
+            link.href = '#' + fieldId;
+            link.textContent = message;
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              const field = document.getElementById(fieldId);
+              if (field) field.focus();
+            });
+            li.appendChild(link);
+          }
+          errorList.appendChild(li);
+        });
+        summary.classList.add('show');
+      } else {
+        summary.classList.remove('show');
+      }
+    }
+
+    // Validate on blur (debounced)
+    const debouncedValidate = debounce(() => {
+      const errors = getFormErrors();
+      updateErrorSummary(errors);
+    }, 300);
+
+    /* ============================================
+       User Type Handling
+       ============================================ */
+
+    const userTypeSelect = document.getElementById('userType');
+    const individualSection = document.getElementById('individualSection');
+    const businessSection = document.getElementById('businessSection');
+    const organizationSection = document.getElementById('organizationSection');
+
+    function updateConditionalSections() {
+      const userType = userTypeSelect.value;
+
+      // Hide all sections
+      individualSection.classList.remove('show');
+      businessSection.classList.remove('show');
+      organizationSection.classList.remove('show');
+
+      // Show selected section
+      if (userType === 'individual') {
+        individualSection.classList.add('show');
+      } else if (userType === 'business') {
+        businessSection.classList.add('show');
+      } else if (userType === 'organization') {
+        organizationSection.classList.add('show');
+        // Initialize board members if not already done
+        if (document.getElementById('boardMembersArray').children.length === 0) {
+          addBoardMember();
+        }
+      }
+
+      // Clear errors and revalidate
+      updateErrorSummary({});
+      debouncedValidate();
+    }
+
+    userTypeSelect.addEventListener('change', () => {
+      updateConditionalSections();
+      saveFormState();
+    });
+
+    /* ============================================
+       Board Members Array Management
+       ============================================ */
+
+    function createBoardMemberElement(index) {
+      const item = document.createElement('div');
+      item.className = 'array-item';
+      item.dataset.index = index;
+
+      // Create structure using DOM methods
+      const header = document.createElement('div');
+      header.className = 'array-item-header';
+
+      const title = document.createElement('div');
+      title.className = 'array-item-title';
+      title.textContent = `Board Member ${index + 1}`;
+      header.appendChild(title);
+      item.appendChild(header);
+
+      // Name field
+      const nameGroup = document.createElement('div');
+      nameGroup.className = 'form-group';
+
+      const nameLabel = document.createElement('label');
+      nameLabel.htmlFor = `boardMemberName${index}`;
+      nameLabel.className = 'required';
+      nameLabel.textContent = 'Name';
+      nameGroup.appendChild(nameLabel);
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.id = `boardMemberName${index}`;
+      nameInput.name = `boardMemberName${index}`;
+      nameInput.dataset.field = 'name';
+      nameInput.placeholder = 'Full name';
+      nameInput.setAttribute('aria-describedby', `boardMemberName${index}-error`);
+      nameGroup.appendChild(nameInput);
+
+      const nameError = document.createElement('div');
+      nameError.id = `boardMemberName${index}-error`;
+      nameError.className = 'error-message';
+      nameGroup.appendChild(nameError);
+      item.appendChild(nameGroup);
+
+      // Email field
+      const emailGroup = document.createElement('div');
+      emailGroup.className = 'form-group';
+
+      const emailLabel = document.createElement('label');
+      emailLabel.htmlFor = `boardMemberEmail${index}`;
+      emailLabel.className = 'required';
+      emailLabel.textContent = 'Email';
+      emailGroup.appendChild(emailLabel);
+
+      const emailInput = document.createElement('input');
+      emailInput.type = 'email';
+      emailInput.id = `boardMemberEmail${index}`;
+      emailInput.name = `boardMemberEmail${index}`;
+      emailInput.dataset.field = 'email';
+      emailInput.placeholder = 'email@example.com';
+      emailInput.setAttribute('aria-describedby', `boardMemberEmail${index}-error`);
+      emailGroup.appendChild(emailInput);
+
+      const emailError = document.createElement('div');
+      emailError.id = `boardMemberEmail${index}-error`;
+      emailError.className = 'error-message';
+      emailGroup.appendChild(emailError);
+      item.appendChild(emailGroup);
+
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'array-item-actions';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'btn-danger btn-remove';
+      removeBtn.setAttribute('aria-label', `Remove board member ${index + 1}`);
+      removeBtn.textContent = 'Remove Member';
+
+      removeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        removeBoardMember(index);
+      });
+
+      actions.appendChild(removeBtn);
+      item.appendChild(actions);
+
+      // Add event listeners
+      nameInput.addEventListener('blur', debouncedValidate);
+      nameInput.addEventListener('input', saveFormState);
+      emailInput.addEventListener('blur', debouncedValidate);
+      emailInput.addEventListener('input', saveFormState);
+
+      return item;
+    }
+
+    function addBoardMember() {
+      const container = document.getElementById('boardMembersArray');
+      const currentIndex = container.children.length;
+      const newElement = createBoardMemberElement(currentIndex);
+      container.appendChild(newElement);
+      updateRemoveButtonStates();
+      saveFormState();
+    }
+
+    function removeBoardMember(index) {
+      const container = document.getElementById('boardMembersArray');
+      const item = container.querySelector(`[data-index="${index}"]`);
+      if (item) {
+        item.remove();
+        reindexBoardMembers();
+        updateRemoveButtonStates();
+        saveFormState();
+        debouncedValidate();
+      }
+    }
+
+    function reindexBoardMembers() {
+      const container = document.getElementById('boardMembersArray');
+      Array.from(container.children).forEach((item, newIndex) => {
+        item.dataset.index = newIndex;
+        const title = item.querySelector('.array-item-title');
+        title.textContent = `Board Member ${newIndex + 1}`;
+
+        const nameLabel = item.querySelectorAll('label')[0];
+        const nameInput = item.querySelector('input[data-field="name"]');
+        const nameError = item.querySelectorAll('.error-message')[0];
+        const emailLabel = item.querySelectorAll('label')[1];
+        const emailInput = item.querySelector('input[data-field="email"]');
+        const emailError = item.querySelectorAll('.error-message')[1];
+        const removeBtn = item.querySelector('.btn-remove');
+
+        nameInput.id = `boardMemberName${newIndex}`;
+        nameInput.name = `boardMemberName${newIndex}`;
+        nameInput.setAttribute('aria-describedby', `boardMemberName${newIndex}-error`);
+        nameLabel.htmlFor = `boardMemberName${newIndex}`;
+        nameError.id = `boardMemberName${newIndex}-error`;
+
+        emailInput.id = `boardMemberEmail${newIndex}`;
+        emailInput.name = `boardMemberEmail${newIndex}`;
+        emailInput.setAttribute('aria-describedby', `boardMemberEmail${newIndex}-error`);
+        emailLabel.htmlFor = `boardMemberEmail${newIndex}`;
+        emailError.id = `boardMemberEmail${newIndex}-error`;
+
+        removeBtn.setAttribute('aria-label', `Remove board member ${newIndex + 1}`);
+      });
+    }
+
+    function updateRemoveButtonStates() {
+      const container = document.getElementById('boardMembersArray');
+      const items = container.querySelectorAll('.array-item');
+      items.forEach(item => {
+        const removeBtn = item.querySelector('.btn-remove');
+        removeBtn.disabled = items.length <= 1;
+      });
+    }
+
+    const addBoardMemberBtn = document.getElementById('addBoardMemberBtn');
+    addBoardMemberBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      addBoardMember();
+    });
+
+    /* ============================================
+       Form Validation on Input
+       ============================================ */
+
+    const form = document.getElementById('registrationForm');
+
+    form.addEventListener('input', (e) => {
+      const input = e.target;
+      if (input.tagName === 'INPUT' || input.tagName === 'SELECT') {
+        debouncedValidate();
+        saveFormState();
+      }
+    });
+
+    form.addEventListener('blur', (e) => {
+      const input = e.target;
+      if (input.tagName === 'INPUT' || input.tagName === 'SELECT') {
+        debouncedValidate();
+      }
+    }, true);
+
+    /* ============================================
+       localStorage Persistence
+       ============================================ */
+
+    const STORAGE_KEY = 'registrationFormState';
+
+    function saveFormState() {
+      const formData = new FormData(form);
+      const state = {
+        userType: formData.get('userType'),
+        fields: {}
+      };
+
+      // Save regular fields
+      for (const [key, value] of formData.entries()) {
+        state.fields[key] = value;
+      }
+
+      // Save board members
+      const boardMembers = [];
+      document.querySelectorAll('.array-item').forEach((item) => {
+        const nameInput = item.querySelector('input[data-field="name"]');
+        const emailInput = item.querySelector('input[data-field="email"]');
+        if (nameInput && emailInput) {
+          boardMembers.push({
+            name: nameInput.value,
+            email: emailInput.value
+          });
+        }
+      });
+
+      if (boardMembers.length > 0) {
+        state.boardMembers = boardMembers;
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function restoreFormState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+
+      try {
+        const state = JSON.parse(saved);
+
+        // Check if form is incomplete
+        const errors = getFormErrors();
+        if (Object.keys(errors).length > 0) {
+          const shouldContinue = confirm(
+            'You have an incomplete registration form saved. Would you like to continue editing?'
+          );
+          if (!shouldContinue) {
+            localStorage.removeItem(STORAGE_KEY);
+            return;
+          }
+        }
+
+        // Restore user type
+        if (state.userType) {
+          userTypeSelect.value = state.userType;
+          updateConditionalSections();
+        }
+
+        // Restore regular fields
+        Object.entries(state.fields).forEach(([key, value]) => {
+          const element = form.elements[key];
+          if (element) {
+            element.value = value;
+          }
+        });
+
+        // Restore board members
+        if (state.boardMembers && state.boardMembers.length > 0) {
+          const container = document.getElementById('boardMembersArray');
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+          state.boardMembers.forEach(() => {
+            addBoardMember();
+          });
+          // Restore values
+          state.boardMembers.forEach((member, index) => {
+            const nameInput = document.querySelector(`input[id="boardMemberName${index}"]`);
+            const emailInput = document.querySelector(`input[id="boardMemberEmail${index}"]`);
+            if (nameInput) nameInput.value = member.name;
+            if (emailInput) emailInput.value = member.email;
+          });
+        }
+      } catch (e) {
+        console.error('Error restoring form state:', e);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    /* ============================================
+       Form Submission
+       ============================================ */
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const errors = getFormErrors();
+      updateErrorSummary(errors);
+
+      if (Object.keys(errors).length === 0) {
+        // Form is valid
+        const successMessage = document.getElementById('successMessage');
+        successMessage.classList.add('show');
+
+        // Clear localStorage
+        localStorage.removeItem(STORAGE_KEY);
+
+        // Log form data (for demo purposes)
+        const formData = new FormData(form);
+        const data = {
+          userType: formData.get('userType'),
+          fields: {}
+        };
+
+        for (const [key, value] of formData.entries()) {
+          data.fields[key] = value;
+        }
+
+        data.boardMembers = Array.from(document.querySelectorAll('.array-item')).map(item => ({
+          name: item.querySelector('input[data-field="name"]')?.value || '',
+          email: item.querySelector('input[data-field="email"]')?.value || ''
+        }));
+
+        console.log('Form submitted successfully:', data);
+
+        // Reset form after 2 seconds
+        setTimeout(() => {
+          form.reset();
+          successMessage.classList.remove('show');
+          updateConditionalSections();
+        }, 2000);
+      } else {
+        // Scroll to error summary
+        document.getElementById('errorSummary').scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    /* ============================================
+       Form Reset Handler
+       ============================================ */
+
+    form.addEventListener('reset', () => {
+      setTimeout(() => {
+        document.getElementById('successMessage').classList.remove('show');
+        updateErrorSummary({});
+        updateConditionalSections();
+      }, 0);
+    });
+
+    /* ============================================
+       Page Load - Restore State
+       ============================================ */
+
+    window.addEventListener('load', () => {
+      restoreFormState();
+      updateConditionalSections();
+    });
+  </script>
+</body>
+</html>

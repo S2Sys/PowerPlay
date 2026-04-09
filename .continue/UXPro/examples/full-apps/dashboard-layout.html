@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UXPro Dashboard Example - Professional Dashboard Layout</title>
+  <style>
+    /* ============================================================================
+       UXPro Design Tokens - CSS Variables
+       ============================================================================ */
+    :root {
+      /* Light Mode Colors */
+      --color-neutral-50: #ffffff;
+      --color-neutral-100: #f9f9f9;
+      --color-neutral-200: #e5e5e5;
+      --color-neutral-300: #d0d0d0;
+      --color-neutral-500: #808080;
+      --color-neutral-600: #525252;
+      --color-neutral-700: #333333;
+      --color-neutral-900: #000000;
+
+      --color-accent-500: #0066ff;
+      --color-accent-600: #0052cc;
+      --color-accent-700: #003d99;
+      --color-accent-light: rgba(0, 102, 255, 0.1);
+
+      --color-success: #00a651;
+      --color-warning: #ff9800;
+      --color-error: #dc3545;
+
+      /* Semantic tokens */
+      --bg-primary: var(--color-neutral-50);
+      --bg-secondary: var(--color-neutral-100);
+      --bg-tertiary: var(--color-neutral-200);
+      --text-primary: var(--color-neutral-900);
+      --text-secondary: var(--color-neutral-600);
+      --text-muted: var(--color-neutral-500);
+      --border-default: var(--color-neutral-200);
+      --border-strong: var(--color-neutral-300);
+
+      /* Typography Scale */
+      --text-xs: 0.64rem;   /* 10px */
+      --text-sm: 0.8rem;    /* 13px */
+      --text-base: 1rem;    /* 16px */
+      --text-lg: 1.25rem;   /* 20px */
+      --text-xl: 1.56rem;   /* 25px */
+
+      /* Spacing Grid (8-point) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+
+      /* Shadows - Elevation */
+      --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px rgb(0 0 0 / 0.1);
+
+      /* Border Radius */
+      --radius-md: 6px;
+      --radius-lg: 8px;
+
+      /* Z-Index Scale */
+      --z-sticky: 200;
+      --z-dropdown: 300;
+      --z-modal: 500;
+
+      /* Font */
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-neutral-50: #1a1a1a;
+        --color-neutral-100: #242424;
+        --color-neutral-200: #404040;
+        --color-neutral-300: #525252;
+        --color-neutral-600: #b0b0b0;
+        --bg-primary: var(--color-neutral-50);
+        --bg-secondary: var(--color-neutral-100);
+        --text-primary: #ffffff;
+        --text-secondary: var(--color-neutral-600);
+        --border-default: var(--color-neutral-200);
+      }
+    }
+
+    /* ============================================================================
+       Base Styles
+       ============================================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      transition: background-color 200ms ease-out, color 200ms ease-out;
+    }
+
+    /* ============================================================================
+       Skip Link (Accessibility)
+       ============================================================================ */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      background: var(--color-accent-500);
+      color: white;
+      padding: 8px;
+      z-index: 9999;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      left: 0;
+    }
+
+    /* ============================================================================
+       Header (Sticky Top Navigation)
+       ============================================================================ */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
+      height: 64px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .app-header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .app-logo {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .app-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--color-accent-500);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    /* Header nav links (center) */
+    nav.header-nav {
+      display: none;
+      flex: 1;
+      justify-content: center;
+      gap: var(--space-8);
+      margin: 0 var(--space-8);
+    }
+
+    nav.header-nav a {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 200ms ease-out;
+    }
+
+    nav.header-nav a:hover {
+      color: var(--text-primary);
+    }
+
+    @media (min-width: 1024px) {
+      nav.header-nav {
+        display: flex;
+      }
+    }
+
+    /* Header user menu */
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--color-accent-500);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .menu-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: background 200ms ease-out;
+    }
+
+    .menu-button:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .menu-button:focus {
+      outline: 2px solid var(--color-accent-500);
+      outline-offset: 2px;
+    }
+
+    @media (min-width: 768px) {
+      .menu-button {
+        display: none;
+      }
+    }
+
+    /* ============================================================================
+       Main Layout Container
+       ============================================================================ */
+    .app-layout {
+      display: flex;
+      height: calc(100vh - 64px);
+    }
+
+    /* ============================================================================
+       Sidebar (Navigation)
+       ============================================================================ */
+    aside {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-default);
+      overflow-y: auto;
+      padding: var(--space-6) 0;
+      transition: transform 300ms ease-out, opacity 300ms ease-out;
+      position: fixed;
+      left: 0;
+      top: 64px;
+      height: calc(100vh - 64px);
+      z-index: var(--z-dropdown);
+    }
+
+    /* Mobile sidebar - hidden by default, revealed with transform */
+    @media (max-width: 767px) {
+      aside {
+        transform: translateX(-100%);
+        opacity: 0;
+        width: 100%;
+        max-width: 320px;
+        box-shadow: var(--shadow-lg);
+      }
+
+      aside.is-open {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      aside {
+        position: relative;
+        top: auto;
+        height: auto;
+        transform: none;
+        opacity: 1;
+      }
+    }
+
+    /* Sidebar navigation */
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-6);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      transition: all 200ms ease-out;
+      min-height: 44px;
+    }
+
+    .sidebar-nav a:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav a.is-active {
+      background: var(--color-accent-light);
+      color: var(--color-accent-500);
+      border-left: 3px solid var(--color-accent-500);
+      padding-left: calc(var(--space-6) - 3px);
+      font-weight: 600;
+    }
+
+    .sidebar-nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================================
+       Main Content Area
+       ============================================================================ */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-6);
+      margin-left: 0;
+    }
+
+    @media (min-width: 768px) {
+      main {
+        margin-left: 260px;
+      }
+    }
+
+    /* ============================================================================
+       Page Content
+       ============================================================================ */
+    .page-header {
+      margin-bottom: var(--space-8);
+    }
+
+    .page-title {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .page-description {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    /* ============================================================================
+       Grid System
+       ============================================================================ */
+    .dashboard-grid {
+      display: grid;
+      gap: var(--space-6);
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .grid-item-span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 1023px) {
+      .grid-item-span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    /* ============================================================================
+       Card Component
+       ============================================================================ */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      transition: all 200ms ease-out;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      margin-bottom: var(--space-4);
+    }
+
+    .card-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .card-subtitle {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .card-body {
+      flex: 1;
+    }
+
+    .card-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--color-accent-500);
+      line-height: 1;
+      margin: var(--space-4) 0;
+    }
+
+    .card-change {
+      font-size: var(--text-sm);
+      color: var(--color-success);
+      margin: var(--space-2) 0;
+    }
+
+    .card-change.negative {
+      color: var(--color-error);
+    }
+
+    .card-footer {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .card-tag {
+      display: inline-block;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      padding: var(--space-1) var(--space-3);
+      border-radius: 4px;
+      font-size: var(--text-xs);
+    }
+
+    /* ============================================================================
+       Footer
+       ============================================================================ */
+    footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-default);
+      padding: var(--space-8) var(--space-6);
+      margin-top: var(--space-12);
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-8);
+      max-width: 1280px;
+    }
+
+    .footer-section h4 {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 200ms ease-out;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-accent-500);
+    }
+
+    /* ============================================================================
+       Responsive Adjustments
+       ============================================================================ */
+    @media (max-width: 767px) {
+      header {
+        height: 56px;
+      }
+
+      .app-layout {
+        height: calc(100vh - 56px);
+      }
+
+      main {
+        padding: var(--space-4);
+      }
+
+      .page-title {
+        font-size: var(--text-lg);
+      }
+
+      .card {
+        padding: var(--space-4);
+      }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+      aside,
+      .card,
+      .menu-button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Accessibility skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header Navigation (Sticky, z-index: 200) -->
+  <header>
+    <div class="app-header-content">
+      <a href="#" class="app-logo">
+        <div class="app-logo-icon">D</div>
+        <span>Dashboard</span>
+      </a>
+
+      <nav class="header-nav">
+        <a href="#overview">Overview</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#reports">Reports</a>
+      </nav>
+
+      <div class="header-user">
+        <button class="menu-button" aria-label="Toggle sidebar" id="menu-toggle">☰</button>
+        <div class="user-avatar" title="User Profile">JD</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout Container -->
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="is-active">
+          <span class="sidebar-nav-icon">📊</span>
+          Dashboard
+        </a>
+        <a href="#analytics">
+          <span class="sidebar-nav-icon">📈</span>
+          Analytics
+        </a>
+        <a href="#reports">
+          <span class="sidebar-nav-icon">📄</span>
+          Reports
+        </a>
+        <a href="#users">
+          <span class="sidebar-nav-icon">👥</span>
+          Users
+        </a>
+        <a href="#settings">
+          <span class="sidebar-nav-icon">⚙️</span>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Welcome to Your Dashboard</h1>
+        <p class="page-description">View your key metrics and recent activity at a glance</p>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Metric Card 1 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Total Revenue</div>
+            <div class="card-subtitle">Last 30 days</div>
+          </div>
+          <div class="card-body">
+            <div class="card-value">$45,231.89</div>
+            <div class="card-change">↑ 20.1% from last month</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">Finance</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 2 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Active Users</div>
+            <div class="card-subtitle">Currently online</div>
+          </div>
+          <div class="card-body">
+            <div class="card-value">12,543</div>
+            <div class="card-change">↑ 12.5% from yesterday</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">Users</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 3 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Conversion Rate</div>
+            <div class="card-subtitle">Last 30 days</div>
+          </div>
+          <div class="card-body">
+            <div class="card-value">3.24%</div>
+            <div class="card-change negative">↓ 2.3% from last month</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">Performance</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 4 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Average Order Value</div>
+            <div class="card-subtitle">Last 30 days</div>
+          </div>
+          <div class="card-body">
+            <div class="card-value">$156.78</div>
+            <div class="card-change">↑ 8.2% from last month</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">Sales</span>
+          </div>
+        </div>
+
+        <!-- Chart Card (2 columns) -->
+        <div class="card grid-item-span-2">
+          <div class="card-header">
+            <div class="card-title">Revenue Trend</div>
+            <div class="card-subtitle">Last 12 months</div>
+          </div>
+          <div class="card-body">
+            <div style="height: 200px; background: var(--bg-tertiary); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: var(--text-sm);">
+              Chart placeholder (Chart.js, D3, etc.)
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+          </div>
+          <div class="card-body">
+            <div style="font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.8;">
+              <div>• User Jane joined</div>
+              <div>• Report exported</div>
+              <div>• Settings updated</div>
+              <div>• Data sync completed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Regions Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top Regions</div>
+          </div>
+          <div class="card-body">
+            <div style="font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.8;">
+              <div>🇺🇸 United States: 45%</div>
+              <div>🇨🇦 Canada: 28%</div>
+              <div>🇲🇽 Mexico: 15%</div>
+              <div>🌍 Other: 12%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Status Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">System Status</div>
+          </div>
+          <div class="card-body">
+            <div style="font-size: var(--text-sm); color: var(--color-success); line-height: 1.8;">
+              <div>✓ All systems operational</div>
+              <div style="color: var(--text-secondary); margin-top: var(--space-3);">Last status check: 2 minutes ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>Product</h4>
+            <div class="footer-links">
+              <a href="#features">Features</a>
+              <a href="#pricing">Pricing</a>
+              <a href="#security">Security</a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Company</h4>
+            <div class="footer-links">
+              <a href="#about">About</a>
+              <a href="#blog">Blog</a>
+              <a href="#careers">Careers</a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Legal</h4>
+            <div class="footer-links">
+              <a href="#privacy">Privacy</a>
+              <a href="#terms">Terms</a>
+              <a href="#contact">Contact</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Toggle sidebar on mobile
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle?.addEventListener('click', () => {
+      sidebar.classList.toggle('is-open');
+    });
+
+    // Close sidebar when clicking on a link (mobile)
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          sidebar.classList.remove('is-open');
+        }
+      });
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+        sidebar.classList.remove('is-open');
+      }
+    });
+
+    // Make skip link functional
+    document.querySelector('.skip-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('#main-content').focus();
+    });
+  </script>
+</body>
+</html>

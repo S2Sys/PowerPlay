@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple App Shell Pattern - UXPro Section 32 Example">
+  <title>Simple App Shell - UXPro v3.1.0</title>
+  <style>
+    /* Design Tokens */
+    :root {
+      /* Layout */
+      --shell-sidebar-width: 240px;
+      --shell-header-height: 64px;
+      --shell-footer-height: 80px;
+      --shell-content-padding: 2rem;
+      --shell-drawer-width: 280px;
+      /* Colors - Light */
+      --shell-header-bg: #FFFFFF;
+      --shell-header-text: #111827;
+      --shell-header-border: #E5E7EB;
+      --shell-nav-bg: #FFFFFF;
+      --shell-nav-text: #374151;
+      --shell-nav-active-bg: #EEF2FF;
+      --shell-nav-active-text: #4338CA;
+      --shell-nav-active-border: #4F46E5;
+      --shell-nav-hover-bg: #F3F4F6;
+      --shell-user-menu-hover-bg: #E5E7EB;
+      --shell-hamburger-color: #111827;
+      --shell-hamburger-hover: #4F46E5;
+      --shell-footer-bg: #F3F4F6;
+      --shell-footer-text: #6B7280;
+      --shell-drawer-overlay: rgba(0, 0, 0, 0.5);
+      /* Typography */
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --transition: 300ms ease-in-out;
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --shell-header-bg: #1F2937;
+        --shell-header-text: #F3F4F6;
+        --shell-header-border: #374151;
+        --shell-nav-bg: #1F2937;
+        --shell-nav-text: #D1D5DB;
+        --shell-nav-active-bg: rgba(99, 102, 241, 0.1);
+        --shell-nav-active-text: #A5B4FC;
+        --shell-user-menu-hover-bg: #4B5563;
+        --shell-hamburger-color: #D1D5DB;
+        --shell-footer-bg: #111827;
+        --shell-footer-text: #9CA3AF;
+        --shell-drawer-overlay: rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: #1F2937;
+      background: #FFFFFF;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        color: #F3F4F6;
+        background: #111827;
+      }
+    }
+
+    /* Shell Grid */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--shell-sidebar-width) 1fr;
+      grid-template-rows: var(--shell-header-height) 1fr var(--shell-footer-height);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .shell-header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      background: var(--shell-header-bg);
+      color: var(--shell-header-text);
+      border-bottom: 1px solid var(--shell-header-border);
+      z-index: 50;
+    }
+
+    .shell-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #4F46E5;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .shell-logo:focus { outline: 2px solid #4F46E5; outline-offset: 2px; }
+
+    .shell-header-center {
+      flex: 1;
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .shell-header-right {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .shell-hamburger {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--shell-hamburger-color);
+      min-width: 48px;
+      min-height: 48px;
+      padding: 10px;
+      transition: color var(--transition);
+    }
+
+    .shell-hamburger:hover { color: var(--shell-hamburger-hover); }
+    .shell-hamburger:focus { outline: 2px solid var(--shell-hamburger-hover); outline-offset: 2px; }
+
+    .shell-hamburger svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* User Menu */
+    .shell-user-menu {
+      position: relative;
+    }
+
+    .shell-user-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--shell-header-text);
+      font-size: 0.875rem;
+      border-radius: 0.375rem;
+      min-height: 48px;
+      min-width: 48px;
+      transition: background-color var(--transition);
+    }
+
+    .shell-user-button:hover { background-color: var(--shell-user-menu-hover-bg); }
+    .shell-user-button:focus { outline: 2px solid var(--shell-hamburger-hover); outline-offset: 2px; }
+
+    .shell-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .shell-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      background: var(--shell-header-bg);
+      border: 1px solid var(--shell-header-border);
+      border-radius: 0.375rem;
+      min-width: 160px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all var(--transition);
+      z-index: 100;
+    }
+
+    .shell-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .shell-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--shell-header-text);
+      font-size: 0.875rem;
+      transition: background-color var(--transition);
+    }
+
+    .shell-dropdown button:hover { background-color: var(--shell-user-menu-hover-bg); }
+    .shell-dropdown button:focus { outline: 2px solid var(--shell-hamburger-hover); outline-offset: -2px; }
+
+    /* Sidebar */
+    .shell-sidebar {
+      grid-row: 2;
+      background: var(--shell-nav-bg);
+      border-right: 1px solid var(--shell-header-border);
+      overflow-y: auto;
+      z-index: 40;
+    }
+
+    .shell-nav {
+      list-style: none;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .shell-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--shell-nav-text);
+      text-decoration: none;
+      border-radius: 0.375rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      width: 100%;
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      transition: all var(--transition);
+      min-height: 48px;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+
+    .shell-nav-link:hover {
+      background-color: var(--shell-nav-hover-bg);
+    }
+
+    .shell-nav-link:focus {
+      outline: 2px solid var(--shell-hamburger-hover);
+      outline-offset: -2px;
+    }
+
+    .shell-nav-link.active {
+      background-color: var(--shell-nav-active-bg);
+      color: var(--shell-nav-active-text);
+      border-left-color: var(--shell-nav-active-border);
+    }
+
+    .shell-nav-icon {
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .shell-nav-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Main Content */
+    .shell-main {
+      grid-row: 2;
+      grid-column: 2;
+      padding: var(--shell-content-padding);
+      overflow-y: auto;
+    }
+
+    .shell-content h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .shell-content p {
+      color: #6B7280;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .shell-content p {
+        color: #D1D5DB;
+      }
+    }
+
+    .shell-card {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .shell-card {
+        background: #1F2937;
+        border-color: #374151;
+      }
+    }
+
+    .shell-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .shell-card ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Footer */
+    .shell-footer {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--shell-footer-bg);
+      color: var(--shell-footer-text);
+      border-top: 1px solid var(--shell-header-border);
+      font-size: 0.875rem;
+    }
+
+    .shell-footer-right {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .shell-footer-link {
+      color: #4F46E5;
+      text-decoration: none;
+      transition: opacity var(--transition);
+    }
+
+    .shell-footer-link:hover { opacity: 0.8; }
+    .shell-footer-link:focus { outline: 2px solid #4F46E5; outline-offset: 2px; }
+
+    /* Overlay */
+    .shell-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--shell-drawer-overlay);
+      z-index: 30;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .shell-overlay.active {
+      opacity: 1;
+    }
+
+    /* Mobile */
+    @media (max-width: 767px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .shell-hamburger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .shell-sidebar {
+        position: fixed;
+        top: var(--shell-header-height);
+        left: 0;
+        width: var(--shell-drawer-width);
+        bottom: var(--shell-footer-height);
+        background: var(--shell-nav-bg);
+        border-right: 1px solid var(--shell-header-border);
+        transform: translateX(-100%);
+        transition: transform var(--transition);
+      }
+
+      .shell-sidebar.active {
+        transform: translateX(0);
+      }
+
+      .shell-main {
+        grid-column: 1;
+      }
+
+      .shell-overlay {
+        display: block;
+      }
+
+      .shell-header-center {
+        display: none;
+      }
+
+      .shell-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+      }
+
+      .shell-footer-right {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Header -->
+    <header class="shell-header" role="banner">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="shell-hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 24 24" fill="none">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <a href="#" class="shell-logo">⚡ UXPro</a>
+      </div>
+
+      <div class="shell-header-center">Dashboard</div>
+
+      <div class="shell-header-right">
+        <div class="shell-user-menu">
+          <button class="shell-user-button" id="userMenuBtn" aria-label="User menu" aria-haspopup="menu" aria-expanded="false">
+            <div class="shell-avatar">JD</div>
+            <span>John Doe</span>
+          </button>
+          <div class="shell-dropdown" id="userDropdown" role="menu">
+            <button role="menuitem">Profile</button>
+            <button role="menuitem">Settings</button>
+            <button role="menuitem">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="shell-sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+      <nav>
+        <ul class="shell-nav">
+          <li><a href="#dashboard" class="shell-nav-link active" data-page="dashboard"><span class="shell-nav-icon">📊</span><span class="shell-nav-label">Dashboard</span></a></li>
+          <li><a href="#projects" class="shell-nav-link" data-page="projects"><span class="shell-nav-icon">📁</span><span class="shell-nav-label">Projects</span></a></li>
+          <li><a href="#reports" class="shell-nav-link" data-page="reports"><span class="shell-nav-icon">📈</span><span class="shell-nav-label">Reports</span></a></li>
+          <li><a href="#team" class="shell-nav-link" data-page="team"><span class="shell-nav-icon">👥</span><span class="shell-nav-label">Team</span></a></li>
+          <li><a href="#files" class="shell-nav-link" data-page="files"><span class="shell-nav-icon">🗂️</span><span class="shell-nav-label">Files</span></a></li>
+          <li><a href="#messages" class="shell-nav-link" data-page="messages"><span class="shell-nav-icon">💬</span><span class="shell-nav-label">Messages</span></a></li>
+          <li><a href="#settings" class="shell-nav-link" data-page="settings"><span class="shell-nav-icon">⚙️</span><span class="shell-nav-label">Settings</span></a></li>
+          <li><a href="#help" class="shell-nav-link" data-page="help"><span class="shell-nav-icon">❓</span><span class="shell-nav-label">Help</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="shell-main" role="main">
+      <div class="shell-content">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p>Welcome to the UXPro Simple App Shell Pattern. This example demonstrates a fully functional micro-app shell with responsive design, accessibility features, and dark mode support.</p>
+
+        <div class="shell-card">
+          <h2>Overview</h2>
+          <p>This shell pattern showcases modern application interface best practices:</p>
+          <ul>
+            <li>Responsive layout for mobile, tablet, and desktop</li>
+            <li>Fixed header and footer with scrollable content</li>
+            <li>Collapsible sidebar navigation on mobile</li>
+            <li>User menu dropdown in the header</li>
+            <li>Dark mode support with system preference detection</li>
+            <li>Full keyboard navigation and screen reader support</li>
+            <li>Smooth animations and transitions</li>
+          </ul>
+        </div>
+
+        <div class="shell-card">
+          <h2>Navigation</h2>
+          <p>Use the sidebar to navigate between sections. On mobile devices, tap the hamburger menu (☰) to reveal navigation. Click any nav item to update this content area.</p>
+        </div>
+
+        <div class="shell-card">
+          <h2>Features</h2>
+          <p><strong>Mobile Responsive:</strong> Resize your browser to see responsive behavior. The sidebar collapses on screens under 768px.</p>
+          <p><strong>User Menu:</strong> Click your name in the header to open the user menu dropdown.</p>
+          <p><strong>Dark Mode:</strong> Your system preference is automatically detected and applied.</p>
+        </div>
+
+        <div class="shell-card">
+          <h2>Accessibility</h2>
+          <p>Built with WCAG 2.1 AA compliance in mind. All interactive elements are keyboard accessible with clear focus indicators. Screen readers are fully supported with proper ARIA labels and semantic HTML.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="shell-footer" role="contentinfo">
+      <p>&copy; 2026 UXPro Design System. All rights reserved.</p>
+      <div class="shell-footer-right">
+        <a href="#" class="shell-footer-link">Privacy</a>
+        <a href="#" class="shell-footer-link">Terms</a>
+        <a href="#" class="shell-footer-link">Contact</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="shell-overlay" id="overlay" role="presentation"></div>
+
+  <script>
+    class AppShell {
+      constructor() {
+        this.hamburger = document.getElementById('hamburgerBtn');
+        this.sidebar = document.getElementById('sidebar');
+        this.overlay = document.getElementById('overlay');
+        this.userMenuBtn = document.getElementById('userMenuBtn');
+        this.userDropdown = document.getElementById('userDropdown');
+        this.navLinks = document.querySelectorAll('.shell-nav-link');
+        this.pageTitle = document.getElementById('pageTitle');
+        this.sidebarOpen = false;
+        this.userMenuOpen = false;
+        this.init();
+      }
+
+      init() {
+        this.hamburger.addEventListener('click', () => this.toggleSidebar());
+        this.overlay.addEventListener('click', () => this.closeSidebar());
+        this.userMenuBtn.addEventListener('click', () => this.toggleUserMenu());
+        this.navLinks.forEach(link => {
+          link.addEventListener('click', (e) => this.handleNavClick(e, link));
+        });
+        document.addEventListener('keydown', (e) => this.handleKeydown(e));
+        document.addEventListener('click', (e) => this.handleOutsideClick(e));
+        window.addEventListener('resize', () => this.handleResize());
+      }
+
+      toggleSidebar() {
+        this.sidebarOpen ? this.closeSidebar() : this.openSidebar();
+      }
+
+      openSidebar() {
+        this.sidebarOpen = true;
+        this.sidebar.classList.add('active');
+        this.overlay.classList.add('active');
+        this.hamburger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      closeSidebar() {
+        this.sidebarOpen = false;
+        this.sidebar.classList.remove('active');
+        this.overlay.classList.remove('active');
+        this.hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      toggleUserMenu() {
+        this.userMenuOpen ? this.closeUserMenu() : this.openUserMenu();
+      }
+
+      openUserMenu() {
+        this.userMenuOpen = true;
+        this.userDropdown.classList.add('active');
+        this.userMenuBtn.setAttribute('aria-expanded', 'true');
+      }
+
+      closeUserMenu() {
+        this.userMenuOpen = false;
+        this.userDropdown.classList.remove('active');
+        this.userMenuBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      handleNavClick(e, link) {
+        e.preventDefault();
+        this.navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        const page = link.getAttribute('data-page');
+        const titles = { dashboard: 'Dashboard', projects: 'Projects', reports: 'Reports', team: 'Team', files: 'Files', messages: 'Messages', settings: 'Settings', help: 'Help' };
+        this.pageTitle.textContent = titles[page] || 'Dashboard';
+        if (window.innerWidth < 768) this.closeSidebar();
+      }
+
+      handleKeydown(e) {
+        if (e.key === 'Escape') {
+          this.closeSidebar();
+          this.closeUserMenu();
+        }
+      }
+
+      handleOutsideClick(e) {
+        if (!this.userMenuBtn.contains(e.target) && !this.userDropdown.contains(e.target)) {
+          this.closeUserMenu();
+        }
+      }
+
+      handleResize() {
+        if (window.innerWidth >= 768 && this.sidebarOpen) {
+          this.closeSidebar();
+        }
+      }
+    }
+
+    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', () => new AppShell()) : new AppShell();
+  </script>
+</body>
+</html>

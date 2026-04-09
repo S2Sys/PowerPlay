@@ -1,0 +1,118 @@
+{
+  "version": "3.0.0",
+  "releaseDate": "2026-04-09T00:00:00Z",
+  "lastUpdated": "2026-04-09T00:00:00Z",
+  "description": "Enterprise design system with 30 sections covering core design laws, responsive design, visual hierarchy, components, animations, layouts, dark mode, accessibility, performance, typography, icons, interactions, component specs, data visualization, micro-interactions, navigation patterns, advanced forms, content patterns, error handling, accessibility deep dive, performance patterns, platform-specific guidelines, iconography details, system updates/maintenance, animation library patterns, collaborative components, advanced state management, and form builder patterns.",
+  "repositoryUrl": "https://github.com/s2sys/uxpro",
+  "rawContentUrl": "https://raw.githubusercontent.com/s2sys/uxpro/main",
+  "compatibility": {
+    "claudeCode": "1.0+",
+    "cursor": "0.30+",
+    "windsurf": "1.0+",
+    "cline": "1.0+",
+    "continue": "0.8+",
+    "copilot": "1.0+"
+  },
+  "sections": {
+    "total": 30,
+    "foundational": [
+      "1: Core Design Laws",
+      "2: Responsive Design Rules",
+      "3: Visual Hierarchy Rules",
+      "4: Component Design Rules",
+      "5: Motion & Animation Rules",
+      "6: Layout Patterns",
+      "7: Dark Mode & Theming",
+      "8: Accessibility (A11Y)",
+      "9: Performance Optimization",
+      "10: Typography Rules",
+      "11: Icon & Imagery Rules",
+      "12: Interaction States",
+      "13: Common Component Specs",
+      "14: Data Visualization"
+    ],
+    "expanded": [
+      "15: Design System Checklist",
+      "16: Micro-interactions & Feedback",
+      "17: Navigation Patterns",
+      "18: Advanced Form Patterns",
+      "19: Content Patterns",
+      "20: Error & Edge Cases",
+      "21: Accessibility Deep Dive",
+      "22: Performance UI Patterns",
+      "23: Platform-Specific Guidelines",
+      "24: Iconography Details",
+      "25: Advanced Data Visualization",
+      "26: System Updates & Maintenance",
+      "27: Animation Library Patterns",
+      "28: Collaborative Component Patterns",
+      "29: Advanced State Management UI Patterns",
+      "30: Form Builder Patterns"
+    ]
+  },
+  "breakingChanges": [],
+  "deprecations": [],
+  "newIn3_0_0": [
+    "Section 30: Form Builder Patterns with conditional visibility, multi-step wizards, and complex dependencies",
+    "73 new form design tokens for step indicators, validation states, and field animations",
+    "3 production-ready form examples: basic dynamic, multi-step wizard, advanced dependencies",
+    "Complete form builder documentation with 828 lines of comprehensive patterns",
+    "localStorage persistence patterns for form state recovery",
+    "Field array patterns for reusable form field groups (add/remove)",
+    "Enhanced error handling with error summaries and field linking"
+  ],
+  "previousNewIn": {
+    "v2_3_0": [
+      "Section 27: Animation Library Patterns with reusable animation systems and composition patterns",
+      "Section 28: Collaborative Component Patterns with presence, cursors, comments, and roles",
+      "Section 29: Advanced State Management UI Patterns with state machines, undo/redo, and optimistic updates",
+      "Extended design-tokens.css with animation library and state management tokens",
+      "New animation keyframes: slide-in, fade-in, scale-pop, shimmer, pulse",
+      "State indicator color tokens: pending, active, completed, error, disabled",
+      "Collaboration presence tokens: editing, viewing, away, offline"
+    ]
+  },
+  "files": [
+    "UIUX-MASTER-PROMPT-SYSTEM.md",
+    "UIUX-SYSTEM-PROMPT.md",
+    "design-tokens.css",
+    "VERSION.json",
+    "UPDATE_GUIDE.md",
+    "cursorrules-windsurfrules.md",
+    "README.md"
+  ],
+  "previousVersions": [
+    {
+      "version": "2.3.0",
+      "releaseDate": "2026-04-08T00:00:00Z",
+      "description": "Added Sections 27-29: Animation Library, Collaborative Components, and Advanced State Management"
+    },
+    {
+      "version": "2.2.0",
+      "releaseDate": "2026-04-08T00:00:00Z",
+      "description": "Added Section 26: System Updates & Maintenance with versioning infrastructure"
+    },
+    {
+      "version": "2.1.0",
+      "releaseDate": "2026-04-08T00:00:00Z",
+      "description": "Added 10 new comprehensive sections (16-25) expanding design system"
+    },
+    {
+      "version": "2.0.0",
+      "releaseDate": "2026-03-15T00:00:00Z",
+      "description": "Initial comprehensive design system with 14 foundational sections"
+    },
+    {
+      "version": "1.0.0",
+      "releaseDate": "2026-01-01T00:00:00Z",
+      "description": "Initial release"
+    }
+  ],
+  "updateNotes": {
+    "phase1Completed": "2026-04-08",
+    "phase2Completed": "2026-04-08",
+    "phase3Completed": "2026-04-09",
+    "milestone": "v3.0.0 - Enterprise Form Builder Patterns added",
+    "status": "Complete - 30 sections, 3,688+ lines of documentation and examples"
+  }
+}

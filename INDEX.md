@@ -1,4 +1,4 @@
-# SmartWorkz PowerStack — File Structure & Index
+# SmartWorkz PowerPlay — File Structure & Index
 
 ## 📁 Directory Organization
 

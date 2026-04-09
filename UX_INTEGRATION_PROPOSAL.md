@@ -1,4 +1,4 @@
-# UXPro Integration Proposal — Add UX Design Agent Rules to PowerStack v2.2.0
+# UXPro Integration Proposal — Add UX Design Agent Rules to PowerPlay v2.2.0
 
 **Date**: 2026-04-09  
 **Status**: Analysis Complete  
@@ -40,11 +40,11 @@ UXPro is a **comprehensive UI/UX design system** for AI-powered coding assistant
 
 ## 💡 Strategic Recommendation
 
-### **YES — Integrate UXPro into PowerStack as v2.2.0 UX Design Agent Suite**
+### **YES — Integrate UXPro into PowerPlay as v2.2.0 UX Design Agent Suite**
 
 **Rationale:**
 1. **Perfect complement** to existing data/observability focus (v2.1.0)
-2. **Fills critical gap** — no UI/UX agent capability currently in PowerStack
+2. **Fills critical gap** — no UI/UX agent capability currently in PowerPlay
 3. **Production-ready** — UXPro is mature (v3.0.0), comprehensive, tested
 4. **Seamless integration** — same YAML + rule.md structure as v2.0.0/v2.1.0
 5. **High-value prompts** — 5+ new UX agent commands enable UI generation, design audits, accessibility checks
@@ -180,7 +180,7 @@ Could add specialized models for design tasks:
 
 ### Phase 1: Create Rule Files (Week 1)
 1. Extract UXPro content into 5 rule files (.continue/rules/)
-2. Align rule structure with existing PowerStack rules (frontmatter, ALWAYS/NEVER, examples)
+2. Align rule structure with existing PowerPlay rules (frontmatter, ALWAYS/NEVER, examples)
 3. Add globs for frontend files (*.tsx, *.jsx, *.css, *.scss, *.html)
 
 ### Phase 2: Add Prompts to config.yaml (Week 1)
@@ -208,7 +208,7 @@ Could add specialized models for design tasks:
 
 ---
 
-## 📈 Impact on PowerStack
+## 📈 Impact on PowerPlay
 
 ### Current State (v2.1.0)
 - **Models**: 14 (5 local + 9 cloud)
@@ -238,7 +238,7 @@ Could add specialized models for design tasks:
 4. **Consistent tokens** — Design system tokens synced across projects
 5. **Performance-aware** — Animation and layout best practices enforced
 
-### For PowerStack
+### For PowerPlay
 1. **Closes capability gap** — No UI/UX agent coverage before v2.2.0
 2. **Broad appeal** — Frontend developers get immediate value
 3. **Production quality** — UXPro is mature, tested, documented
@@ -257,7 +257,7 @@ Could add specialized models for design tasks:
 ### Scope
 - Keep it focused: 5 new rules, 5 new prompts
 - Don't redesign UXPro — use it as-is (it's solid)
-- Align with PowerStack structure (frontmatter, checklists, examples)
+- Align with PowerPlay structure (frontmatter, checklists, examples)
 
 ### Success Criteria
 - ✅ All 5 rules in `.continue/rules/`
@@ -318,7 +318,7 @@ Could add specialized models for design tasks:
 
 ### Option C: Custom UX Rules
 - Use UXPro as reference
-- Create PowerStack-specific UX rules
+- Create PowerPlay-specific UX rules
 - More aligned with existing rules
 
 **My Recommendation:** Option A — Go with v2.2.0 UX Integration. UXPro is excellent, the integration is straightforward, and the value to users is immediate.

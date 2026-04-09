@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UXPro Form Example - Contact Form</title>
+  <style>
+    /* ============================================================================
+       UXPro Design Tokens - CSS Variables
+       ============================================================================ */
+    :root {
+      /* Light Mode Colors */
+      --color-neutral-50: #ffffff;
+      --color-neutral-100: #f9f9f9;
+      --color-neutral-200: #e5e5e5;
+      --color-neutral-300: #d0d0d0;
+      --color-neutral-600: #525252;
+      --color-neutral-700: #333333;
+      --color-neutral-900: #000000;
+
+      --color-accent-500: #0066ff;
+      --color-accent-600: #0052cc;
+      --color-accent-700: #003d99;
+      --color-accent-light: rgba(0, 102, 255, 0.1);
+
+      --color-success: #00a651;
+      --color-error: #dc3545;
+      --color-warning: #ff9800;
+      --color-info: #0066ff;
+
+      /* Semantic tokens */
+      --bg-primary: var(--color-neutral-50);
+      --bg-secondary: var(--color-neutral-100);
+      --text-primary: var(--color-neutral-900);
+      --text-secondary: var(--color-neutral-600);
+      --text-muted: var(--color-neutral-600);
+      --border-default: var(--color-neutral-200);
+      --border-strong: var(--color-neutral-300);
+
+      /* Typography Scale (1.25 Modular Scale) */
+      --text-xs: 0.64rem;   /* 10px */
+      --text-sm: 0.8rem;    /* 13px */
+      --text-base: 1rem;    /* 16px */
+      --text-lg: 1.25rem;   /* 20px */
+      --text-xl: 1.56rem;   /* 25px */
+
+      /* Spacing Grid (8-point) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px rgb(0 0 0 / 0.1);
+
+      /* Border Radius */
+      --radius-sm: 2px;
+      --radius-base: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
+
+      /* Font Family */
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'Courier New', monospace;
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-neutral-50: #1a1a1a;
+        --color-neutral-100: #242424;
+        --color-neutral-200: #404040;
+        --color-neutral-300: #525252;
+        --color-neutral-600: #b0b0b0;
+        --color-neutral-700: #d0d0d0;
+        --color-neutral-900: #ffffff;
+
+        --bg-primary: var(--color-neutral-50);
+        --bg-secondary: var(--color-neutral-100);
+        --text-primary: var(--color-neutral-900);
+        --text-secondary: var(--color-neutral-600);
+        --border-default: var(--color-neutral-200);
+        --border-strong: var(--color-neutral-300);
+      }
+    }
+
+    /* ============================================================================
+       Base Styles
+       ============================================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      transition: background-color 200ms ease-out, color 200ms ease-out;
+    }
+
+    main {
+      min-height: 100vh;
+      padding: var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ============================================================================
+       Form Styles
+       ============================================================================ */
+    .form-container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--bg-secondary);
+      padding: var(--space-8);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .form-header {
+      margin-bottom: var(--space-8);
+    }
+
+    .form-header h1 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+    }
+
+    .form-header p {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    /* Form group - wraps label, input, and helper/error text */
+    .form-group {
+      margin-bottom: var(--space-6);
+    }
+
+    /* UXPro RULE: Form labels positioned above inputs */
+    .form-label {
+      display: block;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+      /* ACCESSIBILITY: Visible label linked to input via htmlFor */
+    }
+
+    /* UXPro RULE: Input height minimum 44px (touch target) */
+    /* UXPro RULE: Border 1px solid, rounded 6px (md) */
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-base);
+      font-family: inherit;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: border-color 200ms ease-out, box-shadow 200ms ease-out;
+      min-height: 44px; /* TOUCH TARGET */
+    }
+
+    /* UXPro RULE: Hover state */
+    .form-input:hover,
+    .form-select:hover,
+    .form-textarea:hover {
+      border-color: var(--border-strong);
+    }
+
+    /* UXPro RULE: Focus state - visible outline (2px solid accent, 2px offset) */
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-accent-500);
+      box-shadow: 0 0 0 3px var(--color-accent-light);
+    }
+
+    /* UXPro RULE: Disabled state - 50% opacity */
+    .form-input:disabled,
+    .form-select:disabled,
+    .form-textarea:disabled {
+      background-color: var(--color-neutral-100);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .form-input:disabled,
+      .form-select:disabled,
+      .form-textarea:disabled {
+        background-color: var(--color-neutral-200);
+      }
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* Helper text - shown below input for guidance */
+    .form-helper {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-top: var(--space-2);
+      line-height: 1.4;
+    }
+
+    /* Error text - shown when validation fails */
+    .form-error {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--color-error);
+      margin-top: var(--space-2);
+      font-weight: 500;
+      line-height: 1.4;
+      /* UXPro RULE: Error color must have 4.5:1 contrast */
+    }
+
+    /* Success text - shown when validation passes */
+    .form-success {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--color-success);
+      margin-top: var(--space-2);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Apply error styling when form-group has is-error state */
+    .form-group.is-error .form-input,
+    .form-group.is-error .form-select,
+    .form-group.is-error .form-textarea {
+      border-color: var(--color-error);
+    }
+
+    .form-group.is-error .form-input:focus,
+    .form-group.is-error .form-select:focus,
+    .form-group.is-error .form-textarea:focus {
+      border-color: var(--color-error);
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    /* Apply success styling when form-group has is-success state */
+    .form-group.is-success .form-input,
+    .form-group.is-success .form-select {
+      border-color: var(--color-success);
+    }
+
+    .form-group.is-success .form-input:focus,
+    .form-group.is-success .form-select:focus {
+      border-color: var(--color-success);
+      box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+    }
+
+    /* Checkbox and Radio Groups */
+    .form-checkbox-group,
+    .form-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .form-checkbox,
+    .form-radio {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    /* UXPro RULE: Touch target minimum 44px (checkbox/radio + label) */
+    .form-checkbox input[type="checkbox"],
+    .form-radio input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin-right: var(--space-3);
+      cursor: pointer;
+      accent-color: var(--color-accent-500);
+      flex-shrink: 0;
+    }
+
+    .form-checkbox label,
+    .form-radio label {
+      font-size: var(--text-base);
+      color: var(--text-primary);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    /* Form actions - buttons at bottom */
+    .form-actions {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-8);
+      flex-wrap: wrap;
+    }
+
+    /* UXPro RULE: Button height minimum 44px (touch target) */
+    /* UXPro RULE: Button hierarchy - primary filled, secondary outlined */
+    .form-button {
+      padding: var(--space-3) var(--space-6);
+      font-size: var(--text-base);
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 200ms ease-out;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      min-width: 120px;
+      text-decoration: none;
+    }
+
+    /* Primary button - filled with accent color */
+    .form-button.primary {
+      background-color: var(--color-accent-500);
+      color: white;
+    }
+
+    .form-button.primary:hover {
+      background-color: var(--color-accent-600);
+    }
+
+    .form-button.primary:active {
+      background-color: var(--color-accent-700);
+      transform: scale(0.98);
+    }
+
+    .form-button.primary:focus {
+      outline: 2px solid var(--color-accent-700);
+      outline-offset: 2px;
+    }
+
+    .form-button.primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Secondary button - outlined */
+    .form-button.secondary {
+      background-color: transparent;
+      color: var(--color-accent-500);
+      border: 2px solid var(--color-accent-500);
+    }
+
+    .form-button.secondary:hover {
+      background-color: var(--color-accent-light);
+    }
+
+    .form-button.secondary:active {
+      background-color: var(--color-accent-500);
+      color: white;
+      transform: scale(0.98);
+    }
+
+    .form-button.secondary:focus {
+      outline: 2px solid var(--color-accent-500);
+      outline-offset: 2px;
+    }
+
+    .form-button.secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Responsive Design - Mobile First */
+    @media (max-width: 639px) {
+      .form-container {
+        padding: var(--space-6);
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-button {
+        width: 100%;
+      }
+    }
+
+    /* Reduce motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .form-input,
+      .form-select,
+      .form-textarea,
+      .form-button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip to main content link for keyboard navigation -->
+  <a href="#main-form" class="skip-link" style="position: absolute; top: -40px; left: -40px; background: var(--color-accent-500); color: white; padding: 8px; z-index: 9999;">
+    Skip to form
+  </a>
+
+  <main>
+    <form class="form-container" id="main-form">
+      <div class="form-header">
+        <h1>Contact Us</h1>
+        <p>We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+      </div>
+
+      <!-- Name field -->
+      <div class="form-group">
+        <label for="name" class="form-label">Full Name</label>
+        <input
+          id="name"
+          type="text"
+          class="form-input"
+          placeholder="John Doe"
+          aria-describedby="name-helper"
+          required
+        />
+        <p class="form-helper" id="name-helper">Enter your full name</p>
+      </div>
+
+      <!-- Email field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          placeholder="john@example.com"
+          aria-describedby="email-helper"
+          required
+        />
+        <p class="form-helper" id="email-helper">We'll never share your email with anyone</p>
+      </div>
+
+      <!-- Phone field (optional) -->
+      <div class="form-group">
+        <label for="phone" class="form-label">Phone Number (Optional)</label>
+        <input
+          id="phone"
+          type="tel"
+          class="form-input"
+          placeholder="(555) 123-4567"
+          aria-describedby="phone-helper"
+        />
+        <p class="form-helper" id="phone-helper">Include country code for international numbers</p>
+      </div>
+
+      <!-- Subject field -->
+      <div class="form-group">
+        <label for="subject" class="form-label">Subject</label>
+        <select id="subject" class="form-select" aria-describedby="subject-helper" required>
+          <option value="">-- Select a subject --</option>
+          <option value="general">General Inquiry</option>
+          <option value="support">Support Request</option>
+          <option value="feedback">Feedback</option>
+          <option value="partnership">Partnership</option>
+          <option value="other">Other</option>
+        </select>
+        <p class="form-helper" id="subject-helper">Choose the best category for your message</p>
+      </div>
+
+      <!-- Message field -->
+      <div class="form-group">
+        <label for="message" class="form-label">Message</label>
+        <textarea
+          id="message"
+          class="form-textarea"
+          placeholder="Tell us more about your inquiry..."
+          aria-describedby="message-helper"
+          required
+        ></textarea>
+        <p class="form-helper" id="message-helper">Minimum 10 characters, maximum 1000</p>
+      </div>
+
+      <!-- Checkboxes -->
+      <div class="form-group">
+        <p class="form-label">Preferences</p>
+        <div class="form-checkbox-group">
+          <div class="form-checkbox">
+            <input
+              id="subscribe"
+              type="checkbox"
+              name="subscribe"
+              aria-describedby="subscribe-desc"
+            />
+            <label for="subscribe">Subscribe to our newsletter</label>
+          </div>
+          <div class="form-checkbox">
+            <input
+              id="contact-me"
+              type="checkbox"
+              name="contact-me"
+              checked
+            />
+            <label for="contact-me">Allow us to contact you about your inquiry</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms checkbox -->
+      <div class="form-group">
+        <div class="form-checkbox">
+          <input
+            id="terms"
+            type="checkbox"
+            name="terms"
+            aria-describedby="terms-desc"
+            required
+          />
+          <label for="terms">I agree to the <a href="#" style="color: var(--color-accent-500);">Terms of Service</a></label>
+        </div>
+        <p class="form-helper" id="terms-desc">Required to submit this form</p>
+      </div>
+
+      <!-- Example error state (for demonstration) -->
+      <div class="form-group is-error" style="display: none;">
+        <label for="demo-error" class="form-label">Example Error Field</label>
+        <input
+          id="demo-error"
+          type="text"
+          class="form-input"
+          aria-invalid="true"
+          aria-describedby="demo-error-msg"
+        />
+        <p class="form-error" id="demo-error-msg">This is an example error message</p>
+      </div>
+
+      <!-- Example success state (for demonstration) -->
+      <div class="form-group is-success" style="display: none;">
+        <label for="demo-success" class="form-label">Example Success Field</label>
+        <input
+          id="demo-success"
+          type="text"
+          class="form-input"
+          value="john_doe_123"
+          aria-describedby="demo-success-msg"
+        />
+        <p class="form-success" id="demo-success-msg">Username is available!</p>
+      </div>
+
+      <!-- Form buttons -->
+      <div class="form-actions">
+        <button type="submit" class="form-button primary" aria-label="Submit the contact form">
+          Send Message
+        </button>
+        <button type="reset" class="form-button secondary" aria-label="Clear all form fields">
+          Clear Form
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Simple form demonstration
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Form submitted! In a real application, this would send the data to a server.');
+      // In production, you would:
+      // 1. Validate all fields
+      // 2. Show loading state on button
+      // 3. Send data to server
+      // 4. Show success/error message
+      // 5. Reset form on success
+    });
+
+    // Make skip link functional
+    document.querySelector('.skip-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('#main-form').focus();
+    });
+  </script>
+</body>
+</html>

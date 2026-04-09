@@ -1,6 +1,6 @@
 ╔═══════════════════════════════════════════════════════════════════════════════╗
 ║                   UXPRO INTEGRATION ANALYSIS — v2.2.0 PROPOSAL                ║
-║                    Add UX Design Agent Rules to PowerStack                    ║
+║                    Add UX Design Agent Rules to PowerPlay                    ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 📊 CURRENT STATE (v2.1.0)
@@ -22,7 +22,7 @@ Status:     Production-ready (v3.0.0, released 2026-04-09)
 Scope:      30 design sections + design tokens + accessibility rules
 Coverage:   Colors, typography, spacing, responsive, animations, accessibility
 Quality:    WCAG 2.1 AA compliant, mobile-first, extensive docs
-Integration: Perfect for Continue.dev/PowerStack
+Integration: Perfect for Continue.dev/PowerPlay
 
 Key Features:
   ✅ 60-30-10 color rule + semantic tokens
@@ -84,7 +84,7 @@ For Users:
   ✅ Design system tokens (consistent across projects)
   ✅ Performance-aware animations (GPU acceleration enforced)
 
-For PowerStack:
+For PowerPlay:
   ✅ Closes capability gap (frontend developers get immediate value)
   ✅ Seamless integration (uses same config.yaml + rule.md structure)
   ✅ Production quality (UXPro is mature, tested, documented)
@@ -133,7 +133,7 @@ Week 2:
 Rationale:
   1. UXPro is excellent — mature, production-ready, comprehensive
   2. Perfect gap filler — frontend developers get immediate value
-  3. Seamless integration — uses PowerStack's existing patterns
+  3. Seamless integration — uses PowerPlay's existing patterns
   4. No redesign needed — use UXPro content directly (it's solid)
   5. High impact — UI/UX capability is critical for modern development
   6. Quick turnaround — 2-week implementation timeline
@@ -158,7 +158,7 @@ Option B: DEFER to v2.3.0
 
 Option C: CUSTOM RULES
   → Use UXPro as reference
-  → Create PowerStack-specific rules
+  → Create PowerPlay-specific rules
   → Align more closely with existing rules
 
 ═══════════════════════════════════════════════════════════════════════════════

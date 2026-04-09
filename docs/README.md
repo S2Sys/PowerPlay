@@ -1,4 +1,4 @@
-# SmartWorkz PowerStack
+# SmartWorkz PowerPlay
 
 > Cursor-level AI code editor power. Windsurf agent autonomy. **Zero cost.** For [Continue.dev](https://continue.dev)
 
