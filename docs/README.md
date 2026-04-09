@@ -11,7 +11,7 @@
 
 ---
 
-## 🚀 Quick Start (5 minutes)
+## 🚀 Quick Start (2 minutes)
 
 ### 1. Install Continue.dev
 ```bash
@@ -22,33 +22,29 @@ Ctrl+Shift+X → Search "Continue" → Install
 Plugins → Marketplace → Continue → Install
 ```
 
-### 2. Set Up API Keys
-```bash
-# Copy the example file
-cp .env.example .env
+### 2. Run Setup Script (Recommended)
+```powershell
+# Windows PowerShell (as Administrator)
+.\setup-powerplay.ps1
 
-# Edit .env and fill in your keys:
-# 1. DHONI_API_KEY=<local-gpu-key>
-# 2. KAPIL_API_KEY=<local-gpu-key>
-# 3. OPENROUTER_API_KEY=<your-new-key-from-https://openrouter.ai>
-
-# Save .env (it's in .gitignore, won't be committed)
+# Or read: docs/SETUP-ENVIRONMENT.md for manual steps
 ```
 
-**Getting OpenRouter Key** (free tier):
-1. Go to https://openrouter.ai/account/api-keys
-2. Click **"Create Key"**
-3. Copy the key (starts with `sk-or-v1-...`)
-4. Paste into `.env` next to `OPENROUTER_API_KEY=`
+This script will:
+- ✅ Set all 3 API keys (environment variables)
+- ✅ Copy config to Continue.dev
+- ✅ Verify setup
+- ✅ Give test instructions
 
-### 3. Copy Config to Continue
-```bash
-# Windows
-cp config.yaml "%APPDATA%\Continue\config.yaml"
-
-# macOS/Linux
-cp config.yaml ~/.continue/config.yaml
+### 3. Restart VS Code & Test
 ```
+1. Close VS Code completely
+2. Reopen VS Code
+3. Open Continue.dev (Ctrl+L)
+4. Type "/" → See 58+ prompts ✅
+```
+
+**See also**: [SETUP-ENVIRONMENT.md](./SETUP-ENVIRONMENT.md) for detailed setup guide
 
 ### 4. Restart Continue
 - VS Code: Ctrl+Shift+P → "Reload Window"

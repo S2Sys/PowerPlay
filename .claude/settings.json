@@ -14,10 +14,17 @@
       "Bash(mv NEXT_RELEASE_TEMPLATE.md docs/reference/)",
       "Bash(wc -l docs/guides/IMPLEMENTATION*.md docs/guides/CLAUDE_CODE*.md docs/guides/MASTER*.md docs/guides/ROADMAP*.md)",
       "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\('config.yaml'\\)\\); print\\('✅ YAML is valid'\\)\")",
-      "Bash(ls -la *.md)"
+      "Bash(ls -la *.md)",
+      "Read(//c/Users/tsent/.continue\" 2>/dev/**)",
+      "Read(//c/Users/tsent/.continue/**)",
+      "Bash(mv V2_5_0_IMPLEMENTATION_SUMMARY.md docs/v2.5.0/)",
+      "Bash(mv V2_6_0_IMPLEMENTATION_SUMMARY.md docs/v2.6.0/)",
+      "Bash(ls -la docs/v2.*)"
     ],
     "additionalDirectories": [
-      "\\dev"
+      "\\dev",
+      "C:\\Users\\tsent\\.continue",
+      "\\tmp"
     ]
   }
 }

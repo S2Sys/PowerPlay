@@ -129,22 +129,28 @@
 
 ---
 
-## 🚀 How to Use
+## 🚀 Setup & How to Use
 
-### Enable in Continue.dev
+### Quick Setup (Windows)
 
-**Step 1**: Copy config to Continue
-```bash
-# Windows
-copy config.yaml "%APPDATA%\Continue\config.yaml"
+**Option 1: Automated (Recommended)**
+```powershell
+# Download setup script and run
+.\setup-powerplay.ps1
 
-# macOS/Linux
-cp config.yaml ~/.continue/config.yaml
+# Select version:
+# - 2.4.0 (Cloud & DevOps)
+# - 2.5.0 (Security & Compliance)
+# - 2.6.0 (Integration & APIs) ← Latest
 ```
 
-**Step 2**: Restart Continue.dev
+**Option 2: Manual Setup**
+1. Open `SETUP-ENVIRONMENT.md` in this folder
+2. Copy environment variable commands to PowerShell
+3. Copy config to Continue: `Copy-Item "config.yaml" "$env:APPDATA\Continue\config.yaml"`
+4. Restart VS Code
 
-**Step 3**: Type `/` in chat to see all 58 prompts
+**Step 3**: Type `/` in Continue.dev chat to see all 58 prompts
 
 ### Example: Security Audit
 
