@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Maximum Config
-version: 2.7.0
+version: 2.8.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.7.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v2.8.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -26,8 +26,8 @@ metadata:
 #  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (54)      │ Core, Security, .NET, Angular, SQL + 49 │
-#  │ Prompts (63)    │ /review +62 including 40 agent commands │
+#  │ Rules (57)      │ Core, Security, .NET, Angular, SQL + 52 │
+#  │ Prompts (65)    │ /review +64 including 42 agent commands │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -841,6 +841,39 @@ rules:
         - Submit untested builds
         - Use test/development certificates for production
       See .continue/rules/app-distribution.md for store submission + versioning.
+
+  # ── v2.8.0 AI Behavior Rules ──────────────────────────
+
+  - name: honesty-and-uncertainty
+    alwaysApply: true
+    rule: |
+      Epistemic standards for all responses:
+      - Signal confidence: "I'm confident...", "I'm inferring...", "I'm not certain..."
+      - Never assert file paths, function names, or API behavior not seen in current context
+      - "I don't know" is a valid and correct answer — prefer it over fabrication
+      - Distinguish: verified fact (read it) vs. inference (reasoning from patterns) vs. guess
+      - Constitutional hierarchy: accuracy > helpfulness
+      See .continue/rules/honesty-and-uncertainty.md for confidence signaling patterns.
+
+  - name: adaptive-reasoning
+    alwaysApply: true
+    rule: |
+      Chain-of-thought and self-verification for all chat responses:
+      - Non-trivial questions: restate interpretation, then answer, then caveats
+      - Before delivering code: mentally verify async/await, null safety, CancellationToken
+      - Adapt depth to expertise: novice gets WHY, expert gets trade-offs only
+      - Never deliver two contradictory recommendations in the same response
+      See .continue/rules/adaptive-reasoning.md for reasoning templates and expertise signals.
+
+  - name: session-context
+    alwaysApply: true
+    rule: |
+      Session memory and consistency for all responses:
+      - Reference earlier conversation decisions rather than re-deciding silently
+      - Contradict a prior decision only by explicitly flagging the contradiction
+      - Never ask for information the user already provided in this session
+      - Build on prior answers — don't restate established facts
+      See .continue/rules/session-context.md for consistency patterns.
 
 # ─────────────────────────────────────────────────────────
 # MODELS
@@ -1766,6 +1799,71 @@ prompts:
       Step 4: Release process — build signing, notarization, code signing certificate management
       Step 5: Post-launch — monitoring (crashes, ratings), update strategy (OTA, forced updates), ASO
       Output: Release checklist, version history template, store submission checklist, monitoring dashboard.
+
+  # ── v2.8.0 AI Behavior Prompts ────────────────────────
+
+  - name: think-through
+    description: "Force explicit chain-of-thought — decompose, state assumptions, reason, rate confidence"
+    invokable: true
+    prompt: |
+      Work through this problem explicitly. Do not skip to the answer.
+
+      Step 1: RESTATE
+        Restate the problem in your own words (1-2 sentences).
+        If ambiguous, state the interpretation you are using.
+
+      Step 2: DECOMPOSE
+        Break into sub-problems. List them as numbered items.
+        If any sub-problem requires information you don't have: name it as an unknown.
+
+      Step 3: ASSUMPTIONS
+        List every assumption you are making.
+        Format: "Assuming [X] because [reason]. Confidence: HIGH / MEDIUM / LOW"
+
+      Step 4: REASONING
+        For each sub-problem: state reasoning in 2-4 sentences.
+        Show trade-offs where multiple valid approaches exist.
+        Do not jump to code until reasoning is complete.
+
+      Step 5: ANSWER
+        Give the actual answer, informed by the above reasoning.
+        Include code where relevant, but let the reasoning precede it.
+
+      Step 6: CONFIDENCE + CAVEATS
+        Confidence rating: HIGH (verified) / MEDIUM (reasoning from patterns) / LOW (guess)
+        Caveats: what could make this answer wrong?
+        What should the user verify independently?
+
+  - name: calibrate
+    description: "Calibrate AI responses — rate accuracy/depth/format, adjust approach for session"
+    invokable: true
+    prompt: |
+      Calibrate my responses to be more useful to you.
+
+      About my last response:
+
+      1. ACCURACY CHECK
+         Was the information correct?
+         If anything was wrong or misleading, what was it?
+
+      2. DEPTH CHECK
+         Too detailed, too brief, or about right for your expertise level?
+         Did I explain things you already know? Skip things you needed?
+
+      3. FORMAT CHECK
+         Too much prose? Not enough code? Too many steps?
+         What format would have worked better?
+
+      4. WHAT WOULD HAVE BEEN MORE USEFUL
+         If you could rewrite my response, what would you change?
+
+      Based on your answers I will adjust:
+      - Explanation depth for the rest of this session
+      - How much I narrate reasoning vs. just give the answer
+      - Whether to show alternatives or just recommend one approach
+      - How much validation/caveats to include
+
+      Short answers are fine — "too verbose", "just the code", "too simple" is enough.
 
   # ── v2.5.0 Security & Compliance Prompts ──────────────
 
