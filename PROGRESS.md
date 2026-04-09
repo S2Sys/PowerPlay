@@ -262,6 +262,77 @@ All deployed to `main` branch ✅
 
 ---
 
+## v2.9.0 Implementation — COMPLETE ✅ (NEW)
+
+### 9. Added Orchestrator System — Routes Tasks Intelligently (THIS SESSION)
+
+**Problem Addressed**: 70 slash commands is too many. Users must already know the exact command name. This session added intelligent routing that accepts plain-language task descriptions and executes the right agent automatically.
+
+**Solution**: An orchestrator layer with 5 prompts that classify intent, select commands, and embed execution logic inline (since Continue.dev has no native prompt chaining).
+
+**New Prompts Added**:
+1. `/pp` — Master orchestrator (130 lines)
+   - Step 1: CLASSIFY intent (30+ signal → category → command mapping)
+   - Step 2: SELECT scope (quick < 100 lines, full > 100 or "complete")
+   - Step 3: PLAN (one-sentence analysis plan)
+   - Step 4: EXECUTE (embed ~20 command logics inline, run one)
+   - Step 5: SUGGEST NEXT (follow-up command if valuable)
+   - Example: `/pp review my auth code for security` → auto-routes to /security-scan or /security-agent
+
+2. `/quick` — Fast-path (no ceremony)
+   - Immediate execution, routing table → output
+   - 11 signal types with dedicated execution logic
+   - Example: `/quick fix the null ref bug` → corrected code only
+
+3. `/sec` — Security domain shortcut (60 lines)
+   - Routes on scope: scan (table only) vs fix (full code) vs architecture
+   - Embed all 4 OWASP branch logics
+   - No need to know /security-scan vs /security-agent
+
+4. `/test` — Testing domain shortcut (60 lines)
+   - Routes on scope: unit (< 50 lines) vs full-suite (> 200 lines) vs gaps
+   - Embed all 3 test command logics
+   - No need to know /add-tests vs /generate-tests-complete
+
+5. `/db` — Database domain shortcut (50 lines)
+   - Routes on content: SQL procedure vs schema review vs schema design
+   - Embed all 3 database command logics
+   - No need to know /optimize-sql vs /database-design vs /data-model
+
+**New Rule File**:
+- `routing-intelligence.md` (230 lines, alwaysApply: false)
+  - Complexity tiers (Quick/Standard/Full) with trigger conditions
+  - Decision trees for all 15 domains (Code Review, Security, Testing, Refactoring, Performance, Database, Documentation, Cloud, UI, Mobile, Integration, etc.)
+  - Signal words → command mapping (30+ entries showing what NOT to use)
+  - Multi-intent handling (execute primary, suggest follow-up)
+  - Routing confidence rules (clear match vs two options vs ambiguous)
+  - Category shortcut quick reference
+
+**Config Updates**:
+- Bumped version: 2.8.0 → 2.9.0
+- Added routing-intelligence rule entry (alwaysApply: false, ~10 lines)
+- Added 5 orchestrator prompts (400+ lines total)
+- Capability map: Rules 57 → 58, Prompts 65 → 70
+
+**Commit**: `6d3a8fc` — Add v2.9.0 PowerPlay orchestrator system ✅ Deployed
+
+**Why This Works**:
+- Intelligent classification: 30+ signal→category mappings handle most requests
+- Scope detection: Automatically picks Quick vs Full based on code size + language
+- Embedded execution: All target command logic is inline, so /pp executes in one pass (no chaining needed)
+- Smart fallbacks: Ambiguous requests get one clarifying question, not a list
+- Domain shortcuts: /sec, /test, /db hide complexity for most common use cases
+- Follow-up suggestions: No need to re-type the next command
+
+**Test Cases Embedded**:
+- `/pp review my auth code for security` → OWASP table
+- `/pp add unit tests to this service` → xUnit test class
+- `/quick fix the bug` → corrected code only
+- `/sec` with code → full OWASP audit with fixes
+- `/test` with small service → unit tests, not full suite
+
+---
+
 ## v2.8.0 Implementation — COMPLETE ✅
 
 ### 8. Added Claude-Like AI Behavior Rules (THIS SESSION)
