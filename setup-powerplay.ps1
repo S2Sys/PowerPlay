@@ -5,22 +5,35 @@
 
 .DESCRIPTION
     This script:
-    1. Sets environment variables (API keys)
-    2. Copies PowerPlay config to Continue.dev
-    3. Tests the setup
+    1. Sets execution policy (RemoteSigned)
+    2. Sets environment variables (API keys)
+    3. Copies PowerPlay config to Continue.dev
+    4. Tests the setup
 
 .EXAMPLE
     .\setup-powerplay.ps1
+    .\setup-powerplay.ps1 -Version 2.7.0
 #>
+
+# Set execution policy
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
 
 param(
     [ValidateSet("2.4.0", "2.5.0", "2.6.0", "2.7.0")]
-    [string]$Version = "2.7.0"
+    [string]$Version = "2.7.0",
+
+    [switch]$SkipVSCodeRestart = $false
 )
 
 Write-Host "`n╔════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host "║  PowerPlay Setup Script v$Version        ║" -ForegroundColor Cyan
 Write-Host "╚════════════════════════════════════════╝`n" -ForegroundColor Cyan
+
+# Verify script is running as Administrator
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "⚠️  WARNING: This script should be run as Administrator" -ForegroundColor Yellow
+    Write-Host "   Some features may not work properly without admin rights`n" -ForegroundColor Yellow
+}
 
 # ============================================================================
 # STEP 1: Set Environment Variables
@@ -36,10 +49,17 @@ $keys = @{
 }
 
 $envVarsSet = 0
+$totalKeys = $keys.Count
+
 foreach ($key in $keys.GetEnumerator()) {
     try {
+        if ([string]::IsNullOrWhiteSpace($key.Value)) {
+            Write-Host "  ⚠️  $($key.Name) is empty - skipping" -ForegroundColor Yellow
+            continue
+        }
+
         [System.Environment]::SetEnvironmentVariable($key.Name, $key.Value, "User")
-        Write-Host "  ✅ $($key.Name)" -ForegroundColor Green
+        Write-Host "  ✅ $($key.Name) = $($key.Value.Substring(0, [Math]::Min(20, $key.Value.Length)))..." -ForegroundColor Green
         $envVarsSet++
     }
     catch {
@@ -47,10 +67,11 @@ foreach ($key in $keys.GetEnumerator()) {
     }
 }
 
-if ($envVarsSet -eq 3) {
-    Write-Host "`n  ✅ All 3 environment variables set successfully`n" -ForegroundColor Green
+Write-Host ""
+if ($envVarsSet -eq $totalKeys) {
+    Write-Host "  ✅ All $totalKeys environment variables set successfully`n" -ForegroundColor Green
 } else {
-    Write-Host "`n  ⚠️  Only $envVarsSet/3 environment variables set`n" -ForegroundColor Yellow
+    Write-Host "  ⚠️  Only $envVarsSet/$totalKeys environment variables set`n" -ForegroundColor Yellow
 }
 
 # ============================================================================
@@ -85,6 +106,14 @@ Write-Host "STEP 3: Copying PowerPlay Config to Continue.dev" -ForegroundColor Y
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`n"
 
 $basePath = "s:\Code101\PowerPlay"
+
+# Validate base path exists
+if (-not (Test-Path $basePath)) {
+    Write-Host "  ❌ PowerPlay path not found: $basePath" -ForegroundColor Red
+    Write-Host "  ⚠️  Please ensure PowerPlay is installed at: $basePath" -ForegroundColor Yellow
+    exit 1
+}
+
 $configVersion = if ($Version -eq "2.7.0") {
     "config.yaml"
 } else {
@@ -92,7 +121,7 @@ $configVersion = if ($Version -eq "2.7.0") {
 }
 
 $sourcePath = Join-Path $basePath $configVersion
-$destPath = "$env:APPDATA\Continue\config.yaml"
+$destPath = Join-Path $env:APPDATA "Continue\config.yaml"
 
 Write-Host "  Source: $sourcePath" -ForegroundColor Gray
 Write-Host "  Destination: $destPath" -ForegroundColor Gray
@@ -126,21 +155,30 @@ Write-Host "━━━━━━━━━━━━━━━━━━━━━━�
 
 if (Test-Path $destPath) {
     try {
-        $content = Get-Content $destPath -Raw
+        $content = Get-Content $destPath -Raw -ErrorAction Stop
 
         # Check version
-        if ($content -match "version: $Version") {
-            Write-Host "  ✅ Config version $Version verified" -ForegroundColor Green
+        $versionMatch = [regex]::Match($content, "version:\s+([\d.]+)")
+        if ($versionMatch.Success) {
+            $currentVersion = $versionMatch.Groups[1].Value
+            if ($currentVersion -eq $Version) {
+                Write-Host "  ✅ Config version $Version verified" -ForegroundColor Green
+            } else {
+                Write-Host "  ⚠️  Version mismatch - Expected $Version, got $currentVersion" -ForegroundColor Yellow
+            }
         } else {
-            $currentVersion = [regex]::Match($content, "version: ([\d.]+)").Groups[1].Value
-            Write-Host "  ⚠️  Version mismatch - Expected $Version, got $currentVersion" -ForegroundColor Yellow
+            Write-Host "  ⚠️  Could not determine config version" -ForegroundColor Yellow
         }
 
         # Count rules and prompts
-        $ruleMatches = [regex]::Matches($content, "^  - name:")
+        $ruleMatches = [regex]::Matches($content, "^\s+-\s+name:")
         $ruleCount = $ruleMatches.Count
 
-        Write-Host "  ✅ Config has $ruleCount rules/prompts configured" -ForegroundColor Green
+        if ($ruleCount -gt 0) {
+            Write-Host "  ✅ Config has $ruleCount rules/prompts configured" -ForegroundColor Green
+        } else {
+            Write-Host "  ⚠️  Could not count rules/prompts" -ForegroundColor Yellow
+        }
     }
     catch {
         Write-Host "  ❌ Error reading config: $_" -ForegroundColor Red
@@ -204,28 +242,53 @@ Write-Host "  [C] Clear Continue.dev cache"
 Write-Host "  [X] Exit"
 Write-Host ""
 
-$choice = Read-Host "Select option (R/O/C/X)"
+$choice = Read-Host "Select option (R/O/C/X)" -ErrorAction SilentlyContinue
 
 switch ($choice.ToUpper()) {
     'R' {
-        Write-Host "Closing VS Code..." -ForegroundColor Yellow
-        Get-Process code -ErrorAction SilentlyContinue | Stop-Process -Force
-        Start-Sleep -Seconds 2
-        Write-Host "Relaunching VS Code..." -ForegroundColor Yellow
-        & "code"
+        if (-not $SkipVSCodeRestart) {
+            Write-Host "Closing VS Code..." -ForegroundColor Yellow
+            Get-Process code -ErrorAction SilentlyContinue | Stop-Process -Force
+            Start-Sleep -Seconds 2
+            Write-Host "Relaunching VS Code..." -ForegroundColor Yellow
+            try {
+                & "code" -ErrorAction Stop
+                Write-Host "✅ VS Code relaunched successfully" -ForegroundColor Green
+            }
+            catch {
+                Write-Host "⚠️  Could not auto-launch VS Code: $_" -ForegroundColor Yellow
+                Write-Host "   Please launch VS Code manually" -ForegroundColor Yellow
+            }
+        }
     }
     'O' {
         Write-Host "Opening docs folder..." -ForegroundColor Yellow
-        explorer "s:\Code101\PowerPlay\docs"
+        $docsPath = Join-Path $basePath "docs"
+        if (Test-Path $docsPath) {
+            try {
+                explorer $docsPath
+                Write-Host "✅ Docs folder opened" -ForegroundColor Green
+            }
+            catch {
+                Write-Host "⚠️  Could not open docs folder: $_" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "⚠️  Docs folder not found at: $docsPath" -ForegroundColor Yellow
+        }
     }
     'C' {
         Write-Host "Clearing Continue.dev cache..." -ForegroundColor Yellow
-        $cachePath = "$env:APPDATA\Continue\index"
+        $cachePath = Join-Path $env:APPDATA "Continue\index"
         if (Test-Path $cachePath) {
-            Remove-Item $cachePath -Recurse -Force -ErrorAction SilentlyContinue
-            Write-Host "✅ Cache cleared. Restart VS Code." -ForegroundColor Green
+            try {
+                Remove-Item $cachePath -Recurse -Force -ErrorAction Stop
+                Write-Host "✅ Cache cleared. Restart VS Code." -ForegroundColor Green
+            }
+            catch {
+                Write-Host "⚠️  Could not clear cache: $_" -ForegroundColor Yellow
+            }
         } else {
-            Write-Host "⚠️  Cache directory not found" -ForegroundColor Yellow
+            Write-Host "ℹ️  Cache directory not found (nothing to clear)" -ForegroundColor Cyan
         }
     }
     'X' {
@@ -237,3 +300,6 @@ switch ($choice.ToUpper()) {
 }
 
 Write-Host ""
+Write-Host "═══════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "Setup Complete!" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════" -ForegroundColor Cyan
