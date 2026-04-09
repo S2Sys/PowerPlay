@@ -18,15 +18,15 @@ metadata:
 # ║  Cursor-level AI. Windsurf-level agents. Zero cost.  ║
 # ╚══════════════════════════════════════════════════════╝
 #
-#  CAPABILITY MAP:
+#  CAPABILITY MAP (FREE MODELS ONLY):
 #  ┌─────────────────┬────────────────────────────────────┐
-#  │ Chat / Reason   │ Qwen 3.5 9B, DeepSeek R1 8B + 2 new │
-#  │ Fast Apply      │ Qwen Coder (KapilDev) maxTok=16384  │
-#  │ Autocomplete    │ Qwen Coder — debounce 400ms         │
-#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter)        │
-#  │ Cloud (14 total)│ Llama 3.1 70B, Mistral Large, Claude Haiku, DeepSeek V3, Qwen3 235B │
+#  │ Chat / Reason   │ Qwen 3.5 9B, DeepSeek R1 8B (local) │
+#  │ Fast Apply      │ Qwen Coder, DeepSeek Coder (local)  │
+#  │ Autocomplete    │ Qwen Coder — debounce 400ms (local) │
+#  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
+#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (54)      │ Core, Security, .NET, Angular, SQL + 49 (agents, data, obs, UX, components, charts, tables, storybook, perf, aws, azure, docker, iac, cicd, security, integration, mobile) │
+#  │ Rules (54)      │ Core, Security, .NET, Angular, SQL + 49 │
 #  │ Prompts (63)    │ /review +62 including 40 agent commands │
 #  └─────────────────┴────────────────────────────────────┘
 
@@ -877,16 +877,6 @@ models:
       maxTokens: 8192
       temperature: 0.1
 
-  - name: Phi4 Mini [Fast]
-    provider: openai
-    model: dhoni-phi
-    apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 2048
-      temperature: 0.4
-
   # ── Fast Apply — KapilDev GPU ──────────────────────────
   # CRITICAL FIX: maxTokens=16384 prevents mid-file truncation
   # temperature=0.05 prevents hallucinated code deletion
@@ -964,50 +954,6 @@ models:
     roles: [chat]
     defaultCompletionOptions:
       maxTokens: 8192
-      temperature: 0.2
-
-  - name: Mistral Large [Analysis]
-    provider: openai
-    model: mistralai/mistral-large:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 8192
-      temperature: 0.3
-
-  # ── v2.0.0 Agent Models ────────────────────────────────
-
-  - name: Claude 3.5 Haiku [Fast Agent]
-    provider: openai
-    model: anthropic/claude-3-5-haiku:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 8192
-      temperature: 0.1
-
-  - name: DeepSeek V3 [Coder]
-    provider: openai
-    model: deepseek/deepseek-chat:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat, edit]
-    defaultCompletionOptions:
-      maxTokens: 8192
-      temperature: 0.2
-
-  # ── v2.1.0 Agent Models ────────────────────────────────
-
-  - name: Qwen3 235B [Deep Analysis]
-    provider: openai
-    model: qwen/qwen3-235b-a22b:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 16384
       temperature: 0.2
 
   # ── Embeddings ─────────────────────────────────────────
