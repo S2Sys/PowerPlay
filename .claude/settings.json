@@ -22,7 +22,12 @@
       "Bash(ls -la docs/v2.*)",
       "Read(//c/Users/tsent/.claude/projects/s--Code101-PowerPlay/memory\" 2>/dev/**)",
       "Read(//c/Users/tsent/.claude/projects/**)",
-      "Bash(bash /tmp/reorganize.sh)"
+      "Bash(bash /tmp/reorganize.sh)",
+      "Bash(powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force\")",
+      "Bash(powershell -Command \"Get-ExecutionPolicy -Scope CurrentUser\")",
+      "Bash(powershell -Command \"Unblock-File -Path 's:\\\\\\\\Code101\\\\\\\\PowerPlay\\\\\\\\setup-powerplay.ps1'\")",
+      "Bash(npm --version)",
+      "Bash(npm install:*)"
     ],
     "additionalDirectories": [
       "\\dev",
