@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Maximum Config
-version: 3.1.0
+version: 3.2.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-09"
   lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.1.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.2.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -2019,6 +2019,8 @@ prompts:
       | generate, create, build, add, new API | Code Gen | /api-endpoint | /api-endpoint |
       | fix, bug, broken, error | Quick Fix | /quick-fix | /refactor-inline |
       | think, reason, explain why | AI Behavior | /think-through | /explain-deep |
+      | pentest, penetration test, ethical hack, red team | Security | /pentest-plan | /pentest-plan |
+      | incident, outage, breach, post-mortem, IR playbook | Security | /incident-response | /incident-response |
 
       ## Step 2 — SELECT
 
@@ -2026,6 +2028,16 @@ prompts:
       - Code selected is < 100 lines OR user says "quick/just/fast" → use Quick Command
       - Code is > 100 lines OR user says "full/complete/all/suite" → use Full Command
       - Request spans 2 concerns → list both, execute primary one
+
+      **Tiebreaker — when 2+ categories match equally:**
+      Apply this precedence order (highest wins):
+      1. Security (if any security keyword present — vulnerability, injection, XSS, OWASP, breach, exploit)
+      2. Requirements (if "requirement", "spec", "story", "criteria", "risk", "feasibility")
+      3. Testing (if "test", "spec", "coverage")
+      4. Database (if "SQL", "query", "schema", "procedure")
+      5. Performance (if "slow", "N+1", "optimize", "bottleneck")
+      6. Code Review (default for code with no other strong signal)
+      If still ambiguous after precedence: ask ONE clarifying question — "Is this [Category A] or [Category B]?" — do not proceed without user confirmation.
 
       State your decision:
       "**Intent**: [category]. **Scope**: [quick/full]. **Primary**: /[name]. **Follow-up**: /[name] (if applicable)."
@@ -2126,6 +2138,10 @@ prompts:
 
       **For any command not listed:**
       Apply the most relevant analysis approach. Be direct, include code snippets for every fix.
+
+      **If no category matches and request is not a software engineering task:**
+      Respond: "I specialise in software engineering tasks — code review, security, testing, refactoring, requirements, database, cloud, and architecture. Could you rephrase your request in one of those areas?"
+      Do NOT attempt to answer unrelated requests (recipes, creative writing, trivia, etc.).
 
       ## Step 5 — SUGGEST NEXT
 
@@ -2285,6 +2301,8 @@ prompts:
       **Open Blockers**: [list or "None"]
       ---
 
+      **NEXT PHASE**: Copy the HANDOFF BLOCK above and run `/acceptance-criteria` with it as context to generate Gherkin acceptance criteria. Or run `/pp-requirements` to execute all 4 phases at once.
+
       You are a requirements engineer. Convert a plain-language business requirement into a complete technical specification.
 
       **6-STEP PROCESS:**
@@ -2367,6 +2385,8 @@ prompts:
       **Review Verdict**: [from Phase 4 if available, else "pending Phase 4"]
       **Open Blockers**: [list or "None"]
       ---
+
+      **NEXT PHASE**: Copy the HANDOFF BLOCK above and run `/risk-assessment` with it as context to get a full risk register and Go/No-Go decision. Or run `/pp-requirements` to execute all 4 phases at once.
 
       You are a QA engineer. Given a user story, generate complete, unambiguous acceptance criteria in Gherkin format.
 
@@ -2500,6 +2520,8 @@ prompts:
       **Open Blockers**: [list or "None"]
       ---
 
+      **NEXT PHASE**: Copy the HANDOFF BLOCK above and run `/requirements-review` with it as context to audit quality (completeness, clarity, testability, traceability). Or run `/pp-requirements` to execute all 4 phases at once.
+
       You are a technical project manager. Assess all risks for a feature/story and produce a risk register + Go/No-Go recommendation.
 
       **5-STEP PROCESS:**
@@ -2612,6 +2634,8 @@ prompts:
       **Review Verdict**: [READY / NEEDS REVISION / BLOCKED — one line reason]
       **Open Blockers**: [final consolidated list, or "None — ready to proceed"]
       ---
+
+      **FINAL PHASE**: If verdict is READY — copy the HANDOFF BLOCK and run `/api-endpoint` (scaffold implementation), `/database-design` (data model), or `/architecture-design` (system design). If NEEDS REVISION — re-run `/requirements-to-specs` with corrections. If BLOCKED — return to Product Owner with Open Blockers.
 
       You are a requirements quality auditor. Review a set of requirements across 5 dimensions and flag issues.
 
