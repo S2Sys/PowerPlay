@@ -31,6 +31,12 @@ The root-level `config.yaml` is:
 - **Use case**: Reference, rollback, understanding v1.0.0 features
 - **Notes**: Has hardcoded API keys (for reference only, never use)
 
+### config-v1.1.0.yaml
+- **Release**: 1.1.0 (2026-04-09)
+- **Status**: Archive
+- **Contains**: v1.1.0 config snapshot (10 prompts, 4 rules, 2 secrets fixed)
+- **Use case**: Reference, rollback, comparing v1.0.1 → v1.1.0
+
 ### config-upgraded.yaml
 - **Type**: Template
 - **Purpose**: Shows how to properly format config with inline comments
@@ -39,17 +45,17 @@ The root-level `config.yaml` is:
   - Extensive inline comments explaining every section
   - Shows recommended values and WHY
   - Demonstrates proper structure
-  - Good as a reference when creating v1.1.0+
+  - Good as a reference when creating v1.2.0+
 
 ## 📊 Version Timeline
 
 | Version | Date | File | Status | Notes |
 |---------|------|------|--------|-------|
 | 1.0.0 | 2026-04-09 | config-v1.0.0.yaml | Archive | Initial release, hardcoded keys |
-| 1.0.1 | 2026-04-09 | config.yaml (root) | Current | Security patch, env variables |
-| 1.1.0 | TBD | config-v1.1.0.yaml (future) | Planned | Claude API, new prompts |
-| 1.2.0 | TBD | config-v1.2.0.yaml (future) | Planned | Custom context providers |
-| 2.0.0 | TBD | config-v2.0.0.yaml (future) | Planned | Schema v2 (breaking) |
+| 1.0.1 | 2026-04-09 | (config.yaml snapshot) | Archive | Security patch, env variables |
+| 1.1.0 | 2026-04-09 | config-v1.1.0.yaml | Archive | Inline powers (5 prompts, 4 rules) |
+| 1.2.0 | TBD | config.yaml (root) | Current | Memory system, workflows, caching |
+| 2.0.0 | TBD | config-v2.0.0.yaml (future) | Planned | Full IDE, 6 agents, schema v2 |
 
 ## 🔄 Release Workflow
 
