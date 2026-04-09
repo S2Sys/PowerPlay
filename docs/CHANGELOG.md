@@ -13,6 +13,51 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.0.0] — 2026-04-09 (Agent-Era Standards)
+
+**Agent-era release — Autonomous agents, code review standards, CI/CD automation, project learning**
+
+### Added
+
+#### Agent Prompts (5 new)
+- `/pr-review` — Autonomous PR review: quality + security + performance + testing + docs
+- `/coverage-gaps` — Find untested code paths, generate targeted test cases to fill gaps
+- `/security-agent` — Full OWASP Top 10 scan with exact remediation code for each issue
+- `/perf-optimize` — Profile → identify bottlenecks → suggest optimizations with before/after comparisons
+- `/workspace-learn` — Analyse codebase conventions and generate onboarding summary
+
+#### Rules (5 new)
+- `agent-behavior.md` — AI agent execution patterns: multi-step planning, verification, error handling, audit trails
+- `pr-standards.md` — Pull request standards: size limits (< 400 lines), description format, review checklist
+- `code-review-standards.md` — Code reviewer guidelines: mindset, severity levels, approval criteria, handling disagreements
+- `ci-cd-standards.md` — CI/CD pipeline standards: stages, gates, environment promotion, secret management, rollback
+- `workspace-conventions.md` — Project conventions template: naming, architecture, patterns, error handling, testing
+
+#### Models (2 new)
+- `Claude 3.5 Haiku [Fast Agent]` via OpenRouter — optimized for fast agentic tasks, temperature 0.1
+- `DeepSeek V3 [Coder]` via OpenRouter — code generation + refactoring, temperature 0.2
+
+### Changed
+- Version bumped to 2.0.0
+- Models: 11 → 13 total (added Claude Haiku, DeepSeek V3)
+- Rules: 14 → 19 total (added 5 agent-era rules)
+- Prompts: 23 → 28 total (added 5 agent commands)
+- Updated capability map in config.yaml header
+- Updated releaseUrl to v2.0.0
+
+### Files Modified
+- `config.yaml` — version 2.0.0, 2 new models, 5 new rules, 5 new prompts
+- `.continue/rules/agent-behavior.md` — NEW (400+ lines)
+- `.continue/rules/pr-standards.md` — NEW (350+ lines)
+- `.continue/rules/code-review-standards.md` — NEW (350+ lines)
+- `.continue/rules/ci-cd-standards.md` — NEW (350+ lines)
+- `.continue/rules/workspace-conventions.md` — NEW (350+ lines)
+
+### Summary
+v2.0.0 enters the agent era: autonomous PR review, test coverage analysis, security auditing, performance optimization, and project learning. All fully configurable within config.yaml using Continue.dev slash commands and rules.
+
+---
+
 ## [1.2.0] — 2026-04-09 (Intelligent Context & Automation)
 
 **v1.2.0 release — Complete automation rules, 5 new prompts, 2 new models**
