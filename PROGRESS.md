@@ -73,7 +73,30 @@
 
 **Commit**: `0eaf782`
 
-#### 6. Cleaned Up Old Documentation Files
+#### 6. Cleaned Up Unused Documentation Files & Empty Folders
+**Action**: Removed 14 old/unused files and empty folders
+
+**Removed**:
+- `docs/audit/` folder - Old audit files
+- `docs/guides/UX_DESIGN/` folder - Unused design docs (2 files)
+- `docs/guides/getting-started/` folder - Empty
+- Old restructuring docs (2 files)
+- Old templates (3 template files)
+- Old reference docs (SDLC-COVERAGE-MATRIX, SECURITY, RELEASES_v2.5.0_v2.6.0, UX_YAML_STRUCTURE_EXAMPLE)
+
+**Kept** (34 current files):
+- Core guides (README.md, INDEX.md)
+- Current analysis (COVERAGE-MATRIX-v27, RULES-AGENTS-REVIEW, v28-PRIORITY-RECOMMENDATIONS)
+- Architecture docs (DOCUMENTATION_ARCHITECTURE.md)
+- All setup guides (API-KEYS-*.md, ENVIRONMENT-VARIABLES.md, etc.)
+- CHANGELOG.md
+- Version release summaries (v1.1.0 through v2.7.0)
+
+**Result**: 48 files removed, cleaner documentation structure, no empty folders
+
+**Commit**: `d45f43a`
+
+#### 7. Cleaned Up Old Documentation Files (Previous)
 **Action**: Removed 12 old scattered implementation plan files from docs/guides
 
 **Removed (old files)**:
@@ -93,6 +116,29 @@
 **Result**: Cleaner docs/guides folder with only current documentation
 
 **Commit**: `9255f21`
+
+#### 7. Cleaned Up Unused Documentation Files & Empty Folders
+**Action**: Removed 14 old/unused files and empty folders
+
+**Removed**:
+- `docs/audit/` folder - Old audit files
+- `docs/guides/UX_DESIGN/` folder - Unused design docs (2 files)
+- `docs/guides/getting-started/` folder - Empty
+- Old restructuring docs (2 files)
+- Old templates (3 template files)
+- Old reference docs (SDLC-COVERAGE-MATRIX, SECURITY, RELEASES_v2.5.0_v2.6.0, UX_YAML_STRUCTURE_EXAMPLE)
+
+**Kept** (34 current files):
+- Core guides (README.md, INDEX.md)
+- Current analysis (COVERAGE-MATRIX-v27, RULES-AGENTS-REVIEW, v28-PRIORITY-RECOMMENDATIONS)
+- Architecture docs (DOCUMENTATION_ARCHITECTURE.md)
+- All setup guides (API-KEYS-*.md, ENVIRONMENT-VARIABLES.md, etc.)
+- CHANGELOG.md
+- Version release summaries (v1.1.0 through v2.7.0)
+
+**Result**: 48 files removed, cleaner documentation structure, no empty folders
+
+**Commit**: `d45f43a`
 
 ---
 
@@ -207,6 +253,10 @@
 | `fd7bbf7` | Update PROGRESS.md with paid models removal | 1 |
 | `9255f21` | Clean up old implementation plan files from docs/guides | 12 |
 | `0eaf782` | Fix tab autocomplete: use OpenRouter free model | 1 |
+| `5219bdd` | Update PROGRESS.md: document tab autocomplete fix | 1 |
+| `b216760` | Document all API keys environment variable implementation | 1 |
+| `d9ff838` | Add comprehensive API keys implementation summary | 1 |
+| `d45f43a` | Clean up unused documentation files and empty folders | 11 |
 
 All deployed to `main` branch ✅
 
