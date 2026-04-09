@@ -757,8 +757,8 @@ mcpServers:
   # Git — read log, diff, blame, branch info
   - name: Git
     type: stdio
-    command: uvx
-    args: [mcp-server-git, --repository, .]
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-git", "--repository", "."]
 
   # File System — read/write/create files autonomously
   - name: FileSystem
@@ -768,7 +768,9 @@ mcpServers:
 
   # Continue Docs — search Continue documentation from chat
   - name: Continue Docs
-    uses: continuedev/continue-docs-mcp
+    type: stdio
+    command: npx
+    args: ["-y", "@continuedev/continue-docs-mcp"]
 
   # SQLite — query local dev databases (ExamPrep, SmartWorkz dev)
   - name: SQLite Dev DB
@@ -780,7 +782,7 @@ mcpServers:
   - name: Playwright Browser
     type: stdio
     command: npx
-    args: ["@playwright/mcp@latest"]
+    args: ["-y", "@modelcontextprotocol/server-playwright"]
 
   # Azure DevOps — uncomment with your PAT when needed
   # - name: Azure DevOps
