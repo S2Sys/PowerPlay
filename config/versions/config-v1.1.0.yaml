@@ -1,0 +1,592 @@
+name: SmartWorkz PowerStack — Maximum Config
+version: 1.1.0
+schema: v1
+
+# Release metadata (updated per version)
+metadata:
+  releaseDate: "2026-04-09"
+  lastUpdated: "2026-04-09"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v1.1.0"
+  wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
+  changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
+  supportedContinueVersions: ">=0.8.0"
+  author: "SmartWorkz Dev"
+  license: "MIT"
+
+# ╔══════════════════════════════════════════════════════╗
+# ║  SMARTWORKZ POWERSTACK — Continue.dev Elite Config   ║
+# ║  Cursor-level AI. Windsurf-level agents. Zero cost.  ║
+# ╚══════════════════════════════════════════════════════╝
+#
+#  CAPABILITY MAP:
+#  ┌─────────────────┬────────────────────────────────────┐
+#  │ Chat / Reason   │ Qwen 3.5 9B, DeepSeek R1 8B        │
+#  │ Fast Apply      │ Qwen Coder (KapilDev) maxTok=16384  │
+#  │ Autocomplete    │ Qwen Coder — debounce 400ms         │
+#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter)        │
+#  │ Cloud Fallback  │ GPT-OSS, MiniMax, Gemma4, Qwen3    │
+#  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
+#  │ Rules           │ .NET, Angular, SQL, Performance, etc │
+#  │ Prompts         │ /review /quick-fix +13 inline/util   │
+#  └─────────────────┴────────────────────────────────────┘
+
+defaultCompletionOptions:
+  maxTokens: 4096
+  temperature: 0.3
+
+# ─────────────────────────────────────────────────────────
+# RULES — system instructions for ALL chat/agent/edit
+# Equivalent to Cursor's .cursorrules
+# ─────────────────────────────────────────────────────────
+rules:
+  - name: smartworkz-core
+    alwaysApply: true
+    rule: |
+      You are an expert AI assistant embedded in SmartWorkz Technologies.
+      Stack: .NET 8, ASP.NET Core, Angular 17+, SQL Server 2022, Azure DevOps, AWS.
+      Always:
+        - Use C# 12 features (primary constructors, collection expressions)
+        - Prefer async/await with CancellationToken parameters
+        - Use ILogger<T>, never Console.Write
+        - Angular: standalone components, inject(), OnPush, typed forms
+      Never:
+        - Leave TODO comments in generated code
+        - Use Thread.Sleep — always Task.Delay
+        - Expose raw exceptions to API consumers
+        - Hardcode secrets or connection strings
+
+  - name: dotnet-rules
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      .NET/C# standards:
+      - Controllers: [ApiController] + [Route("api/v1/[controller]")] — no business logic
+      - Services: interface + Scoped implementation
+      - Repositories: Dapper with parameterised queries only
+      - Validation: FluentValidation at controller boundary
+      - Errors: ProblemDetails RFC 7807
+      - All DB calls must be async with Async suffix
+      - Enable nullable reference types (#nullable enable)
+      - XML docs required on all public members
+
+  - name: angular-rules
+    globs: ["**/*.ts", "**/*.html"]
+    alwaysApply: false
+    rule: |
+      Angular 17+ standards:
+      - Standalone components only — no NgModules for new code
+      - inject() not constructor injection
+      - ChangeDetectionStrategy.OnPush everywhere
+      - Signals preferred over BehaviorSubject for local state
+      - DevExtreme: DxDataGrid/DxTreeList — explicit column definitions always
+      - Typed reactive forms: FormGroup<T>
+      - HTTP: typed responses, takeUntilDestroyed()
+      - Routes: lazy-loaded with loadComponent
+
+  - name: sql-rules
+    globs: ["**/*.sql"]
+    alwaysApply: false
+    rule: |
+      SQL Server standards:
+      - SET NOCOUNT ON at top of every stored procedure
+      - Parameterised queries only — never string concatenation
+      - WITH (NOLOCK) on read-heavy SELECTs
+      - Temp tables over CTEs for > 10k rows
+      - BEGIN TRY / BEGIN CATCH on all procedures
+      - Set-based operations over cursors always
+      - SARGable WHERE clauses (no functions wrapping columns)
+
+  - name: security-always
+    alwaysApply: true
+    rule: |
+      Security (applied everywhere):
+      - Never hardcode secrets, API keys, connection strings
+      - Parameterised queries only — flag string concatenation
+      - Sanitise all user input before use
+      - Flag any code logging passwords, tokens, or PII
+      - Angular: use DomSanitizer — never bypass security
+
+  - name: performance-audit
+    globs: ["**/*.cs", "**/*.ts", "**/*.sql"]
+    alwaysApply: false
+    rule: |
+      Performance standards:
+      - SQL: Avoid N+1 queries, SELECT specific columns, add indexes, parameterised only
+      - C#: Use async/await, minimize allocations, use Span<T> for perf-critical code
+      - TypeScript: Lazy-load modules, OnPush change detection, signals over subscriptions
+      - General: Profile before optimizing, use benchmarks, avoid premature optimization
+
+  - name: memory-management
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      Memory management standards:
+      - using statement for all IDisposable, IAsyncDisposable
+      - Unsubscribe from events in Dispose or use weak event pattern
+      - No circular references or event handler leaks
+      - WeakReference for caches, not strong references
+      - Profile for memory leaks: unregistered event handlers, unreleased resources
+
+  - name: async-best-practices
+    globs: ["**/*.cs", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Async/await standards:
+      - Never use .Result or .Wait() — always await
+      - CancellationToken on all async methods
+      - ConfigureAwait(false) in libraries (C#)
+      - No async/await in constructors — use factory or separate Init method
+      - Never fire-and-forget: if you Task.Run, always await or .ContinueWith() error handling
+
+  - name: error-handling-advanced
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      Error handling standards:
+      - Custom exception hierarchy — never throw base Exception
+      - HTTP: ProblemDetails RFC 7807 format for errors
+      - Structured logging: correlation IDs, context, severity
+      - Polly for resilience: retry policies, circuit breakers, timeouts
+      - Never expose raw stack traces to API clients
+      - Log with ILogger<T>, never Console — include context
+
+# ─────────────────────────────────────────────────────────
+# MODELS
+# ─────────────────────────────────────────────────────────
+models:
+  # ── Local Chat — Dhoni GPU ─────────────────────────────
+
+  - name: Qwen 3.5 9B [Local Chat]
+    provider: openai
+    model: dhoni-qwen
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    chatOptions:
+      baseSystemMessage: |
+        Senior .NET/Angular architect. Be concise. Use code blocks.
+        Never repeat questions back. Get straight to the solution.
+      baseAgentSystemMessage: |
+        Autonomous coding agent. Think step-by-step. Use tools to read
+        files before editing. Verify logic before finishing.
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: DeepSeek R1 8B [Reasoning]
+    provider: openai
+    model: dhoni-deepseek
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.1
+
+  - name: Phi4 Mini [Fast]
+    provider: openai
+    model: dhoni-phi
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 2048
+      temperature: 0.4
+
+  # ── Fast Apply — KapilDev GPU ──────────────────────────
+  # CRITICAL FIX: maxTokens=16384 prevents mid-file truncation
+  # temperature=0.05 prevents hallucinated code deletion
+
+  - name: Qwen Coder [Apply]
+    provider: openai
+    model: kapil-qwen-coder
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [apply, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: DeepSeek Coder 6.7B [Edit]
+    provider: openai
+    model: kapil-deepseek-coder
+    apiBase: http://rohit:4000/v1
+    apiKey: ${DHONI_API_KEY}
+    roles: [edit, chat]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  # ── Cloud Fallback — OpenRouter Free ──────────────────
+
+  - name: GPT OSS 120B [Cloud]
+    provider: openai
+    model: openai/gpt-oss-120b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: MiniMax M2.5 [Cloud]
+    provider: openai
+    model: minimax/minimax-m2.5:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 4096
+      temperature: 0.7
+
+  - name: Qwen3 Coder [Cloud Edit]
+    provider: openai
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Gemma 4 26B [Cloud]
+    provider: openai
+    model: google/gemma-4-26b-a4b-it:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  # ── Embeddings ─────────────────────────────────────────
+
+  - name: NVIDIA Nemotron Embed
+    provider: openai
+    model: llama-nemotron-embed-vl-1b-v2
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [embed]
+
+# ─────────────────────────────────────────────────────────
+# TAB AUTOCOMPLETE — explicit top-level required v0.9+
+# ─────────────────────────────────────────────────────────
+tabAutocompleteModel:
+  provider: openai
+  model: kapil-qwen-coder
+  apiBase: http://rohit:4000/v1
+  apiKey: ${DHONI_API_KEY}
+
+tabAutocompleteOptions:
+  debounceDelay: 400            # Prevents mid-block interruption
+  maxPromptTokens: 1500
+  prefixPercentage: 0.75
+  multilineCompletions: "auto"
+  useCache: true
+  useOtherFiles: true           # Cross-file context like Copilot
+
+# ─────────────────────────────────────────────────────────
+# EMBEDDINGS — explicit top-level required
+# ─────────────────────────────────────────────────────────
+embeddingsProvider:
+  provider: openai
+  model: llama-nemotron-embed-vl-1b-v2
+  apiBase: https://openrouter.ai/api/v1
+  apiKey: ${OPENROUTER_API_KEY}
+
+# ─────────────────────────────────────────────────────────
+# MCP SERVERS — Agent mode tools (Cursor/Windsurf-equivalent)
+# Only active in Agent mode
+# ─────────────────────────────────────────────────────────
+mcpServers:
+  # Git — read log, diff, blame, branch info
+  - name: Git
+    type: stdio
+    command: uvx
+    args: [mcp-server-git, --repository, .]
+
+  # File System — read/write/create files autonomously
+  - name: FileSystem
+    type: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
+
+  # Continue Docs — search Continue documentation from chat
+  - name: Continue Docs
+    uses: continuedev/continue-docs-mcp
+
+  # SQLite — query local dev databases (ExamPrep, SmartWorkz dev)
+  - name: SQLite Dev DB
+    type: stdio
+    command: npx
+    args: ["-y", "mcp-sqlite", "./dev.db"]
+
+  # Playwright — browser agent: scrape docs, test UI, fill forms
+  - name: Playwright Browser
+    type: stdio
+    command: npx
+    args: ["@playwright/mcp@latest"]
+
+  # Azure DevOps — uncomment with your PAT when needed
+  # - name: Azure DevOps
+  #   type: stdio
+  #   command: npx
+  #   args: ["-y", "azure-devops-mcp"]
+  #   env:
+  #     AZURE_DEVOPS_ORG_URL: "https://dev.azure.com/your-org"
+  #     AZURE_DEVOPS_TOKEN: "your-pat-here"
+
+# ─────────────────────────────────────────────────────────
+# CONTEXT PROVIDERS — @-mentions in chat
+# ─────────────────────────────────────────────────────────
+contextProviders:
+  - name: code
+    params:
+      nRetrieveFiles: 15
+  - name: codebase
+    params:
+      nRetrieve: 30
+      nFinal: 8
+      useReranking: false
+  - name: docs
+    params: {}
+  - name: diff
+    params: {}
+  - name: terminal
+    params: {}
+  - name: problems
+    params: {}
+  - name: folder
+    params: {}
+  - name: file
+    params: {}
+  - name: currentFile
+    params: {}
+  - name: repo-map
+    params: {}
+  - name: open
+    params: {}
+
+# ─────────────────────────────────────────────────────────
+# DOCS INDEXING — @docs targets for semantic search
+# ─────────────────────────────────────────────────────────
+docs:
+  - name: Continue.dev
+    startUrl: https://docs.continue.dev/intro
+  - name: ASP.NET Core 8
+    startUrl: https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core
+  - name: Angular 17
+    startUrl: https://angular.dev/overview
+  - name: DevExtreme
+    startUrl: https://js.devexpress.com/Documentation/ApiReference/
+  - name: Dapper
+    startUrl: https://www.learndapper.com/
+  - name: FluentValidation
+    startUrl: https://docs.fluentvalidation.net/en/latest/
+
+# ─────────────────────────────────────────────────────────
+# PROMPTS — /slash commands
+# ─────────────────────────────────────────────────────────
+prompts:
+  - name: review
+    description: "Full code review — bugs, patterns, security"
+    invokable: true
+    prompt: |
+      Perform a thorough code review. Structure as:
+      ## Summary — one sentence
+      ## Issues Found — table: Severity | Line | Issue | Fix
+      ## Security Concerns — SQL injection, XSS, exposed secrets, auth
+      ## Performance Notes — N+1, blocking calls, missing indexes
+      ## Suggested Refactors — SOLID violations, design patterns
+      Be direct. Include code snippets for every fix.
+
+  - name: optimize-sql
+    description: "Optimise SQL stored procedure"
+    invokable: true
+    prompt: |
+      Optimise this SQL Server stored procedure:
+      1. Add SET NOCOUNT ON
+      2. Add BEGIN TRY/CATCH
+      3. Replace cursors with set-based ops
+      4. Suggest CREATE INDEX for missing indexes
+      5. Replace CTEs with temp tables for > 10k rows
+      6. Add WITH (NOLOCK) where safe
+      7. Make WHERE clauses SARGable
+      Output: complete optimised procedure + index recommendations + change log.
+
+  - name: add-tests
+    description: "Generate xUnit unit tests"
+    invokable: true
+    prompt: |
+      Generate xUnit tests with Moq and FluentAssertions.
+      Cover: happy path, edge cases, null inputs, exceptions.
+      Pattern: MethodName_Scenario_ExpectedResult.
+      Use Arrange/Act/Assert comments. Mock all externals.
+      Output complete test class — no placeholders.
+
+  - name: add-docs
+    description: "Add XML documentation comments"
+    invokable: true
+    prompt: |
+      Add XML docs to all public members:
+      <summary>, <param>, <returns>, <exception>, <remarks>.
+      Add <example> for utility methods. Keep logic unchanged.
+
+  - name: ng-component
+    description: "Generate Angular standalone component"
+    invokable: true
+    prompt: |
+      Generate a complete Angular 17+ standalone component:
+      - inject(), OnPush, standalone: true
+      - Typed FormGroup<T> if form needed
+      - Service interface + implementation
+      - DevExtreme HTML template
+      - SCSS with sw- BEM naming
+      Output: compilable component + service + model files.
+
+  - name: api-endpoint
+    description: "Generate complete .NET API endpoint"
+    invokable: true
+    prompt: |
+      Generate a complete ASP.NET Core 8 endpoint:
+      - Controller + DTOs + FluentValidation
+      - Service interface + Scoped implementation
+      - Dapper repository with parameterised SQL
+      - ILogger<T> + ProblemDetails error handling
+      - DI registration comment for Program.cs
+      Output complete compilable C# files.
+
+  - name: security-scan
+    description: "Security audit — OWASP Top 10 check"
+    invokable: true
+    prompt: |
+      Security audit (OWASP Top 10):
+      Check for: SQL injection, XSS, hardcoded secrets,
+      missing auth, insecure deserialization, path traversal,
+      sensitive data in logs, CORS misconfiguration,
+      missing input validation, exposed stack traces.
+      Output: table — Severity | Line | Vulnerability | Fix Code
+
+  - name: explain-deep
+    description: "Deep explanation of complex code"
+    invokable: true
+    prompt: |
+      Explain this code:
+      1. Problem it solves
+      2. Step-by-step logic
+      3. Key design decisions
+      4. Potential failure modes
+      5. How to improve it
+      Use ASCII diagrams for complex flows.
+
+  # ── v1.1.0 Inline Actions ──────────────────────────────
+
+  - name: inline-review
+    description: "Inline code review — annotated issues with severity"
+    invokable: true
+    prompt: |
+      Quick inline review of selected code.
+      Format: Severity | Line | Issue | Fix Code
+      Keep it tight — one issue per row, no explanations.
+      Severity: Critical | Warning | Info
+      Include specific line numbers and code snippets.
+
+  - name: quick-fix
+    description: "Auto-fix the selected code — apply best practices"
+    invokable: true
+    prompt: |
+      Fix the selected code. Output ONLY the corrected code block.
+      No explanation, no comments, just the fixed code.
+      Apply: proper naming, async/await, error handling, nullable types, IDisposable.
+      Make it production-ready in one pass.
+
+  - name: explain-inline
+    description: "Explain selected code with inline comments"
+    invokable: true
+    prompt: |
+      Add // comments to explain the selected code.
+      One comment per meaningful line.
+      Tone: explain to a junior developer.
+      Output: same code with // comments added.
+      Never change logic, only add explanations.
+
+  - name: refactor-inline
+    description: "Refactor selected code — extract, simplify, modernize"
+    invokable: true
+    prompt: |
+      Refactor the selected code. Output ONLY the refactored code.
+      Pick the most impactful single transformation:
+      1. Extract method (if duplicated or complex)
+      2. Simplify logic (reduce nesting, early returns)
+      3. Modernize syntax (C# 12 features, modern TypeScript)
+      One transformation only. Don't change behavior.
+
+  - name: add-types
+    description: "Add TypeScript types or C# explicit types"
+    invokable: true
+    prompt: |
+      Add types to the selected code.
+      TypeScript: replace 'any', add param/return types, add generic constraints.
+      C#: replace 'var' with explicit types, add nullable annotations (#nullable enable).
+      Output: typed code only, no explanation.
+      Make every type as specific as possible.
+
+  # ── v1.1.0 Utility Prompts ─────────────────────────────
+
+  - name: performance-check
+    description: "Identify performance issues — N+1, allocations, blocking"
+    invokable: true
+    prompt: |
+      Performance audit of selected code.
+      Check for:
+      - SQL N+1 queries, SELECT *, missing indexes
+      - Allocations in loops, large object allocations
+      - Blocking .Result, .Wait(), Thread.Sleep
+      - Unnecessary Enumerable chains
+      Output: Severity | Location | Issue | Fix Code table
+
+  - name: memory-audit
+    description: "Detect memory leaks and disposal issues"
+    invokable: true
+    prompt: |
+      Memory audit of selected code.
+      Check for:
+      - IDisposable without using statement
+      - Event handler leaks (no unsubscribe)
+      - Circular references, cached objects
+      - WeakReference misuse
+      Output: Issues found with line numbers and fixes.
+
+  - name: database-design
+    description: "Review or generate database schema"
+    invokable: true
+    prompt: |
+      Database design analysis:
+      If schema provided: review normalization, indexes, FK constraints, naming.
+      If feature described: suggest schema design, tables, relationships.
+      Output: SQL CREATE TABLE statements + index recommendations + rationale.
+
+  - name: architecture-design
+    description: "System architecture advice for the described feature"
+    invokable: true
+    prompt: |
+      Architecture design for the described feature.
+      Suggest: layer responsibilities, dependency direction, design pattern.
+      Consider: testability, scalability, maintainability.
+      Output: ASCII architecture diagram + layer descriptions + pattern rationale.
+
+  - name: refactor-large
+    description: "Plan a large refactoring — analysis then steps"
+    invokable: true
+    prompt: |
+      Large refactoring plan for selected code/feature.
+      Step 1: Analyze — what needs changing and why
+      Step 2: Plan — ordered refactoring steps with risks
+      Step 3: Structure — which files to change in what order
+      Output: numbered refactoring plan with file paths and estimated effort.
+
+experimental:
+  readResponseToCursor: false
