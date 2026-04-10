@@ -43,17 +43,26 @@ rules:
     alwaysApply: true
     rule: |
       You are an expert AI assistant embedded in SmartWorkz Technologies.
-      Stack: .NET 8, ASP.NET Core, Angular 17+, SQL Server 2022, Azure DevOps, AWS.
+      Supported Stacks:
+        - **Backend**: .NET 8, ASP.NET Core, Node.js, Python, PHP (Drupal)
+        - **Frontend**: Angular 17+, React 18+, Flutter, MAUI
+        - **Database**: SQL Server 2022, PostgreSQL, MySQL, MongoDB
+        - **Cloud**: Azure DevOps, AWS, GCP
+
       Always:
-        - Use C# 12 features (primary constructors, collection expressions)
-        - Prefer async/await with CancellationToken parameters
-        - Use ILogger<T>, never Console.Write
+        - Use C# 12 features (primary constructors, collection expressions) for .NET
+        - Prefer async/await with CancellationToken parameters for backend
+        - Use ILogger<T>, never Console.Write or console.log for logging
         - Angular: standalone components, inject(), OnPush, typed forms
+        - React: functional components, hooks, TypeScript strict mode
+        - Flutter/MAUI: null safety, immutable widgets, provider/bloc state management
+        - PHP: type hints, PSR-12 standards, dependency injection
       Never:
         - Leave TODO comments in generated code
-        - Use Thread.Sleep — always Task.Delay
+        - Use Thread.Sleep (C#) or setTimeout (blocking) — always Task.Delay or async patterns
         - Expose raw exceptions to API consumers
         - Hardcode secrets or connection strings
+        - Use plain text passwords or tokens in code
 
   - name: dotnet-rules
     globs: ["**/*.cs"]
@@ -82,6 +91,67 @@ rules:
       - Typed reactive forms: FormGroup<T>
       - HTTP: typed responses, takeUntilDestroyed()
       - Routes: lazy-loaded with loadComponent
+
+  - name: react-rules
+    globs: ["**/*.tsx", "**/*.jsx"]
+    alwaysApply: false
+    rule: |
+      React 18+ standards:
+      - Functional components only — no class components
+      - Hooks: useState, useEffect, useCallback, useMemo, useContext
+      - TypeScript strict mode: type all props and state
+      - Custom hooks for logic extraction (useAsync, useForm, usePagination)
+      - State management: Redux Toolkit, Zustand, or Context + useReducer
+      - No inline function definitions in JSX — use useCallback
+      - memo() for expensive components, useCallback for callbacks
+      - Suspense for async component loading
+      - Controlled forms: onChange handlers, no uncontrolled components
+
+  - name: flutter-rules
+    globs: ["**/*.dart"]
+    alwaysApply: false
+    rule: |
+      Flutter standards:
+      - Null safety: prefer non-nullable types, use ? only when needed
+      - Immutable widgets: use const constructors everywhere
+      - State management: Provider, BLoC, GetX (pick one, not mixed)
+      - Avoid mutable StatefulWidget — prefer functional + state manager
+      - Use FutureBuilder/StreamBuilder for async UI
+      - Hot reload safety: avoid global variables and static state
+      - Linting: use analysis_options.yaml with strict rules
+      - Asset handling: define all assets in pubspec.yaml
+      - Formatting: dartfmt (2-space indentation)
+
+  - name: maui-rules
+    globs: ["**/*.xaml.cs", "**/*.xaml"]
+    alwaysApply: false
+    rule: |
+      MAUI standards:
+      - MVVM pattern: ViewModel, Model, View separation
+      - Data binding: {Binding} syntax with proper paths
+      - Command pattern: ICommand or RelayCommand for button actions
+      - Null safety: use #nullable enable in .cs files
+      - Platform-specific code: use #if WINDOWS / #if MACCATALYST etc
+      - Async methods: use async/await, never Task.Result blocking
+      - ResourceDictionary: centralize colors, fonts, styles
+      - Triggers: use DataTrigger, EventTrigger for conditional UI
+      - Layout: use Grid with RowDefinitions/ColumnDefinitions, avoid AbsoluteLayout
+
+  - name: php-drupal-rules
+    globs: ["**/*.php"]
+    alwaysApply: false
+    rule: |
+      PHP/Drupal standards:
+      - Type hints: declare(strict_types=1) at top of every file
+      - PSR-12: code standard, 2-space indentation
+      - Drupal hooks: implement hook_* following naming convention
+      - Module structure: module.info.yml, module.module, src/ folder
+      - Dependency injection: use services and ContainerInterface
+      - Database: use $database service, parameterised queries (not db_query)
+      - Forms: use Form API, FormInterface implementation
+      - Validation: use validator service for business logic
+      - Comments: PHPDoc on all functions with @param @return @throws
+      - No global functions — use service classes
 
   - name: sql-rules
     globs: ["**/*.sql"]
