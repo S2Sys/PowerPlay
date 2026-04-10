@@ -2047,6 +2047,83 @@ docs:
     startUrl: https://docs.fluentvalidation.net/en/latest/
 
 # ─────────────────────────────────────────────────────────
+# PARALLEL PROCESSING — v3.9.0 Configuration
+# ─────────────────────────────────────────────────────────
+
+parallelProcessing:
+  enabled: true
+  workerPoolSize: 4                    # Range: 4-8 workers
+  maxConcurrentPatterns: 3             # Max patterns per group
+  defaultTimeout: 600                  # Default timeout in seconds
+
+  # Load balancing strategy
+  loadBalancing:
+    strategy: least-busy               # Options: round-robin, least-busy, weighted
+    retryPolicy: exponential-backoff   # Options: exponential-backoff, linear, none
+    maxRetries: 3
+
+  # Circuit breaker for resilience
+  circuitBreaker:
+    enabled: true
+    failureThreshold: 5                # Failures before opening
+    resetTimeout: 30                   # Seconds before half-open attempt
+    monitorInterval: 10                # Health check interval in seconds
+
+  # Output caching
+  caching:
+    enabled: true
+    ttl: 3600                          # 1 hour cache lifetime in seconds
+    strategy: lru                      # Options: lru, lfu, fifo
+    maxSize: 1000                      # Max cached pattern results
+    invalidateOn:
+      - architecture-change
+      - requirement-update
+      - config-change
+
+  # Parallel group definitions (pattern sets that can run together)
+  parallelGroups:
+
+    codeGeneration:
+      name: "Code Generation Phase"
+      patterns: [/api-endpoint, /ng-component, /react-component]
+      timeout: 600
+      conflictResolution: merge
+      dependencies: []
+      priority: 1
+
+    architecture:
+      name: "Architecture & Design Phase"
+      patterns: [/architecture-design, /database-design, /design-system-setup]
+      timeout: 300
+      conflictResolution: merge
+      dependencies: []
+      priority: 1
+
+    testing:
+      name: "Testing Phase"
+      patterns: [/add-tests, /visual-regression-testing, /api-contract-testing]
+      timeout: 300
+      conflictResolution: merge
+      dependencies: [codeGeneration, architecture]
+      priority: 2
+
+    deployment:
+      name: "Deployment & Infrastructure"
+      patterns: [/docker-containerize, /kubernetes-deploy, /iac-generate]
+      timeout: 300
+      conflictResolution: merge
+      dependencies: [codeGeneration]
+      priority: 3
+
+    security:
+      name: "Security & Compliance"
+      patterns: [/threat-modeling, /cloud-security-posture, /dependency-scanning-continuous]
+      timeout: 300
+      conflictResolution: merge
+      dependencies: [architecture]
+      priority: 2
+
+# ─────────────────────────────────────────────────────────
 # PROMPTS — /slash commands
 # ─────────────────────────────────────────────────────────
 prompts:
