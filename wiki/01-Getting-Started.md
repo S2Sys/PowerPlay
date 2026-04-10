@@ -118,19 +118,27 @@ public class UserService
 ## Next Steps
 
 - 📖 Read [Config Reference](./02-Config-Reference.md) to understand sections
-- 📋 Read [Rules Guide](./03-Rules-Guide.md) to see all rules in detail
+- 📋 Read [Orchestrator Modes Guide](./03-Orchestrator-Modes-v3.5.0.md) to see all prompts and routing logic (**NEW: Master Prompts + 23 aliases**)
 - 🛠️ Read [MCP Servers Guide](./05-MCP-Servers-Guide.md) to use tools like Git, FileSystem
 - 💬 Read [Prompts Reference](./06-Prompts-Reference.md) for all /commands
 
 ---
 
-## Quick Reference: Key Shortcuts
+## Quick Reference: Key Shortcuts & Commands
 
-| Shortcut | Action |
+| Shortcut / Command | Action |
 |----------|--------|
 | **Ctrl+L** | Open Continue chat (VS Code) |
 | **Cmd+M** | Open Continue chat (macOS) |
 | **Ctrl+K** | Quick action menu |
+| **/pp** | Master orchestrator — auto-routes to best command |
+| **/quick** | Fast fixes, reviews, tests |
+| **/master-prompt** or **/project** | Analyze project + tech stack + recommendations |
+| **/learn** or **/analyze** | Workspace conventions + patterns + top 5 PowerPlay fit |
+| **/builder** or **/wizard** | Interactive tech stack builder |
+| **/requirement** or **/spec** | Full 4-phase requirements chain |
+| **/deep** or **/explain** | Deep code explanation |
+| **/doc** or **/docs** | Add XML documentation |
 | **/review** | Code review prompt |
 | **/add-tests** | Generate xUnit tests |
 | **@file** | Reference current file |
