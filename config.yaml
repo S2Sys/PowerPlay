@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Streamlined Config
-version: 3.5.0
+version: 3.6.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
-  releaseDate: "2026-04-09"
-  lastUpdated: "2026-04-09"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.5.0"
+  releaseDate: "2026-04-10"
+  lastUpdated: "2026-04-10"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.6.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -27,7 +27,7 @@ metadata:
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
 #  │ Rules (14)      │ Core, Security, .NET, Angular, SQL (simplified) │
-#  │ Prompts (40)    │ /play, /quick + 38 consolidated: /sec /test /db /api /arch /deploy /data /frontend + code actions + requirements chain │
+#  │ Prompts (46)    │ /play, /quick + 44 consolidated: /sec /test /db /api /arch /deploy /data /frontend /design-patterns /saga /pub-sub /point-to-point /request-reply /eventual-consistency + code actions + requirements chain │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -4333,6 +4333,298 @@ prompts:
     prompt: |
       [Alias for /master-prompt-builder — Prompt wizard]
       Execute /master-prompt-builder to generate a master prompt interactively.
+
+  # ── v3.6.0 Design & Messaging Patterns Phase 1 ─────────────────
+
+  - name: design-patterns-guide
+    description: "GoF design patterns reference and application guide"
+    invokable: true
+    prompt: |
+      Design patterns reference for this context.
+
+      **Creational patterns** (object creation):
+      - **Singleton**: One instance (logger, config). Problem: thread-safety, testing. Use: static field + lock, or lazy<T>.
+      - **Factory**: Create objects without coupling. Problem: many subclasses. Use: return interface, caller doesn't know concrete type.
+      - **Builder**: Complex objects step-by-step. Problem: telescoping constructors. Use: fluent builder pattern, separate builder class.
+      - **Abstract Factory**: Family of related objects. Problem: multiple factories to manage. Use: interface with methods per type.
+      - **Prototype**: Clone objects. Problem: deep vs shallow copy complexity. Use: ICloneable (C#), clone() (Java).
+      - **Object Pool**: Reuse expensive objects. Problem: state management, concurrency. Use: blocking queue, checkout/checkin.
+
+      **Structural patterns** (object composition):
+      - **Adapter**: Convert one interface to another. Problem: inheritance vs composition trade-off. Use: wrapper class implements target interface.
+      - **Bridge**: Decouple abstraction from implementation. Problem: over-engineering for simple cases. Use: when both vary independently.
+      - **Composite**: Tree of objects as single object. Problem: type safety. Use: recursive composition with composite interface.
+      - **Decorator**: Add behavior to object dynamically. Problem: order matters, complexity. Use: wrapper around interface, delegation.
+      - **Facade**: Simplified interface to subsystem. Problem: hidden complexity. Use: one class exposes clean API to complex system.
+      - **Flyweight**: Share common data to save memory. Problem: thread-safety, immutability. Use: immutable shared objects + factory.
+      - **Proxy**: Control access to another object. Problem: indirection overhead. Use: lazy loading, access control, caching.
+
+      **Behavioral patterns** (object interaction):
+      - **Chain of Responsibility**: Pass request along chain. Problem: request may go unhandled. Use: middleware, handler interface.
+      - **Command**: Encapsulate request as object. Problem: command object overhead. Use: queue operations, undo/redo, event sourcing.
+      - **Iterator**: Access elements sequentially. Problem: hidden internal structure. Use: IEnumerable<T> (C#), Iterator interface.
+      - **Mediator**: Centralize complex communication. Problem: mediator becomes bottleneck. Use: event bus, message broker.
+      - **Memento**: Capture and restore state. Problem: memory overhead, privacy. Use: serialization, snapshots, undo.
+      - **State**: Alter behavior based on internal state. Problem: many state classes. Use: state interface + concrete implementations, context holds current state.
+      - **Template Method**: Define algorithm skeleton, subclasses fill in steps. Problem: inheritance coupling. Use: abstract method, concrete steps.
+      - **Visitor**: Add operations without modifying element classes. Problem: coupling, new elements require visitor update. Use: double dispatch pattern.
+      - **Interpreter**: Define language grammar and interpretation. Problem: complex, rarely needed. Use: parse tree, visitor pattern.
+      - **Observer**: Notify multiple objects of state change. Problem: tight coupling, memory leaks. Use: event, delegate, weak references.
+
+      **When to apply**:
+      - For MONDAY (architecture/design phase): Choose patterns during class design, not during implementation
+      - For code REVIEW: Suggest patterns to refactor complex code after it's written
+      - For REFACTORING: Use patterns to untangle tight coupling or reduce duplication
+      - Never: Over-engineer simple code. Use patterns only when problem is clear
+
+      **Gotchas**:
+      - Singleton: Use dependency injection instead (easier to test)
+      - Adapter: Don't use when refactoring—fix the interface instead
+      - Proxy: Lazy loading should measure actual cost first
+      - State: Don't create state per request—reuse state instances
+
+  - name: saga-pattern
+    description: "Saga pattern for distributed transactions — orchestration vs choreography"
+    invokable: true
+    prompt: |
+      Saga pattern for managing distributed transactions across services.
+
+      **Problem**: Monolithic ACID transactions don't work across services. Need consistency without locking.
+
+      **Two approaches**:
+
+      **ORCHESTRATION (central coordinator)**:
+      - One service orchestrates the saga (Order Service)
+      - Calls Service B → if ok, calls Service C → if ok, commits
+      - If step fails, orchestrator triggers compensating transactions in reverse
+      - Example: Order → Reserve Inventory → Charge Payment → Ship. Fail at payment? Refund reservation.
+      - Pros: Clear flow, centralized logic, easy to see saga definition
+      - Cons: Orchestrator becomes bottleneck, tight coupling, harder to scale
+
+      **CHOREOGRAPHY (event-driven, decentralized)**:
+      - Service A publishes "OrderCreated" event
+      - Service B subscribes, reserves inventory, publishes "InventoryReserved"
+      - Service C subscribes, charges payment, publishes "PaymentCharged"
+      - If payment fails, Service C publishes "PaymentFailed" → Service B compensates
+      - Pros: Loose coupling, scales easier, services are autonomous
+      - Cons: Hard to follow saga logic (events scattered), debugging complex, eventual consistency
+
+      **Compensation pattern**:
+      - Each forward step has a compensating transaction
+      - Reserve inventory → compensation: Release inventory
+      - Charge payment → compensation: Refund payment
+      - Compensations execute in reverse order
+
+      **Idempotency is CRITICAL**:
+      - Saga step may be retried due to failure/timeout
+      - Each step must be idempotent (running twice = running once)
+      - Use unique saga ID, step counter, track "step X already completed"
+
+      **When to use**:
+      - TUESDAY (queueing, distributed workflows): Orchestration for simple orders (Order → Payment → Inventory)
+      - WEDNESDAY (workflows): Choreography for complex, event-driven architectures (microservices with many services)
+
+      **Avoid**:
+      - Nested sagas (saga calling saga) — flatten to single saga
+      - Mixing orchestration + choreography in same saga (confusing)
+      - Forgetting idempotency keys (retries cause duplication)
+
+  - name: pub-sub-messaging
+    description: "Pub/Sub messaging pattern — Event Bus, Topics, Event Source, Subscribers"
+    invokable: true
+    prompt: |
+      Publish-Subscribe messaging for event-driven architecture.
+
+      **Architecture**:
+      - Publisher: Publishes event to topic (no knowledge of subscribers)
+      - Topic/Channel: Event storage, multiple subscribers per topic
+      - Subscriber: Listens to topic, processes events asynchronously
+      - Message Broker: Kafka, RabbitMQ, Azure Service Bus, AWS SNS/SQS
+
+      **Key decisions**:
+      - **Topic naming**: `order.created`, `payment.processed`, `inventory.reserved`
+      - **Payload**: Include ID + timestamp + version (break if schema changes)
+      - **Retry**: Exponential backoff (1s, 2s, 4s, 8s, max 5 attempts)
+      - **Dead Letter Queue**: Failed messages after retries → DLQ for investigation
+      - **Ordering**: Some brokers guarantee per-partition (Kafka), some don't (RabbitMQ fanout)
+
+      **Example (.NET)**:
+      ```
+      // Publish
+      public interface IEventPublisher { Task PublishAsync<T>(T @event); }
+      await _publisher.PublishAsync(new OrderCreatedEvent { OrderId = 123, Total = 99.99m });
+
+      // Subscribe
+      public class OrderCreatedEventHandler : IEventHandler<OrderCreatedEvent>
+      {
+        public async Task HandleAsync(OrderCreatedEvent @event) => ...
+      }
+      ```
+
+      **Comparison to Point-to-Point**:
+      - Pub/Sub: Multiple subscribers (one event, many handlers) → loose coupling
+      - Point-to-Point: Single consumer (queue, load-balanced) → work distribution
+
+      **When to use**:
+      - WEDNESDAY (workflows): Multi-step workflows (Order → Reserve → Ship)
+      - FRIDAY (event sourcing): Event log is source of truth
+      - Generally: Event-driven architecture, loosely-coupled services
+
+      **Gotchas**:
+      - Subscriber goes offline → may miss events. Solution: persistent topic with replay
+      - Event schema change → subscribers break. Solution: version events, handle multiple versions
+      - Duplicate event processing → chaos. Solution: idempotency keys, deduplication
+
+  - name: point-to-point-messaging
+    description: "Point-to-Point messaging — Queues, load balancing, work distribution"
+    invokable: true
+    prompt: |
+      Point-to-Point messaging for work distribution across workers.
+
+      **Architecture**:
+      - Sender: Places message on queue
+      - Queue: FIFO (or priority-based), single consumer at a time
+      - Consumer: Picks up message, processes, acknowledges (ack)
+      - Load balancing: Multiple consumers pull from same queue (work sharing)
+
+      **Key components**:
+      - **Queue**: FIFO or priority (urgent messages first)
+      - **Message expiration (TTL)**: Message deleted if not processed in X seconds
+      - **Acknowledgment**: Consumer acks after successful processing. If crashed before ack, message requeues
+      - **Dead Letter Queue (DLQ)**: Messages that failed N retries go here
+      - **Priority**: High/Normal/Low — system processes high-priority first
+
+      **Example (.NET)**:
+      ```
+      // Send
+      await _queue.SendAsync(new ProcessInvoiceJob { InvoiceId = 456 });
+
+      // Receive (consumer)
+      var job = await _queue.ReceiveAsync();
+      try {
+        await ProcessInvoiceAsync(job);
+        await job.AcknowledgeAsync();
+      } catch {
+        // Don't ack — message requeues for retry
+      }
+      ```
+
+      **Priority queue example**:
+      ```
+      Priority.High → process immediately
+      Priority.Normal → queue after high
+      Priority.Low → process last
+      ```
+
+      **When to use**:
+      - TUESDAY (queueing/jobs): Background job processing (invoicing, reports, emails)
+      - Generally: Long-running tasks, work distribution, rate limiting
+
+      **Comparison to Pub/Sub**:
+      - Point-to-Point: Single consumer wins the message → work distribution
+      - Pub/Sub: All subscribers get the message → event notification
+
+      **Gotchas**:
+      - Consumer crashes mid-processing (no ack) → message requeues, processed twice. Solution: idempotency
+      - Queue grows unbounded → memory pressure. Solution: auto-scaling consumers, priority, TTL
+      - No message ordering → business logic breaks. Solution: partition by key (invoiceId), process per partition serially
+
+  - name: request-reply-messaging
+    description: "Request-Reply messaging — Synchronous over async, correlation IDs, temporal coupling"
+    invokable: true
+    prompt: |
+      Request-Reply messaging for synchronous-style communication over async transport.
+
+      **Problem**: Microservices need synchronous request-response but want async reliability (no direct HTTP).
+
+      **Solution**:
+      - Requestor sends request to queue with `ReplyTo` address + correlation ID
+      - Responder receives, processes, sends response to `ReplyTo` address with same correlation ID
+      - Requestor waits for response (with timeout) matching correlation ID
+      - Simulates synchronous call but uses async infrastructure
+
+      **Key elements**:
+      - **Correlation ID**: Unique ID linking request ↔ response
+      - **Reply-To queue**: Where responder sends response
+      - **Timeout**: Requestor waits max X seconds for response
+      - **Message versioning**: Requests/responses evolve independently
+
+      **Example (.NET)**:
+      ```
+      // Request
+      var correlationId = Guid.NewGuid();
+      var request = new GetCustomerRequest { CustomerId = 789, CorrelationId = correlationId };
+      await _requestQueue.SendAsync(request);
+
+      // Wait for response
+      var response = await _replyQueue.WaitForAsync(correlationId, timeout: TimeSpan.FromSeconds(30));
+      ```
+
+      **Responder**:
+      ```
+      var request = await _queue.ReceiveAsync();
+      var response = new GetCustomerResponse { CustomerId = 789, Data = ... };
+      await _replyQueue.SendAsync(response, correlationId: request.CorrelationId);
+      ```
+
+      **When to use**:
+      - WEDNESDAY (workflows): Service A must wait for Service B result before proceeding
+      - When temporal coupling is necessary (can't be eventually consistent)
+      - Avoid when: Services can work independently → use Pub/Sub instead
+
+      **Gotchas**:
+      - Requestor crashes before reading response → response wasted
+      - Responder never sends response → requestor hangs (hence timeout)
+      - Clock skew (responder clock wrong) → correlation ID logic breaks
+      - Circular requests (A asks B, B asks A) → deadlock
+
+  - name: eventual-consistency
+    description: "Eventual consistency pattern — Accept stale data, propagate updates asynchronously"
+    invokable: true
+    prompt: |
+      Eventual consistency for distributed systems with async updates.
+
+      **Problem**: Strong consistency (ACID) requires coordination. Slow, tight-coupling. Need to scale.
+
+      **Solution**: Accept that data is temporarily stale. Updates propagate asynchronously.
+
+      **Example**:
+      - User updates profile in Service A
+      - Service A updates local database immediately
+      - Service A publishes "ProfileUpdated" event
+      - Service B subscribes, updates its copy (async, eventual)
+      - Query Service B within 1 second? May see old data. Query after 5 seconds? Consistent.
+
+      **Handling stale reads**:
+      - Display "last updated 3 seconds ago" to users
+      - Redirect writes to authoritative source (Service A)
+      - Use version numbers, timestamps to detect staleness
+      - Refresh after mutation (user updates profile → reload from Service A)
+
+      **Conflict resolution**:
+      - Last-write-wins: Later timestamp wins (simplest, can lose data)
+      - Causal ordering: Track causality, merge intelligently
+      - Application-specific: E.g., product inventory: take minimum of all replicas
+
+      **When to use**:
+      - THURSDAY (caching, state sync): Cache updates propagate slowly
+      - FRIDAY (event sourcing): Event log is source of truth
+      - User profiles, inventory counts (loosely consistent OK)
+
+      **When NOT to use**:
+      - Financial transactions (balance must be accurate)
+      - Constraints (can't oversell limited stock)
+
+      **Acceptance criteria**:
+      - Define "eventually consistent within X seconds"
+      - Show users staleness indicator
+      - Have conflict resolution strategy documented
+      - Test with network partitions
+
+      **Gotchas**:
+      - Forgetting to publish updates → replicas diverge forever
+      - Timeout without waiting for consensus → different systems see different "consistent" state
+      - No version tracking → impossible to detect staleness
 
 experimental:
   readResponseToCursor: false
