@@ -26,16 +26,30 @@ export function parsePrompts(configPath: string): PowerPlayPrompt[] {
 function extractPrompts(content: string): PowerPlayPrompt[] {
   const prompts: PowerPlayPrompt[] = [];
 
-  const promptRegex = /  - name:\s*(\w+)\s*\n\s*description:\s*"([^"]+)"\s*\n\s*invokable:\s*true\s*\n\s*prompt:\s*\|\s*\n([\s\S]*?)(?=\n  - name:|$)/g;
+  // Find the prompts: section (skip rules: section)
+  const promptsSectionMatch = content.match(/^prompts:\s*\n/m);
+  if (!promptsSectionMatch) {
+    return [];
+  }
+
+  // Extract only the prompts section
+  const promptsStart = promptsSectionMatch.index! + promptsSectionMatch[0].length;
+  const promptsContent = content.substring(promptsStart);
+
+  // Regex to match individual prompts
+  const promptRegex = /  - name:\s*(\w+(?:-\w+)*)\s*\n\s*description:\s*"([^"]+)"\s*\n\s*invokable:\s*true\s*\n\s*prompt:\s*\|\s*\n([\s\S]*?)(?=\n  - name:|$)/g;
 
   let match;
   const categoryMap = buildCategoryMap(content);
 
-  while ((match = promptRegex.exec(content)) !== null) {
+  while ((match = promptRegex.exec(promptsContent)) !== null) {
     const name = match[1];
     const description = match[2];
     const promptBody = match[3];
-    const category = findCategory(content, match.index, categoryMap);
+
+    // Calculate position in original content for category detection
+    const absolutePosition = promptsStart + match.index;
+    const category = findCategory(content, absolutePosition, categoryMap);
 
     prompts.push({
       name,
