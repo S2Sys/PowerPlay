@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Streamlined Config
-version: 3.6.0
+version: 3.7.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
   releaseDate: "2026-04-10"
   lastUpdated: "2026-04-10"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.6.0"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.7.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -27,7 +27,7 @@ metadata:
 #  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
 #  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
 #  │ Rules (14)      │ Core, Security, .NET, Angular, SQL (simplified) │
-#  │ Prompts (46)    │ /play, /quick + 44 consolidated: /sec /test /db /api /arch /deploy /data /frontend /design-patterns /saga /pub-sub /point-to-point /request-reply /eventual-consistency + code actions + requirements chain │
+#  │ Prompts (55)    │ /play, /quick + 53 consolidated: /sec /test /db /api /arch /deploy /data /frontend /design-patterns /saga /pub-sub /point-to-point /request-reply /eventual-consistency /decorator /proxy /idempotency /dlq /builder /composite /state /event-sourcing /choreography + code actions + requirements chain │
 #  └─────────────────┴────────────────────────────────────┘
 
 defaultCompletionOptions:
@@ -4334,7 +4334,7 @@ prompts:
       [Alias for /master-prompt-builder — Prompt wizard]
       Execute /master-prompt-builder to generate a master prompt interactively.
 
-  # ── v3.6.0 Design & Messaging Patterns Phase 1 ─────────────────
+  # ── v3.6.0 Design & Messaging Patterns Phase 1-3 COMPLETE ────────
 
   - name: design-patterns-guide
     description: "GoF design patterns reference and application guide"
@@ -4625,6 +4625,807 @@ prompts:
       - Forgetting to publish updates → replicas diverge forever
       - Timeout without waiting for consensus → different systems see different "consistent" state
       - No version tracking → impossible to detect staleness
+
+  # ── v3.6.0 Design & Messaging Patterns Phase 2 ─────────────────
+
+  - name: decorator-pattern
+    description: "Decorator pattern — Add behavior dynamically without inheritance"
+    invokable: true
+    prompt: |
+      Decorator pattern for dynamic behavior modification.
+
+      **Problem**: Inheritance creates rigid hierarchies. Need to add behavior at runtime, combine behaviors.
+
+      **Solution**: Decorator wraps original object, delegates to it, adds behavior before/after.
+
+      **Structure**:
+      ```
+      IComponent (interface)
+      ├── ConcreteComponent (original)
+      └── Decorator (implements IComponent, wraps IComponent)
+          ├── ConcreteDecoratorA (add behavior A)
+          ├── ConcreteDecoratorB (add behavior B)
+          └── Nested: DecoratorA(DecoratorB(ConcreteComponent))
+      ```
+
+      **Example (.NET)**:
+      ```
+      public interface IDataSource { string Read(); }
+
+      public class FileDataSource : IDataSource {
+        public string Read() => File.ReadAllText("file.txt");
+      }
+
+      public class EncryptionDecorator : IDataSource {
+        private IDataSource _inner;
+        public EncryptionDecorator(IDataSource inner) => _inner = inner;
+        public string Read() => Decrypt(_inner.Read());
+      }
+
+      public class CompressionDecorator : IDataSource {
+        private IDataSource _inner;
+        public CompressionDecorator(IDataSource inner) => _inner = inner;
+        public string Read() => Decompress(_inner.Read());
+      }
+
+      // Usage
+      var source = new FileDataSource();
+      var encrypted = new EncryptionDecorator(source);
+      var compressed = new CompressionDecorator(encrypted);
+      var data = compressed.Read(); // Decompress(Decrypt(FileRead()))
+      ```
+
+      **Real-world**:
+      - Stream wrappers (GZipStream, DeflateStream wrapping FileStream)
+      - HTTP middleware (auth → logging → compression)
+      - UI components (Button with tooltip, border, shadow)
+
+      **When to use**:
+      - Adding/removing behavior at runtime
+      - Multiple behaviors that can combine (not inheritance hierarchy)
+      - Single Responsibility: Decorator only adds one responsibility
+
+      **When NOT to use**:
+      - Simple inheritance works (don't over-engineer)
+      - Behavior is fixed at compile-time
+      - Decorator chain gets too long (hard to follow)
+
+      **Gotchas**:
+      - Performance: Each decorator adds call overhead (v.s. single implementation)
+      - Ordering: Decorator order matters (encryption then compression ≠ compression then encryption)
+      - Type checking: `source is EncryptionDecorator` breaks with layers of decorators
+      - Stack overflow: Circular decoration (A decorates B, B decorates A)
+
+  - name: proxy-pattern
+    description: "Proxy pattern — Control access to object (lazy loading, caching, access control)"
+    invokable: true
+    prompt: |
+      Proxy pattern for controlled access, lazy loading, and caching.
+
+      **Problem**: Need to control when/how object is accessed. Cost: expensive to create, access control needed.
+
+      **Solution**: Proxy object acts like original, but controls access (lazy create, cache, auth).
+
+      **Types of proxies**:
+
+      **1. LAZY PROXY** (Lazy Loading):
+      ```
+      public interface IExpensiveResource { string GetData(); }
+
+      public class ExpensiveService : IExpensiveResource {
+        private Database _db = new(); // Expensive!
+        public string GetData() => _db.Query(...);
+      }
+
+      public class LazyProxy : IExpensiveResource {
+        private ExpensiveService _inner;
+        public string GetData() {
+          _inner ??= new ExpensiveService(); // Create only on first use
+          return _inner.GetData();
+        }
+      }
+      ```
+      Use: Database connections, large objects, remote resources.
+
+      **2. CACHING PROXY**:
+      ```
+      public class CachingProxy : IDataSource {
+        private Dictionary<string, string> _cache = new();
+        private IDataSource _inner;
+
+        public string Read(string key) {
+          if (!_cache.TryGetValue(key, out var value)) {
+            value = _inner.Read(key);
+            _cache[key] = value;
+          }
+          return value;
+        }
+      }
+      ```
+      Use: Expensive computations, API calls, queries.
+
+      **3. ACCESS CONTROL PROXY**:
+      ```
+      public class SecurityProxy : IAdminService {
+        private IAdminService _inner;
+        private User _currentUser;
+
+        public void DeleteUser(int id) {
+          if (!_currentUser.IsAdmin) throw new UnauthorizedAccessException();
+          _inner.DeleteUser(id);
+        }
+      }
+      ```
+      Use: Authorization, role checks, audit logging.
+
+      **4. LOGGING PROXY**:
+      ```
+      public class LoggingProxy : IRepository {
+        public User GetById(int id) {
+          _logger.Info($"GetById({id})");
+          var result = _inner.GetById(id);
+          _logger.Info($"GetById({id}) = {result}");
+          return result;
+        }
+      }
+      ```
+
+      **Proxy vs Decorator**:
+      - Proxy: Controls access (lazy, cache, auth, logging) — same interface
+      - Decorator: Adds responsibility (encryption, compression) — wraps interface
+
+      **When to use**:
+      - THURSDAY (caching): Lazy loading + caching + staleness handling
+      - Access control: Auth before executing operations
+      - Logging/monitoring: Audit who called what and when
+
+      **Gotchas**:
+      - Cache invalidation: Hard to know when cache is stale
+      - Proxy transparency: Exceptions, timeouts not handled same as original
+      - Double lookup: Check cache + miss → call inner (race condition in multi-threaded)
+      - Memory leaks: Cache grows unbounded (need TTL or LRU eviction)
+
+  - name: idempotency
+    description: "Idempotency pattern — Safe retries, deduplication, exactly-once semantics"
+    invokable: true
+    prompt: |
+      Idempotency pattern for safe request retries without duplication.
+
+      **Problem**: Network request fails → retry → succeeds. But was it processed before? If yes, now we have duplicate.
+
+      **Solution**: Mark each request with unique ID. Server checks "already processed?" before executing.
+
+      **Implementation**:
+
+      **Step 1: Generate Idempotency Key**:
+      ```
+      // Client side
+      string idempotencyKey = Guid.NewGuid().ToString();
+      var request = new CreateOrderRequest { OrderId = 123, Total = 99.99m };
+      await client.CreateOrderAsync(request, idempotencyKey: idempotencyKey);
+
+      // If fails, retry with SAME idempotencyKey
+      await client.CreateOrderAsync(request, idempotencyKey: idempotencyKey); // Safe!
+      ```
+
+      **Step 2: Check Idempotency Store**:
+      ```
+      public class CreateOrderHandler {
+        private IIdempotencyStore _store;
+
+        public async Task<OrderResponse> HandleAsync(CreateOrderRequest req, string idempotencyKey) {
+          // Check if already processed
+          var cachedResponse = await _store.GetAsync(idempotencyKey);
+          if (cachedResponse != null) {
+            return cachedResponse; // Return cached result
+          }
+
+          // Process request
+          var order = await CreateOrderAsync(req);
+
+          // Store result
+          await _store.SetAsync(idempotencyKey, order);
+          return order;
+        }
+      }
+      ```
+
+      **Step 3: Clean Old Keys**:
+      - TTL: Remove keys older than 24 hours (or business window)
+      - Reason: Prevent unbounded memory growth in idempotency store
+
+      **Storage options**:
+      - Redis: Fast, in-memory, auto TTL support
+      - Database: Persistent, survives restarts
+      - Distributed cache: Redis + DB for durability
+
+      **Scope of key**:
+      - Per-user per-endpoint: Same user, same endpoint, same key = same result
+      - Global: One key across all endpoints (dangerous)
+      - Idempotency-Key header: Client provides, server respects (HTTP standard)
+
+      **When to use**:
+      - TUESDAY (queueing): Each job must be idempotent (process 1000x = process 1x)
+      - WEDNESDAY (workflows): Saga steps must be idempotent
+      - Critical operations: Payments, order creation, account changes
+      - Distributed systems: Network failures → retries
+
+      **Gotchas**:
+      - Forgetting to check key → duplicates anyway
+      - Key expires too soon → retry processed as new request
+      - Non-deterministic results: Same input, different output each time → idempotency breaks
+      - Concurrent retries: Both requests see "not processed" → both execute (race condition)
+        Solution: Use database with unique constraint on idempotencyKey
+
+  - name: dead-letter-queue
+    description: "Dead Letter Queue — Failed message handling, investigation, replay"
+    invokable: true
+    prompt: |
+      Dead Letter Queue (DLQ) pattern for handling messages that fail permanently.
+
+      **Problem**: Message fails processing → retry 5 times → still fails. What now?
+
+      **Solution**: Move failed message to Dead Letter Queue for investigation and replay.
+
+      **Architecture**:
+      ```
+      Message Queue → Consumer
+                  ↓ (fail 5x)
+              Dead Letter Queue → DLQ Handler (investigate, alert, replay)
+      ```
+
+      **Failure scenarios**:
+      1. **Poison message**: Invalid format, malformed JSON, schema mismatch
+      2. **Transient failure**: Database down, service timeout (should retry, not DLQ)
+      3. **Permanent failure**: Business logic error (customer not found, insufficient funds)
+
+      **DLQ Strategy**:
+
+      **Step 1: Retry Policy**:
+      ```
+      Attempt 1: immediate
+      Attempt 2: wait 1s
+      Attempt 3: wait 2s
+      Attempt 4: wait 4s
+      Attempt 5: wait 8s
+      Attempt 6: → DLQ
+      ```
+      Exponential backoff gives transient failures time to recover.
+
+      **Step 2: DLQ Handler**:
+      ```
+      public class DLQHandler {
+        public async Task HandleAsync(Message msg) {
+          // Log for investigation
+          _logger.Error($"DLQ: {msg.Id} - {msg.Body}", msg.Exception);
+
+          // Alert team
+          await _alerting.SendAsync($"DLQ message: {msg.Id}");
+
+          // Store in database for investigation
+          await _dlqStore.SaveAsync(new DLQRecord {
+            MessageId = msg.Id,
+            Payload = msg.Body,
+            Error = msg.Exception,
+            Timestamp = DateTime.UtcNow,
+            Status = DLQStatus.Pending // For manual replay
+          });
+        }
+      }
+      ```
+
+      **Step 3: Manual Replay**:
+      ```
+      // Operator investigates → fixes issue → replays
+      var dlqMessage = await _dlqStore.GetAsync(messageId);
+      await _queue.SendAsync(dlqMessage); // Back to main queue
+      await _dlqStore.MarkAsReplayedAsync(messageId);
+      ```
+
+      **Message fields for DLQ**:
+      ```
+      {
+        "originalMessageId": "abc-123",
+        "attemptNumber": 6,
+        "failureReason": "Customer not found: 789",
+        "lastException": "EntityNotFoundException",
+        "failureTimestamp": "2026-04-10T14:30:00Z",
+        "originalPayload": { ... }
+      }
+      ```
+
+      **When to use**:
+      - TUESDAY (queueing): All message processing
+      - WEDNESDAY (workflows): Saga step failures
+      - Long-running jobs: Reports, invoices, batch operations
+
+      **Monitoring DLQ**:
+      - Alert on DLQ depth (> 10 messages → investigate)
+      - Track DLQ arrival rate (spike → new bug)
+      - Dashboard: DLQ messages by hour, by error type
+      - SLO: Process DLQ within 24 hours (manual or auto-replay)
+
+      **Gotchas**:
+      - DLQ fills up unbounded → memory pressure
+      - No way to replay automatically → stuck forever
+      - No logging of why it failed → investigation time
+      - Message expires in DLQ → lost forever
+      - Duplicate DLQ handling (send same message twice) → must be idempotent
+
+  # ── v3.6.0 Design & Messaging Patterns Phase 3 ─────────────────
+
+  - name: builder-pattern
+    description: "Builder pattern — Complex object construction, fluent interface, optional parameters"
+    invokable: true
+    prompt: |
+      Builder pattern for constructing complex objects step-by-step.
+
+      **Problem**: Constructor has many optional parameters. Telescoping constructors ugly. Hard to read intent.
+
+      ```
+      // Telescoping constructor — hard to read
+      var order = new Order(123, "customer", null, 99.99m, null, null, true, false, null);
+      ```
+
+      **Solution**: Builder separates construction from representation. Fluent interface.
+
+      **Implementation**:
+
+      ```
+      public class OrderBuilder {
+        private int _orderId;
+        private string _customer;
+        private DateTime _date = DateTime.UtcNow;
+        private decimal _total;
+        private List<OrderItem> _items = new();
+        private bool _isPaid = false;
+
+        public OrderBuilder WithId(int id) { _orderId = id; return this; }
+        public OrderBuilder WithCustomer(string name) { _customer = name; return this; }
+        public OrderBuilder WithDate(DateTime date) { _date = date; return this; }
+        public OrderBuilder WithTotal(decimal amount) { _total = amount; return this; }
+        public OrderBuilder AddItem(OrderItem item) { _items.Add(item); return this; }
+        public OrderBuilder MarkAsPaid() { _isPaid = true; return this; }
+
+        public Order Build() {
+          if (string.IsNullOrEmpty(_customer)) throw new InvalidOperationException("Customer required");
+          return new Order(_orderId, _customer, _date, _total, _items, _isPaid);
+        }
+      }
+
+      // Usage
+      var order = new OrderBuilder()
+        .WithId(123)
+        .WithCustomer("John")
+        .WithTotal(99.99m)
+        .AddItem(new OrderItem { ... })
+        .AddItem(new OrderItem { ... })
+        .MarkAsPaid()
+        .Build();
+      ```
+
+      **C# 12 Record Expressions (Modern)**:
+      ```
+      // Records with `with` keyword
+      var order = new Order(123, "customer", 99.99m) with { IsPaid = true, Status = "Shipped" };
+      ```
+
+      **When to use**:
+      - MONDAY (architecture): Complex domain objects (Order, Invoice, Request)
+      - Many optional parameters
+      - Step-by-step construction
+      - Validation at build time
+
+      **Gotchas**:
+      - Builder creates intermediate objects (memory overhead)
+      - Builder state can be reused (reset it to avoid confusion)
+      - Validation at build time is good, but catch issues early
+
+  - name: composite-pattern
+    description: "Composite pattern — Tree structures, recursive composition, unified interface"
+    invokable: true
+    prompt: |
+      Composite pattern for tree structures and recursive composition.
+
+      **Problem**: Files and folders have different structure (folder contains files OR folders). Need unified interface.
+
+      **Solution**: Composite object can contain leaf objects and other composites. Recursive.
+
+      **Example (File System)**:
+      ```
+      public abstract class FileSystemItem {
+        public string Name { get; }
+        public abstract long GetSize();
+        public abstract void Display(int indent = 0);
+      }
+
+      public class File : FileSystemItem {
+        public long Size { get; }
+        public override long GetSize() => Size;
+        public override void Display(int indent = 0) {
+          Console.WriteLine(new string(' ', indent) + Name + " " + Size);
+        }
+      }
+
+      public class Folder : FileSystemItem {
+        private List<FileSystemItem> _children = new();
+
+        public void Add(FileSystemItem item) => _children.Add(item);
+        public void Remove(FileSystemItem item) => _children.Remove(item);
+
+        public override long GetSize() => _children.Sum(c => c.GetSize());
+
+        public override void Display(int indent = 0) {
+          Console.WriteLine(new string(' ', indent) + Name + "/");
+          foreach (var child in _children) {
+            child.Display(indent + 2);
+          }
+        }
+      }
+
+      // Usage
+      var root = new Folder { Name = "Documents" };
+      root.Add(new File { Name = "file1.txt", Size = 1024 });
+      var subfolder = new Folder { Name = "subfolder" };
+      subfolder.Add(new File { Name = "file2.txt", Size = 2048 });
+      root.Add(subfolder);
+
+      root.Display();
+      // Documents/
+      //   file1.txt 1024
+      //   subfolder/
+      //     file2.txt 2048
+
+      var totalSize = root.GetSize(); // 3072
+      ```
+
+      **Real-world examples**:
+      - DOM tree (HTML elements, can contain other elements)
+      - Menu system (menu items, submenus)
+      - Organizational structure (manager, employees, sub-managers)
+      - Permission hierarchies (roles contain permissions)
+
+      **When to use**:
+      - MONDAY (architecture): Hierarchical structures
+      - Part-whole relationships (trees, folders, org charts)
+      - Need to treat leaf and composite same way
+
+      **Gotchas**:
+      - Circular references (folder contains itself) → infinite loop
+      - Type checking breaks abstraction (`if (item is File)`) → use visitor pattern instead
+      - Performance: Recursive operations slow on deep trees
+
+  - name: state-pattern
+    description: "State pattern — Behavior varies by internal state, state transitions"
+    invokable: true
+    prompt: |
+      State pattern for objects with behavior that varies by internal state.
+
+      **Problem**: Order has states (Pending → Paid → Shipped → Delivered). Behavior differs per state.
+
+      **Naive approach** (big if/else):
+      ```
+      public void ProcessOrder(Order order) {
+        if (order.Status == OrderStatus.Pending) {
+          // Wait for payment
+        } else if (order.Status == OrderStatus.Paid) {
+          // Ship order
+        } else if (order.Status == OrderStatus.Shipped) {
+          // Deliver order
+        }
+      }
+      ```
+      Problem: Logic scattered, hard to add states, violates Open/Closed principle.
+
+      **State Pattern Solution**:
+      ```
+      public interface IOrderState {
+        void Pay(Order order);
+        void Ship(Order order);
+        void Deliver(Order order);
+      }
+
+      public class PendingState : IOrderState {
+        public void Pay(Order order) {
+          order.Status = OrderStatus.Paid;
+          order.State = new PaidState();
+        }
+        public void Ship(Order order) => throw new InvalidOperationException("Cannot ship pending order");
+        public void Deliver(Order order) => throw new InvalidOperationException("Cannot deliver pending order");
+      }
+
+      public class PaidState : IOrderState {
+        public void Pay(Order order) => throw new InvalidOperationException("Already paid");
+        public void Ship(Order order) {
+          order.Status = OrderStatus.Shipped;
+          order.State = new ShippedState();
+        }
+        public void Deliver(Order order) => throw new InvalidOperationException("Not shipped yet");
+      }
+
+      public class ShippedState : IOrderState {
+        public void Pay(Order order) => throw new InvalidOperationException("Already paid");
+        public void Ship(Order order) => throw new InvalidOperationException("Already shipped");
+        public void Deliver(Order order) {
+          order.Status = OrderStatus.Delivered;
+          order.State = new DeliveredState();
+        }
+      }
+
+      // Order class
+      public class Order {
+        public IOrderState State { get; set; } = new PendingState();
+        public void Pay() => State.Pay(this);
+        public void Ship() => State.Ship(this);
+        public void Deliver() => State.Deliver(this);
+      }
+
+      // Usage
+      var order = new Order();
+      order.Pay(); // PendingState → PaidState ✓
+      order.Ship(); // PaidState → ShippedState ✓
+      order.Deliver(); // ShippedState → DeliveredState ✓
+      order.Pay(); // DeliveredState.Pay() → throws ✗
+      ```
+
+      **Benefits**:
+      - Each state in separate class
+      - State transitions explicit
+      - Invalid transitions raise errors (not silent failures)
+      - Easy to add new states (Open/Closed principle)
+
+      **When to use**:
+      - WEDNESDAY (workflows): Order/document workflows with clear states
+      - Behavior varies by state
+      - State transitions are explicit
+
+      **Gotchas**:
+      - State explosion: Too many states → too many classes
+      - Context and state coupling: State needs to access context (Order) to change state
+      - Reusability: States specific to one context (Order state ≠ Payment state)
+
+  - name: event-sourcing
+    description: "Event sourcing — Event log as source of truth, state reconstruction, audit trail"
+    invokable: true
+    prompt: |
+      Event sourcing for event-based state reconstruction and audit trails.
+
+      **Problem**: State in database (current order status). But how did we get here? Lost history.
+
+      **Solution**: Store events (what happened), not state. Reconstruct state from events.
+
+      **Core concepts**:
+
+      **1. EVENTS AS SOURCE OF TRUTH**:
+      ```
+      Event Log (immutable append-only):
+      1. OrderCreated(id=123, customer="John", total=99.99)
+      2. PaymentProcessed(id=123, amount=99.99)
+      3. OrderShipped(id=123, trackingNumber="XYZ123")
+      4. OrderDelivered(id=123)
+
+      Current State = Replay all events
+      Order { Status = Delivered, Total = 99.99, Shipped = true }
+      ```
+
+      **2. SNAPSHOT (Performance optimization)**:
+      ```
+      Every 100 events, take snapshot:
+      Snapshot at event 200: Order { Status = Shipped, ... }
+
+      To get current state:
+      Load snapshot 200 → Replay events 201-250 → done
+      (not replay from event 1)
+      ```
+
+      **3. EVENT STORE**:
+      ```
+      public class EventStore {
+        private List<DomainEvent> _events = new();
+
+        public void Append(DomainEvent @event) {
+          _events.Add(@event);
+        }
+
+        public IEnumerable<DomainEvent> GetEventsSince(DateTime since) {
+          return _events.Where(e => e.Timestamp >= since);
+        }
+
+        public Order Reconstruct(int orderId) {
+          var orderEvents = _events.Where(e => e.AggregateId == orderId);
+          var order = new Order();
+          foreach (var @event in orderEvents) {
+            order.Apply(@event); // Mutate state based on event
+          }
+          return order;
+        }
+      }
+
+      public class Order {
+        public int Id { get; private set; }
+        public OrderStatus Status { get; private set; }
+
+        public void Apply(DomainEvent @event) {
+          switch (@event) {
+            case OrderCreated created:
+              Id = created.OrderId;
+              Status = OrderStatus.Pending;
+              break;
+            case PaymentProcessed paid:
+              Status = OrderStatus.Paid;
+              break;
+            case OrderShipped shipped:
+              Status = OrderStatus.Shipped;
+              break;
+          }
+        }
+      }
+      ```
+
+      **Benefits**:
+      - **Audit trail**: Complete history of what happened
+      - **Time travel**: Reconstruct state at any point in time
+      - **Debugging**: See exact sequence of events
+      - **Compliance**: Immutable log for regulations (PCI, HIPAA)
+      - **Reprocessing**: Run new business logic on old events
+
+      **When to use**:
+      - FRIDAY (event sourcing): Financial transactions, orders, workflows
+      - Compliance/audit required (must track all changes)
+      - Temporal queries ("what was order status 2 hours ago?")
+
+      **Storage**:
+      - Event Store (specialized): EventStoreDB, Axon Framework
+      - Append-only table in database: Table(EventId, AggregateId, EventType, Payload, Timestamp)
+      - Message broker: Kafka topic (immutable log)
+
+      **Gotchas**:
+      - Event schema evolution: Events change over time → versioning
+      - Eventual consistency: State lags events (cache invalidation problem)
+      - Query complexity: Can't just `SELECT * WHERE Status = 'Shipped'` → must replay events
+      - Storage: Event log grows unbounded (snapshot/archiving needed)
+      - Distributed transactions: Multiple aggregates → saga pattern
+
+  - name: choreography-vs-orchestration
+    description: "Choreography vs Orchestration — Decision framework for distributed workflows"
+    invokable: true
+    prompt: |
+      Decision framework for choosing choreography vs orchestration in distributed systems.
+
+      **ORCHESTRATION (Centralized Coordinator)**
+
+      **Flow**:
+      ```
+      Order Service (Orchestrator)
+          ↓ commands
+      → Inventory Service (reserve)
+          ↓ reply
+      → Payment Service (charge)
+          ↓ reply
+      → Shipping Service (ship)
+          ↓ reply
+      Done or Compensate
+      ```
+
+      **Characteristics**:
+      - Central service coordinates all steps
+      - Service A calls B, B calls C, C calls D
+      - Synchronous or async via point-to-point messaging
+      - Easy to see flow (just one orchestrator)
+      - Tight coupling: Orchestrator knows all services
+
+      **When to use**:
+      - Simple workflows (< 5 steps)
+      - Clear linear flow (Order → Payment → Ship)
+      - One service owns the process
+      - Debugging is priority (flow is visible)
+
+      **Gotchas**:
+      - Orchestrator becomes bottleneck (high throughput → scales hard)
+      - Tight coupling (orchestrator changes → all services affected)
+      - Retry logic in orchestrator (complex, error-prone)
+      - Hard to scale horizontally (orchestrator is single point)
+
+      **Example**:
+      ```
+      public class OrderOrchestrator {
+        public async Task ProcessOrderAsync(Order order) {
+          await _inventory.ReserveAsync(order.Items);
+          try {
+            await _payment.ChargeAsync(order.Total);
+          } catch {
+            await _inventory.ReleaseAsync(order.Items); // Compensate
+            throw;
+          }
+          await _shipping.ShipAsync(order);
+        }
+      }
+      ```
+
+      **CHOREOGRAPHY (Event-Driven, Decentralized)**
+
+      **Flow**:
+      ```
+      Order Service publishes OrderCreated
+      ↓
+      Inventory Service subscribes, reserves, publishes InventoryReserved
+      ↓
+      Payment Service subscribes, charges, publishes PaymentProcessed
+      ↓
+      Shipping Service subscribes, ships, publishes OrderShipped
+      ```
+
+      **Characteristics**:
+      - No central coordinator
+      - Services emit events
+      - Other services subscribe and react
+      - Asynchronous via pub/sub
+      - Hard to follow flow (events scattered)
+      - Loose coupling: Services don't know about each other
+
+      **When to use**:
+      - Complex workflows (> 5 steps, many branches)
+      - Multiple systems involved independently
+      - Loose coupling is priority
+      - Scale is priority (no central bottleneck)
+      - Event-driven architecture already present
+
+      **Gotchas**:
+      - Saga logic scattered across services (hard to debug)
+      - Concurrent event processing (ordering issues)
+      - Eventual consistency (state eventually catches up)
+      - Dead Letter Queue needed (event processing failures)
+
+      **Example**:
+      ```
+      // Order Service
+      public class CreateOrderHandler {
+        public async Task HandleAsync(CreateOrderCommand cmd) {
+          var order = Order.Create(cmd);
+          await _orderRepo.SaveAsync(order);
+          await _eventBus.PublishAsync(new OrderCreatedEvent { OrderId = order.Id });
+        }
+      }
+
+      // Inventory Service
+      public class OrderCreatedEventHandler : IEventHandler<OrderCreatedEvent> {
+        public async Task HandleAsync(OrderCreatedEvent @event) {
+          await _inventory.ReserveAsync(@event.OrderId, ...);
+          await _eventBus.PublishAsync(new InventoryReservedEvent { OrderId = @event.OrderId });
+        }
+      }
+
+      // Payment Service
+      public class InventoryReservedEventHandler : IEventHandler<InventoryReservedEvent> {
+        public async Task HandleAsync(InventoryReservedEvent @event) {
+          await _payment.ChargeAsync(@event.OrderId);
+          await _eventBus.PublishAsync(new PaymentProcessedEvent { OrderId = @event.OrderId });
+        }
+      }
+      ```
+
+      **DECISION MATRIX**:
+
+      | Factor | Orchestration | Choreography |
+      |--------|---|---|
+      | Coupling | Tight | Loose |
+      | Visibility | Easy (one place) | Hard (scattered) |
+      | Scale | Limited | Better |
+      | Debugging | Easy | Hard |
+      | Workflows | Simple (<5 steps) | Complex (>5 steps) |
+      | Failure handling | Centralized | Distributed |
+      | Performance | Fast (sync) | Eventual consistency |
+      | Team size | 2-3 services | Many services |
+
+      **HYBRID APPROACH**:
+      - Use orchestration for core happy path
+      - Use choreography for side effects (logging, notifications)
+      - Example: Order orchestrator coordinates critical path; EventBus notifies analytics/email
+
+      **When to choose**:
+      - **Tuesday/Wednesday**: Simple orders → Orchestration; Complex microservices → Choreography
+      - **Existing event-driven system**: Choreography (already have infrastructure)
+      - **New system**: Start with orchestration (simpler), migrate to choreography if needed
 
 experimental:
   readResponseToCursor: false
