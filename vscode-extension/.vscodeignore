@@ -1,0 +1,12 @@
+.git
+.gitignore
+.DS_Store
+*.vsix
+**/*.map
+**/*.ts
+!**/*.d.ts
+node_modules
+src
+tsconfig.json
+.vscode-test
+.prettierrc

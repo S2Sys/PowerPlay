@@ -6140,5 +6140,48 @@ prompts:
       Step 6: Alerting — automated alerts when trends diverge from expected (e.g., error rate increasing over days)
       Output: Dashboard specification (Metrics | Time window | Seasonality | Anomaly detection rules | Alerts).
 
+  # ── v3.9.0 New Orchestrator Patterns ────────────────────
+
+  - name: validate-requirements
+    description: "Validate requirements quality — INVEST criteria, completeness, clarity, feasibility, acceptance criteria"
+    invokable: true
+    prompt: |
+      Validate a list of requirements against quality criteria.
+      Input: requirements list (plain text, numbered list, or JSON Requirement[])
+      Step 1: Parse — extract id, name, description, priority, estimatedEffort from input
+      Step 2: INVEST scoring — score each criterion Independent/Negotiable/Valuable/Estimable/Small/Testable (0-10)
+      Step 3: Completeness — has name, non-empty description, acceptance criteria signals, priority assigned
+      Step 4: Clarity — flag ambiguous words (may, might, some, appropriate, several, etc), verify measurable language
+      Step 5: Feasibility — estimated effort present, no contradictory constraints, dependencies identified
+      Step 6: Verdict — Pass (score ≥80) | Needs Work (50-79) | Fail (<50)
+      Output: Validation report table (Requirement | Score | INVEST breakdown | Issues | Severity | Recommendations).
+
+  - name: optimize-database-schema
+    description: "Optimize SQL schema — normalization, missing indexes, constraints, naming conventions, migration script"
+    invokable: true
+    prompt: |
+      Analyze and optimize a SQL schema (CREATE TABLE statements or description).
+      Step 1: Parse — extract tables, columns, types, existing constraints and indexes
+      Step 2: Normalization — check 1NF (no repeating groups), 2NF (no partial deps), 3NF (no transitive deps)
+      Step 3: Indexes — flag FK columns without indexes, frequently-queried columns, composite index candidates
+      Step 4: Constraints — flag missing NOT NULL, missing FK references, missing UNIQUE on natural keys
+      Step 5: Naming — PascalCase tables, consistent column casing, no SQL reserved word conflicts
+      Step 6: Artifacts — corrected schema DDL + CREATE INDEX statements + ALTER TABLE migration skeleton
+      Output: Corrected schema + index recommendations + migration script (ready to review and run).
+
+  - name: generate-helm-charts
+    description: "Generate Helm charts — Chart.yaml, values.yaml, deployment/service/ingress/configmap templates"
+    invokable: true
+    prompt: |
+      Generate a complete Helm chart from a Docker image and deployment specification.
+      Input: image name (repo/name:tag), replicas, ports, env vars (plain + secret), resource limits, optional ingress
+      Step 1: Chart.yaml — name, version, appVersion, description, type: application
+      Step 2: values.yaml — image.repository/tag, replicaCount, resources, service ports, ingress config, env
+      Step 3: templates/deployment.yaml — Deployment with {{ .Values.* }}, resource limits, liveness/readiness probes
+      Step 4: templates/service.yaml — ClusterIP mapping container ports to service ports
+      Step 5: templates/ingress.yaml — conditional ({{- if .Values.ingress.enabled }}), host/path, optional TLS
+      Step 6: templates/configmap.yaml — conditional (configMap non-empty), env or volume mount
+      Output: Complete Helm chart (6 files) + helm install/upgrade commands.
+
 experimental:
   readResponseToCursor: false

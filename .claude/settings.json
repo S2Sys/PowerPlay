@@ -59,7 +59,16 @@
       "Bash(awk '/^rules:/{p=1} /^prompts:/{p=0} p && /^  - name:/{print}' config.yaml)",
       "Bash(awk '/^prompts:/{p=1} /^[a-z]/{if\\(p && $0 !~ /^prompts:/\\)p=0} p && /^  - name:/{print}' config.yaml)",
       "Bash(grep -E \"^  - name: \\(product-roadmap|competitive-analysis|stakeholder-management|product-metrics|load-testing-plan|chaos-engineering|api-contract-testing|test-automation-frameworks|mutation-testing|threat-modeling|supply-chain-security|secret-management|dependency-scanning-continuous|cloud-security-posture|design-system-setup|wireframing-guide|interaction-design|prototyping-guide|design-handoff|design-qa\\)$\" config.yaml)",
-      "Bash(grep -E \"^  - name: \\(product-roadmap|design-qa\\)$\" config.yaml)"
+      "Bash(grep -E \"^  - name: \\(product-roadmap|design-qa\\)$\" config.yaml)",
+      "Bash(wc -l s:/Code101/PowerPlay/src/orchestrator/parallel/*.ts s:/Code101/PowerPlay/src/orchestrator/monitoring/*.ts)",
+      "Bash(wc -l s:/Code101/PowerPlay/tests/*.ts)",
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(npx @vscode/vsce package)",
+      "Bash(ls -lh s:/Code101/PowerPlay/vscode-extension/*.vsix)",
+      "Bash(ls -lh s:/Code101/PowerPlay/vscode-extension/out/*.js)",
+      "Bash(awk '{print $NF, $5}')"
     ],
     "additionalDirectories": [
       "\\dev",

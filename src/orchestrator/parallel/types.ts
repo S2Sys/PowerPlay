@@ -279,3 +279,97 @@ export interface WorkerMetrics {
   utilizationPercentage: number;
   lastUsedAt: number;
 }
+
+// ── v3.9.0 Path 4A Types ────────────────────────────────
+
+export type InvestCriterion = 'independent' | 'negotiable' | 'valuable' | 'estimable' | 'small' | 'testable';
+export type ValidationSeverity = 'critical' | 'warning' | 'info';
+
+export interface RequirementValidationIssue {
+  criterion: string;
+  issue: string;
+  severity: ValidationSeverity;
+  recommendation: string;
+}
+
+export interface RequirementValidationScore {
+  requirementId: string;
+  requirementName: string;
+  overallScore: number; // 0-100
+  investScores: Map<InvestCriterion, number>; // 0-10 each
+  issues: RequirementValidationIssue[];
+  verdict: 'pass' | 'needs-work' | 'fail';
+}
+
+export interface ValidationReport {
+  totalRequirements: number;
+  passedCount: number;
+  needsWorkCount: number;
+  failedCount: number;
+  scores: RequirementValidationScore[];
+  summary: string;
+  timestamp: number;
+}
+
+export type NormalizationViolation = '1NF' | '2NF' | '3NF';
+export type IndexRecommendationType = 'composite' | 'covering' | 'unique' | 'partial';
+export type ConstraintIssueType = 'missing-not-null' | 'missing-fk' | 'missing-unique' | 'naming-convention';
+
+export interface SchemaViolation {
+  table: string;
+  column?: string;
+  violationType: NormalizationViolation | ConstraintIssueType;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+}
+
+export interface IndexRecommendation {
+  table: string;
+  columns: string[];
+  type: IndexRecommendationType;
+  reason: string;
+  estimatedImpact: 'high' | 'medium' | 'low';
+  ddl: string;
+}
+
+export interface SchemaOptimizationReport {
+  inputTables: string[];
+  violations: SchemaViolation[];
+  indexRecommendations: IndexRecommendation[];
+  correctedSchema: string;
+  migrationScript: string;
+  namingIssues: string[];
+  timestamp: number;
+}
+
+export interface HelmDeploymentSpec {
+  imageName: string;
+  replicas: number;
+  ports: Array<{ name: string; containerPort: number; servicePort: number }>;
+  envVars: Array<{ name: string; value: string; secret?: boolean }>;
+  resources: {
+    requests: { cpu: string; memory: string };
+    limits: { cpu: string; memory: string };
+  };
+  ingress?: {
+    enabled: boolean;
+    host: string;
+    path?: string;
+    tlsEnabled?: boolean;
+  };
+  configMap?: Record<string, string>;
+}
+
+export interface HelmChartFile {
+  path: string;
+  content: string;
+}
+
+export interface HelmChartOutput {
+  chartName: string;
+  chartVersion: string;
+  files: HelmChartFile[];
+  installCommand: string;
+  upgradeCommand: string;
+  timestamp: number;
+}

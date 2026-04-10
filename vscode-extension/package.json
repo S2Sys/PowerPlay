@@ -1,0 +1,139 @@
+{
+  "name": "powerplay-ai",
+  "displayName": "PowerPlay AI for Continue.dev",
+  "description": "Snippets, status bar monitoring, and quick commands for PowerPlay orchestration patterns",
+  "version": "2.0.0",
+  "publisher": "SmartWorkz",
+  "author": {
+    "name": "SmartWorkz Dev",
+    "url": "https://github.com/anthropics"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/anthropics/claude-code",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/claude-code"
+  },
+  "bugs": {
+    "url": "https://github.com/anthropics/claude-code/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Snippets",
+    "Productivity"
+  ],
+  "keywords": [
+    "powerplay",
+    "orchestration",
+    "continue.dev",
+    "ai",
+    "snippets",
+    "monitoring"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "powerplay",
+          "title": "PowerPlay",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "powerplay": [
+        {
+          "id": "powerplay.sidebar",
+          "name": "Prompts",
+          "type": "webview"
+        }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "markdown",
+        "path": "./powerplay.code-snippets"
+      },
+      {
+        "language": "plaintext",
+        "path": "./powerplay.code-snippets"
+      },
+      {
+        "language": "typescript",
+        "path": "./powerplay.code-snippets"
+      },
+      {
+        "language": "csharp",
+        "path": "./powerplay.code-snippets"
+      }
+    ],
+    "commands": [
+      {
+        "command": "powerplay.showStatus",
+        "title": "PowerPlay: Show Monitoring Status",
+        "category": "PowerPlay"
+      },
+      {
+        "command": "powerplay.openDashboard",
+        "title": "PowerPlay: Open Dashboard",
+        "category": "PowerPlay"
+      },
+      {
+        "command": "powerplay.pickCommand",
+        "title": "PowerPlay: Quick Pick Command",
+        "category": "PowerPlay"
+      },
+      {
+        "command": "powerplay.reloadConfig",
+        "title": "PowerPlay: Reload Config",
+        "category": "PowerPlay"
+      },
+      {
+        "command": "powerplay.copyCommand",
+        "title": "PowerPlay: Copy Command",
+        "category": "PowerPlay"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "powerplay.pickCommand",
+        "key": "alt+p",
+        "mac": "cmd+shift+p",
+        "when": "editorFocus || !editorFocus"
+      }
+    ],
+    "configuration": {
+      "title": "PowerPlay",
+      "properties": {
+        "powerplay.statusBarEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show PowerPlay status bar item (zap icon)"
+        },
+        "powerplay.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to config.yaml (leave empty to use workspace root)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.21.0",
+    "typescript": "^5.3.0"
+  }
+}
