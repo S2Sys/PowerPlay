@@ -55,7 +55,11 @@
       "Bash(ls -1 config-v*.yaml)",
       "Bash(sed -n '/^prompts:/,/^models:/p' 's:/Code101/PowerPlay/config.yaml')",
       "Bash(echo \"   Prompts: $\\(sed -n '/^prompts:/,/^models:/p' 's:/Code101/PowerPlay/config.yaml')",
-      "Bash(grep -v \"\\\\.md$\")"
+      "Bash(grep -v \"\\\\.md$\")",
+      "Bash(awk '/^rules:/{p=1} /^prompts:/{p=0} p && /^  - name:/{print}' config.yaml)",
+      "Bash(awk '/^prompts:/{p=1} /^[a-z]/{if\\(p && $0 !~ /^prompts:/\\)p=0} p && /^  - name:/{print}' config.yaml)",
+      "Bash(grep -E \"^  - name: \\(product-roadmap|competitive-analysis|stakeholder-management|product-metrics|load-testing-plan|chaos-engineering|api-contract-testing|test-automation-frameworks|mutation-testing|threat-modeling|supply-chain-security|secret-management|dependency-scanning-continuous|cloud-security-posture|design-system-setup|wireframing-guide|interaction-design|prototyping-guide|design-handoff|design-qa\\)$\" config.yaml)",
+      "Bash(grep -E \"^  - name: \\(product-roadmap|design-qa\\)$\" config.yaml)"
     ],
     "additionalDirectories": [
       "\\dev",
