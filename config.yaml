@@ -3256,5 +3256,174 @@ prompts:
       Maturity: [MVP / Growth / Scale / Mature]
       **Top 5 PowerPlay Commands**: /[cmd1], /[cmd2], /[cmd3], /[cmd4], /[cmd5]
 
+  # ── Master Prompt Aliases ───────────────────────────────────
+
+  # Documentation Aliases (/doc)
+  - name: docs
+    description: "Alias for /doc — Add XML documentation comments"
+    invokable: true
+    prompt: |
+      [Alias for /doc — Add XML documentation]
+      Execute /doc on this code.
+
+  - name: document
+    description: "Alias for /doc — Add XML documentation comments"
+    invokable: true
+    prompt: |
+      [Alias for /doc — Add XML documentation]
+      Execute /doc on this code.
+
+  - name: xml
+    description: "Alias for /doc — Add XML documentation comments"
+    invokable: true
+    prompt: |
+      [Alias for /doc — Add XML documentation]
+      Execute /doc on this code.
+
+  # Deep Explanation Aliases (/deep)
+  - name: dive
+    description: "Alias for /deep — Deep code explanation"
+    invokable: true
+    prompt: |
+      [Alias for /deep — Deep code explanation]
+      Execute /deep on this code.
+
+  - name: explain
+    description: "Alias for /deep — Deep code explanation"
+    invokable: true
+    prompt: |
+      [Alias for /deep — Deep code explanation]
+      Execute /deep on this code.
+
+  - name: understand
+    description: "Alias for /deep — Deep code explanation"
+    invokable: true
+    prompt: |
+      [Alias for /deep — Deep code explanation]
+      Execute /deep on this code.
+
+  # Workspace Analysis Aliases (/learn, /discover)
+  - name: analyze
+    description: "Alias for /learn — Analyze project conventions + patterns"
+    invokable: true
+    prompt: |
+      [Alias for /learn — Workspace analysis]
+      Execute /learn on this project.
+
+  - name: context
+    description: "Alias for /learn — Generate workspace context block"
+    invokable: true
+    prompt: |
+      [Alias for /learn — Workspace context]
+      Execute /learn on this project.
+
+  - name: onboard
+    description: "Alias for /learn — Onboarding conventions document"
+    invokable: true
+    prompt: |
+      [Alias for /learn — Onboarding guide]
+      Execute /learn on this project.
+
+  - name: patterns
+    description: "Alias for /discover — Discover project patterns + architecture"
+    invokable: true
+    prompt: |
+      [Alias for /discover — Pattern discovery]
+      Execute /discover on this project.
+
+  - name: audit
+    description: "Alias for /learn — Audit project conventions"
+    invokable: true
+    prompt: |
+      [Alias for /learn — Convention audit]
+      Execute /learn on this project.
+
+  # Requirements Aliases (/requirement)
+  - name: spec
+    description: "Alias for /requirement — Generate technical specification"
+    invokable: true
+    prompt: |
+      [Alias for /requirement — Technical specification]
+      Execute /requirement on this request.
+
+  - name: specs
+    description: "Alias for /requirement — Generate technical specifications"
+    invokable: true
+    prompt: |
+      [Alias for /requirement — Technical specifications]
+      Execute /requirement on this request.
+
+  - name: rfc
+    description: "Alias for /requirement — Request for Comments / Requirements"
+    invokable: true
+    prompt: |
+      [Alias for /requirement — RFC process]
+      Execute /requirement on this request.
+
+  - name: requirements
+    description: "Alias for /requirement — Full requirements chain"
+    invokable: true
+    prompt: |
+      [Alias for /requirement — Requirements engineering]
+      Execute /requirement on this request.
+
+  # Master Prompt Aliases (/master-prompt)
+  - name: project
+    description: "Alias for /master-prompt — Analyze project + tech stack + recommendations"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt — Project analysis]
+      Execute /master-prompt on this project.
+
+  - name: scan
+    description: "Alias for /master-prompt — Scan project + generate master prompt"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt — Project scan]
+      Execute /master-prompt on this project.
+
+  - name: inventory
+    description: "Alias for /master-prompt — Inventory tech stack + standards"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt — Stack inventory]
+      Execute /master-prompt on this project.
+
+  - name: profile
+    description: "Alias for /master-prompt — Generate project profile + roadmap"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt — Project profile]
+      Execute /master-prompt on this project.
+
+  - name: assessment
+    description: "Alias for /master-prompt — Assess project + recommend PowerPlay commands"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt — Project assessment]
+      Execute /master-prompt on this project.
+
+  # Master Prompt Builder Aliases (/master-prompt-builder)
+  - name: builder
+    description: "Alias for /master-prompt-builder — Interactive tech stack builder"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt-builder — Tech stack builder]
+      Execute /master-prompt-builder to generate a master prompt interactively.
+
+  - name: stack
+    description: "Alias for /master-prompt-builder — Build tech stack configuration"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt-builder — Stack builder]
+      Execute /master-prompt-builder to generate a master prompt interactively.
+
+  - name: wizard
+    description: "Alias for /master-prompt-builder — Interactive wizard for master prompts"
+    invokable: true
+    prompt: |
+      [Alias for /master-prompt-builder — Prompt wizard]
+      Execute /master-prompt-builder to generate a master prompt interactively.
+
 experimental:
   readResponseToCursor: false
