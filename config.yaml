@@ -2557,6 +2557,7 @@ prompts:
       Determine scope based on:
       - Code selected is < 100 lines OR user says "quick/just/fast" → use Quick Command
       - Code is > 100 lines OR user says "full/complete/all/suite" → use Full Command
+      - Request spans 2+ concerns and patterns are parallelizable → activate parallel execution (v3.9.0)
       - Request spans 2 concerns → list both, execute primary one
 
       **Tiebreaker — when 2+ categories match equally:**
@@ -2672,6 +2673,35 @@ prompts:
       **For /bi:**
       Route: schema/star/snowflake/fact → schema + CREATE TABLE; metric/KPI/definition → metric catalog; dashboard/chart/layout → wireframe spec; pipeline/dbt/Airflow/ELT → pipeline architecture.
 
+      ## Step 4.5 — PARALLEL PATTERN DETECTION (v3.9.0)
+
+      Check if this request maps to 2+ parallelizable patterns:
+
+      **Parallelizable groups (run 3+ patterns simultaneously for 3-5x speedup):**
+      - **Code Generation**: /api-endpoint + /ng-component + /react-component (no dependencies)
+      - **Architecture & Design**: /architecture-design + /database-design + /design-system-setup (no deps)
+      - **Testing** (after code gen): /add-tests + /visual-regression-testing + /api-contract-testing
+      - **Deployment**: /docker-containerize + /kubernetes-deploy + /iac-generate (parallel-safe)
+      - **Security Hardening**: /threat-modeling + /cloud-security-posture + /dependency-scanning-continuous
+      - **Custom multi-pattern**: if request mentions "generate X + Y + Z simultaneously" or "all at once"
+
+      **If 2+ patterns map to the same parallelizable group:**
+      Execute in parallel via dependency graph + worker pool:
+      1. Build dependency graph from selected patterns
+      2. Partition into executable groups based on dependencies
+      3. Execute groups in parallel (each group runs concurrently)
+      4. Merge outputs with conflict resolution
+      5. Report: speedup factor (sequential vs parallel time), worker utilization, cache hits
+      Format result as: **Parallel Execution Report** | Total Duration | Speedup | Worker Utilization | Patterns Completed
+
+      **Example requests triggering parallel execution:**
+      - "Generate API endpoint + Angular component + database schema"
+      - "Create Docker container + Kubernetes manifests + Terraform infrastructure"
+      - "Design architecture + schema + design system all at once"
+
+      **If only 1 pattern matches:**
+      Execute single pattern via Step 4 (normal routing). Do NOT force parallel.
+
       **For /design-patterns-guide, /builder-pattern, /composite-pattern, /decorator-pattern, /proxy-pattern, /state-pattern:**
       Present the selected design pattern with: Problem it solves | When to use | When NOT to use | Structure/example | Real-world use cases | Gotchas and trade-offs. Include code snippets where applicable.
 
@@ -2732,13 +2762,15 @@ prompts:
       Respond: "I specialise in software engineering tasks — code review, security, testing, refactoring, requirements, database, cloud, and architecture. Could you rephrase your request in one of those areas?"
       Do NOT attempt to answer unrelated requests (recipes, creative writing, trivia, etc.).
 
-      ## Step 5 — SUGGEST NEXT
+      ## Step 6 — SUGGEST NEXT
 
       After completing, if a natural follow-up exists:
       "**Next**: run `/[command]` to `[what it adds]`. Type it with your selected code to continue."
       Only suggest if it genuinely adds value.
 
-      ## Step 6 — DISCOVERY
+      **For parallel execution completions**: suggest related optimization commands (caching, monitoring, performance tuning).
+
+      ## Step 7 — DISCOVERY
 
       After Step 5, show up to 3 related commands the user hasn't used this session. Only show if the matched domain has 3+ other commands.
 
