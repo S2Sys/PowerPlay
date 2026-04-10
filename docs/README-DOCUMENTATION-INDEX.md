@@ -1,27 +1,29 @@
-# PowerPlay v3.7.0 Documentation Index
+# PowerPlay v3.8.0 Documentation Index
 
-**Version**: v3.7.0 | **Status**: ✅ PRODUCTION READY | **Last Updated**: 2026-04-10
+**Version**: v3.8.0 Phase 1 | **Status**: ✅ PRODUCTION READY | **Last Updated**: 2026-04-10
 
 ---
 
 ## 📚 Complete Documentation Map
 
 ```
-PowerPlay v3.7.0
+PowerPlay v3.8.0
 ├── Release & Overview
-│   ├── v37-RELEASE-SUMMARY.md ..................... Release notes, features, impact
+│   ├── v37-RELEASE-SUMMARY.md ..................... v3.7.0 Release notes, features, impact
+│   ├── v38-PHASE1-RELEASE-NOTES.md .............. v3.8.0 Phase 1: 20 role-focused rules
 │   └── v37-DESIGN-MESSAGING-ORCHESTRATOR-INDEX.md . Master guide with navigation
 │
 ├── Coverage Analysis
 │   ├── COVERAGE-BY-ROLE-TECH-SDLC-ORCHESTRATOR.md . Comprehensive audit (4 dimensions)
-│   └── COVERAGE-QUICK-REFERENCE.md ............... One-page quick lookup
+│   ├── COVERAGE-QUICK-REFERENCE.md ............... One-page quick lookup
+│   └── GAP-IMPROVEMENT-PLAN-v38.md .............. v3.8.0 improvement roadmap
 │
 ├── Workflow & Process
 │   ├── ORCHESTRATOR-WORKFLOW-WITH-UXUI.md ....... Complete 6-phase workflow
 │   ├── WORKFLOW-COMPARISON-WITH-WITHOUT-UXUI.md . Before/after comparison
 │   └── CRITICAL-FIX-UI-UX-INTEGRATION.md ........ Why UI/UX matters
 │
-├── Pattern Rules (15 New)
+├── Pattern Rules (35 New)
 │   ├── Design Patterns (10)
 │   │   ├── design-patterns-guide ................. 22 GoF patterns reference
 │   │   ├── builder-pattern ...................... Fluent object construction
@@ -38,23 +40,57 @@ PowerPlay v3.7.0
 │   │   ├── request-reply-messaging ............ Sync over async, correlation IDs
 │   │   └── eventual-consistency ................ Stale data, async propagation
 │   │
-│   └── Support Patterns (3)
-│       ├── idempotency ........................... Safe retries, deduplication
-│       ├── dead-letter-queue .................... Failed message handling, replay
-│       └── choreography-vs-orchestration ....... Decision framework, trade-offs
+│   ├── Support Patterns (3)
+│   │   ├── idempotency ........................... Safe retries, deduplication
+│   │   ├── dead-letter-queue .................... Failed message handling, replay
+│   │   └── choreography-vs-orchestration ....... Decision framework, trade-offs
+│   │
+│   ├── Product Manager Rules (4) — NEW in v3.8.0
+│   │   ├── product-roadmap ...................... Vision, themes, features, success metrics
+│   │   ├── competitive-analysis ................ Market positioning, feature gaps
+│   │   ├── stakeholder-management .............. Identify, assess, prioritize, engagement
+│   │   └── product-metrics ...................... KPIs, usage, engagement, retention, revenue
+│   │
+│   ├── QA/Test Rules (5) — NEW in v3.8.0
+│   │   ├── load-testing-plan .................... Capacity planning, scalability testing
+│   │   ├── chaos-engineering .................... Resilience testing, fault injection
+│   │   ├── api-contract-testing ................ Schema validation, backward compatibility
+│   │   ├── test-automation-frameworks .......... Test pyramid, Page Object Model, CI/CD
+│   │   └── mutation-testing ..................... Test quality validation, mutation scoring
+│   │
+│   ├── Security Rules (5) — NEW in v3.8.0
+│   │   ├── threat-modeling ...................... STRIDE framework, attack surfaces, mitigations
+│   │   ├── supply-chain-security ............... Dependencies, SBOM, vulnerability scanning
+│   │   ├── secret-management .................... Storage, rotation, access control, detection
+│   │   ├── dependency-scanning-continuous ...... Automated scanning, remediation, compliance
+│   │   └── cloud-security-posture .............. IAM, encryption, monitoring, compliance
+│   │
+│   └── Designer Rules (6) — NEW ROLE in v3.8.0
+│       ├── design-system-setup ................. Component library, tokens, documentation
+│       ├── wireframing-guide ................... Low-fi to high-fi progression
+│       ├── interaction-design .................. Micro-interactions, animations, feedback
+│       ├── prototyping-guide ................... High-fi prototypes, user testing
+│       ├── design-handoff ...................... Specs, assets, tokens, accessibility
+│       └── design-qa ........................... Cross-browser, responsive, a11y, consistency
 │
 └── Configuration
-    └── config.yaml ............................ 55 prompts, 15 new pattern rules
+    └── config.yaml ............................ 75 prompts, 35 new pattern rules
 ```
 
 ---
 
 ## 🎯 Quick Navigation by Use Case
 
+### "I want to understand what changed in v3.8.0 Phase 1"
+→ Start with **v38-PHASE1-RELEASE-NOTES.md** (10 min read)
+- What's new (20 role-focused rules)
+- Coverage improvement (94% → 95.5%)
+- New Designer role (0% → 85%)
+
 ### "I want to understand what changed in v3.7.0"
 → Start with **v37-RELEASE-SUMMARY.md** (10 min read)
 - What's new (15 patterns)
-- Coverage improvement (45% → 95%)
+- Coverage improvement (79% → 94%)
 - User impact (daily work mapping)
 
 ### "I want to see how everything works end-to-end"
@@ -308,6 +344,6 @@ PowerPlay v3.7.0 documentation includes:
 ---
 
 **Last Updated**: 2026-04-10
-**Version**: v3.7.0
+**Version**: v3.8.0 Phase 1
 **Status**: ✅ PRODUCTION READY
-**Coverage**: 94% (all roles, tech stacks, SDLC phases)
+**Coverage**: 95.5% (roles 95% ↑, tech 93%, SDLC 93%, orchestrator 100%)
