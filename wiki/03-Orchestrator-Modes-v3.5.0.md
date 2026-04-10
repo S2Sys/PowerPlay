@@ -1,6 +1,8 @@
-# PowerPlay v3.2.0 — Orchestrator Modes Guide
+# PowerPlay v3.5.0 — Orchestrator Modes Guide
 
-**Complete reference for all available modes, commands, and routing logic.**
+**Complete reference for all available modes, commands, master prompts, and routing logic.**
+
+> **v3.5.0 Update**: Added 6 master prompts + 23 aliases for project analysis, workspace conventions, and tech stack discovery.
 
 ---
 
@@ -11,8 +13,20 @@
 | Mode | Speed | Use Case |
 |------|-------|----------|
 | **`/pp`** | 5-10 min | Describe task in natural language → auto-routes to best command |
+| **`/play`** | 5-10 min | Alias for `/pp` (command consolidation v3.5.0+) |
 | **`/quick`** | 1-2 min | Fast fixes, reviews, tests — immediate execution |
 | **`/pp-requirements`** | 15-30 min | Full 4-phase requirements chain (Specs → Criteria → Risk → Review) |
+
+### 📊 Master Prompts (NEW in v3.5.0)
+
+| Command | Aliases | Purpose | Use Case |
+|---------|---------|---------|----------|
+| **`/master-prompt`** | `/project`, `/scan`, `/inventory`, `/profile`, `/assessment` | Comprehensive project analysis + tech stack inventory + PowerPlay fit | Analyze entire project, detect patterns, get top 10 commands |
+| **`/master-prompt-builder`** | `/builder`, `/stack`, `/wizard` | Interactive HTML tech stack builder | Build project master prompt interactively |
+| **`/learn`** | `/analyze`, `/context`, `/onboard`, `/audit`, `/discover`, `/patterns` | Workspace conventions + SmartWorkz patterns + top 5 PowerPlay fit | Onboard new developers, audit conventions, detect patterns |
+| **`/requirement`** | `/spec`, `/specs`, `/rfc`, `/requirements` | Full 4-phase requirements chain with HANDOFF BLOCKs | Requirements engineering with context carry-over |
+| **`/deep`** | `/dive`, `/explain`, `/understand` | Deep code explanation (Problem/Logic/Design/Failures/Edges) | Understand code internals deeply |
+| **`/doc`** | `/docs`, `/document`, `/xml` | Add XML documentation comments | Document code with <summary>/<param>/<returns> |
 
 ### 🔐 Security
 
@@ -371,6 +385,168 @@ Each requirements phase outputs a **HANDOFF BLOCK** — ~100 tokens of structure
   ↓ Step-by-step refactoring plan delivered
 ```
 
+### Workflow 5: Project Analysis → Onboarding (NEW in v3.5.0)
+```
+/master-prompt [on project root]
+  ↓ Comprehensive project analysis
+  ↓ Tech stack inventory + code standards audit
+  ↓ Top 10 PowerPlay commands ranked by impact
+  ↓ Improvement roadmap (30/90/180 days)
+
+/learn [same project]
+  ↓ Workspace conventions + SmartWorkz pattern detection
+  ↓ Top 5 PowerPlay commands for this project
+  ↓ WORKSPACE CONTEXT block (emitted for /pp calls to reference)
+```
+
+### Workflow 6: Tech Stack Builder (NEW in v3.5.0)
+```
+/builder [or /wizard or /stack]
+  ↓ Interactive HTML form opens
+  ↓ Select: Project basics, tech stack, code standards, patterns, compliance
+  ↓ Auto-generate master prompt markdown
+  ↓ Copy to clipboard / Download / Use as context
+```
+
+---
+
+## Master Prompts (v3.5.0+)
+
+Master prompts are comprehensive project analysis tools. Each has multiple aliases for easy discovery.
+
+### `/master-prompt` — Full Project Analysis
+
+**Aliases**: `/project`, `/scan`, `/inventory`, `/profile`, `/assessment`
+
+**Input**: Project root or codebase selection
+
+**Output**:
+1. **Project Analysis** — Name, type, industry, scale, criticality, team
+2. **Tech Stack Inventory** — Backend (runtime, framework, ORM, database), Frontend, Infrastructure, Data
+3. **Code Standards Detection** — async/CancellationToken, ILogger<T>, FluentValidation, DevExtreme, WCAG, test coverage
+4. **Architecture Patterns** — Layering, messaging, scaling, data flow, deployment
+5. **Compliance & Security Posture** — SOC 2, HIPAA, PCI-DSS, GDPR requirements
+6. **PowerPlay Fit Analysis** — Top 10 commands ranked by daily/weekly/rarely usage
+7. **Improvement Roadmap** — 30/90/180-day priorities
+8. **Master Rules** — Project-specific rules and constraints
+
+**Use When**: Starting new project work, onboarding, assessing code quality, planning improvements
+
+---
+
+### `/master-prompt-builder` — Interactive Tech Stack Builder
+
+**Aliases**: `/builder`, `/stack`, `/wizard`
+
+**Input**: None (generates interactive HTML form)
+
+**Output**: Interactive form with sections:
+- Project Basics (name, description, industry)
+- Tech Stack (backend, frontend, infrastructure, data)
+- Code Standards (FluentValidation, ILogger<T>, async/CancellationToken, C# 12, etc.)
+- Architecture Patterns (Repository, Service Layer, CQRS, Event-Driven, etc.)
+- Compliance & Security (SOC 2, HIPAA, PCI-DSS, GDPR)
+
+**Features**:
+- Dynamic master prompt generation as you select options
+- Copy to clipboard
+- Export to markdown
+- Download as `.md` file
+- Self-contained HTML (no external dependencies)
+
+**Use When**: Building project master prompt interactively, exploring tech stack options
+
+---
+
+### `/learn` — Workspace Analysis & Conventions
+
+**Aliases**: `/analyze`, `/context`, `/onboard`, `/audit`, `/discover`, `/patterns`
+
+**Input**: Project root or codebase selection
+
+**Output**:
+1. **Standard Conventions** — Naming, folder structure, patterns, error handling, testing, architecture
+2. **SmartWorkz Pattern Detection** — DevExtreme, Dapper vs EF Core, Angular inject(), ILogger<T>, sw-BEM CSS, async/CancellationToken, FluentValidation, C# 12 primary constructors
+3. **PowerPlay Fit Analysis** — Top 5 most relevant PowerPlay commands for THIS project
+4. **WORKSPACE CONTEXT Block** — Structured summary (Stack, ORM, CSS Convention, Injection, Logging, Tests, CancellationToken, DevExtreme, C# Version, Top 5 Commands)
+
+**Features**:
+- Emits WORKSPACE CONTEXT block at end (future `/pp` calls can reference this)
+- Saves to `docs/WORKSPACE_CONVENTIONS.md` (appends new sections if file exists)
+- Update-friendly (prepends new date-stamped sections)
+
+**Use When**: Onboarding new developers, auditing conventions, setting up workspace context
+
+---
+
+### `/requirement` — Full Requirements Chain (Alias for `/pp-requirements`)
+
+**Aliases**: `/spec`, `/specs`, `/rfc`, `/requirements`
+
+**Input**: Business requirement (plain language)
+
+**Output**: Complete 4-phase requirements package:
+
+1. **Phase 1: Specs** — REQ-F/REQ-NF + API contracts + database entities + design implications + open questions + HANDOFF BLOCK
+2. **Phase 2: Criteria** — Gherkin Given/When/Then + test cases + HANDOFF BLOCK
+3. **Phase 3: Risk** — Risk register + feasibility + Go/No-Go decision + HANDOFF BLOCK
+4. **Phase 4: Review** — Quality audit across 5 dimensions (completeness, clarity, testability, consistency, traceability) + FINAL VERDICT
+
+**Features**:
+- Auto-cascade: Each phase automatically suggests next phase
+- HANDOFF BLOCKs carry context forward
+- Copyable blocks for manual progression
+
+**Use When**: Converting business requirements to technical specs, creating acceptance criteria, assessing risk
+
+---
+
+### `/deep` — Deep Code Explanation
+
+**Aliases**: `/dive`, `/explain`, `/understand`
+
+**Input**: Code selection
+
+**Output**: Structured explanation:
+1. **Problem** — What is this code solving?
+2. **Logic** — How does it work? (step-by-step)
+3. **Design Decisions** — Why this approach? (alternatives + tradeoffs)
+4. **Failure Modes** — What can go wrong?
+5. **Edge Cases** — When does it break?
+
+**Use When**: Understanding complex code, preparing code review comments, documenting design decisions
+
+---
+
+### `/doc` — Add XML Documentation
+
+**Aliases**: `/docs`, `/document`, `/xml`
+
+**Input**: Code selection
+
+**Output**: Code with XML documentation:
+- `<summary>` — one-line description
+- `<param>` — parameter descriptions
+- `<returns>` — return value description
+- `<exception>` — thrown exceptions
+- `<remarks>` — additional notes
+- `<example>` — usage examples (for utilities)
+
+**Use When**: Adding documentation to public APIs, preparing for code review, improving code discoverability
+
+---
+
+## Alias Quick Reference
+
+**Documentation**: `/doc` → `/docs`, `/document`, `/xml` (4 total)
+**Deep Explanation**: `/deep` → `/dive`, `/explain`, `/understand` (4 total)
+**Workspace Analysis**: `/learn` → `/analyze`, `/context`, `/onboard`, `/audit`, `/discover`, `/patterns` (7 total)
+**Requirements**: `/requirement` → `/spec`, `/specs`, `/rfc`, `/requirements` (5 total)
+**Project Analysis**: `/master-prompt` → `/project`, `/scan`, `/inventory`, `/profile`, `/assessment` (6 total)
+**Tech Stack Builder**: `/master-prompt-builder` → `/builder`, `/stack`, `/wizard` (4 total)
+
+**Total**: 6 core master prompts + 23 aliases = **29 entry points**
+
 ---
 
 ## Fallback & Error Handling
@@ -435,6 +611,9 @@ Explicitly say "quick" or "full":
 
 | Version | Changes |
 |---------|---------|
+| **v3.5.0** | Command consolidation (92 → 40 via internal routing) + 6 master prompts + 23 aliases for project analysis, workspace conventions, tech stack discovery |
+| **v3.4.0** | Machine Learning (ML) + Business Intelligence (BI) domains (5 ML + 5 BI + 2 orchestrators) |
+| **v3.3.0** | Domain shortcuts `/api /arch /deploy /data /frontend` for discoverability |
 | **v3.2.0** | Tiebreaker rule, orphaned commands routing, fallback clause, auto-cascade NEXT PHASE |
 | **v3.1.0** | Shared memory orchestrator for requirements phases, mega-agent `/pp-requirements` |
 | **v3.0.0** | Requirements phase agents (specs → criteria → risk → review) |
@@ -443,4 +622,4 @@ Explicitly say "quick" or "full":
 
 ---
 
-**Last Updated**: 2026-04-09 | **PowerPlay v3.2.0**
+**Last Updated**: 2026-04-10 | **PowerPlay v3.5.0**
