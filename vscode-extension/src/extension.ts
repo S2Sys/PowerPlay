@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { parsePrompts, getConfigPath, PowerPlayPrompt } from './configParser';
 import { PowerPlaySidebarProvider } from './sidebarProvider';
 import { showCommandPicker, insertOrCopyCommand } from './commandPicker';
+import { PowerPlaySettingsPanel } from './settingsPanel';
 
 let statusBarItem: vscode.StatusBarItem;
 let sidebarProvider: PowerPlaySidebarProvider;
@@ -67,6 +68,10 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  const settingsCmd = vscode.commands.registerCommand('powerplay.openSettings', () => {
+    PowerPlaySettingsPanel.createOrShow(context.extensionUri);
+  });
+
   // Watch for config changes
   const configWatcher = vscode.workspace.createFileSystemWatcher('**/config.yaml');
   configWatcher.onDidCreate(() => updateStatusBar());
@@ -81,6 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
     pickCommandCmd,
     reloadConfigCmd,
     copyCommandCmd,
+    settingsCmd,
     configWatcher,
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('powerplay')) {

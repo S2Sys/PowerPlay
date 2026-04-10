@@ -98,6 +98,12 @@
         "command": "powerplay.copyCommand",
         "title": "PowerPlay: Copy Command",
         "category": "PowerPlay"
+      },
+      {
+        "command": "powerplay.openSettings",
+        "title": "PowerPlay: Open Settings",
+        "category": "PowerPlay",
+        "icon": "$(settings-gear)"
       }
     ],
     "keybindings": [
