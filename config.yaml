@@ -224,6 +224,137 @@ rules:
       - Queryset: use select_related() and prefetch_related() to avoid N+1
       - Settings: use environment variables, separate settings by environment (dev/prod)
 
+  # ── Phase 2 Rules: High Priority ────────────────────────────
+
+  - name: vue3-rules
+    globs: ["**/*.vue"]
+    alwaysApply: false
+    rule: |
+      Vue 3 standards:
+      - Use Composition API (not Options API) for new components
+      - <script setup> syntax preferred: no manual expose, auto-import, cleaner syntax
+      - Type props and emits explicitly: defineProps<T>(), defineEmits<T>()
+      - Reactive state: ref() for single values, reactive() for objects
+      - Computed properties: computed(() => ...) instead of getters
+      - Custom composables for logic extraction (useAsync, useForm, useCounter)
+      - Lifecycle hooks: onMounted, onUnmounted (Composition API preferred)
+      - Template: v-bind shorthand :, v-on shorthand @, event handling
+      - Watchers: watch(() => ...) with proper dependencies and cleanup
+      - State management: Pinia (not Vuex) for global state, composables for local
+
+  - name: prisma-rules
+    globs: ["**/*.ts", "**/*.js"]
+    alwaysApply: false
+    rule: |
+      Prisma standards (Node.js ORM):
+      - Schema: define models in schema.prisma, use explicit @relation() for relationships
+      - Types: leverage generated types (PrismaClient<T>), never use any for models
+      - Queries: use include/select for eager loading, avoid N+1 by default
+      - Migrations: always use prisma migrate (not manual schema changes)
+      - Transactions: use $transaction() for multi-step operations
+      - Unique constraints: @unique, @@unique for business logic constraints
+      - Soft deletes: use @updatedAt for timestamp, add custom isDeleted field if needed
+      - Indexes: add @@index where queries frequently filter (performance critical)
+      - Error handling: wrap operations in try/catch, handle Prisma-specific errors
+      - Testing: use separate test database (DATABASE_URL_TEST), reset before each test
+
+  - name: spring-boot-rules
+    globs: ["**/*.java"]
+    alwaysApply: false
+    rule: |
+      Java / Spring Boot standards:
+      - Annotations: @RestController, @Service, @Repository for layering
+      - Dependency Injection: constructor injection (final fields), never @Autowired
+      - Validation: @Valid on method params, use validator annotations (@NotNull, @Email, etc.)
+      - Exception Handling: @ControllerAdvice with @ExceptionHandler for centralized error responses
+      - JPA/Hibernate: @Entity models with proper relationships, use DTOs for responses
+      - Async patterns: CompletableFuture, @Async on service methods, reactor for reactive
+      - Configuration: @Configuration with @Bean factory methods, not XML
+      - Testing: JUnit 5, Mockito for mocks, @SpringBootTest for integration tests
+      - Logging: use SLF4J (not System.out), structured with context (MDC for correlation IDs)
+      - Properties: use application.yml (not properties), externalize config per environment
+
+  - name: graphql-rules
+    globs: ["**/*.ts", "**/*.js", "**/*.py"]
+    alwaysApply: false
+    rule: |
+      GraphQL standards:
+      - Schema design: clear naming (not REST-like), types with descriptions, scalar types
+      - Queries: flat structure, minimize field selection (prevent over-fetching)
+      - Mutations: group by domain (createUser, updateUser, deleteUser), batch operations
+      - Subscriptions: for real-time (chat, notifications), use connection-based subscriptions
+      - Resolvers: single responsibility, fetch only requested fields (N+1 prevention)
+      - Input validation: validate inputs in resolver, use custom scalars for strict types
+      - Error handling: return GraphQL errors with proper codes, client can handle gracefully
+      - Pagination: cursor-based (not offset), include hasNextPage, endCursor
+      - Authorization: implement at field level (@auth directive or resolver check)
+      - Federation: use Apollo Federation for microservices (if applicable)
+
+  # ── Phase 3 Rules: Medium Priority ──────────────────────────
+
+  - name: ngrx-rules
+    globs: ["**/*.ts"]
+    alwaysApply: false
+    rule: |
+      NgRx standards (Angular state management):
+      - Actions: define as classes (not interfaces), one action per file, clear naming
+      - Reducers: pure functions, handle all action types, immutable updates
+      - Selectors: memoized with createSelector(), reuse selectors, avoid redundant subscriptions
+      - Effects: handle side effects (HTTP, navigation, timers), dispatch actions on success/error
+      - DevTools: integrate Redux DevTools for time-travel debugging in development
+      - Entity adapter: use createEntityAdapter for collections (CRUD operations)
+      - Feature state: organize by feature module, use StoreModule.forFeature()
+      - Async actions: use ofType(Action.request), switchMap/concatMap/mergeMap for HTTP
+      - Testing: test reducers, selectors, effects in isolation with marble testing
+
+  - name: blazor-rules
+    globs: ["**/*.razor", "**/*.cs"]
+    alwaysApply: false
+    rule: |
+      Blazor standards (ASP.NET Web UI):
+      - Component lifecycle: OnInitializedAsync for data load, OnParametersSetAsync for param changes
+      - Data binding: @bind for two-way, @onchange for events, @bind:get/@bind:set for control
+      - Event handling: @onclick, @onchange with EventCallback (not Task.Run)
+      - Forms: EditForm with DataAnnotationsValidator, cascading parameters for nested forms
+      - HTTP: HttpClient injected, use async patterns (not blocking)
+      - Routing: NavLink for navigation, @page directive for routes, layout inheritance
+      - JS Interop: IJSRuntime for browser APIs (last resort, prefer C# when possible)
+      - Child components: use @ChildContent for slots, RenderFragments for flexibility
+      - State management: cascading parameters for parent→child, events for child→parent
+      - Testing: Blazor test component, render, act, assert pattern
+
+  - name: gcp-rules
+    globs: ["**/*.ts", "**/*.py", "**/*.java"]
+    alwaysApply: false
+    rule: |
+      Google Cloud Platform standards:
+      - Cloud Functions: event-driven (Pub/Sub, HTTP, Firestore triggers), stateless
+      - Firestore: schema design with collections/documents, real-time listeners, indexes for queries
+      - BigQuery: append-only analytics, partition by date, cluster for performance
+      - Pub/Sub: async messaging, topics/subscriptions, at-least-once delivery
+      - Cloud Storage: object versioning, lifecycle policies for cost, signed URLs for security
+      - Cloud Run: containerized services, auto-scaling, 15-minute timeout limits
+      - Identity: use service accounts, not application credentials on disk
+      - Logging: use Cloud Logging client library, structured JSON logs
+      - Monitoring: set up Cloud Monitoring alerts, use custom metrics
+      - Cost: use GCP cost calculator, set budgets and alerts, monitor commitment usage
+
+  - name: postgres-rules
+    globs: ["**/*.sql"]
+    alwaysApply: false
+    rule: |
+      PostgreSQL standards:
+      - Types: JSONB for semi-structured (not strings), UUID for IDs, ENUM for fixed choices
+      - Window functions: ROW_NUMBER(), RANK(), aggregate window functions for analytics
+      - Partitioning: by range (date) or list for large tables, enable constraint exclusion
+      - Indexes: B-tree for equality, GIN for JSONB, BRIN for large sequential tables
+      - Full-text search: use tsvector and tsquery, FTS operators for text search
+      - Array operations: @> (contains), && (overlap), any() with operators
+      - Transactions: explicit BEGIN/COMMIT, ISOLATION LEVEL for concurrency control
+      - Constraints: CHECK, UNIQUE, FOREIGN KEY with ON DELETE CASCADE/SET NULL
+      - Views: materialized views for heavy aggregations, refresh on schedule
+      - Extensions: uuid-ossp for UUIDs, pgcrypto for hashing, PostGIS for spatial data
+
   - name: sql-rules
     globs: ["**/*.sql"]
     alwaysApply: false
