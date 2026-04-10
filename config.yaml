@@ -355,6 +355,643 @@ rules:
       - Views: materialized views for heavy aggregations, refresh on schedule
       - Extensions: uuid-ossp for UUIDs, pgcrypto for hashing, PostGIS for spatial data
 
+  # ── SDLC & Agile Methodology Rules (v3.5.0+) ─────────────────
+
+  # ── Phase 1: CRITICAL (User Stories, Estimation, Sprint Planning, TDD, Deployment, Backlog)
+
+  - name: user-story-rules
+    alwaysApply: true
+    rule: |
+      User Story standards:
+      Format: As a [role], I want [feature], so that [benefit]
+
+      Acceptance Criteria (Gherkin Given/When/Then):
+      - Given [initial context]
+      - When [user action]
+      - Then [expected outcome]
+
+      Definition of Done (DoD) checklist (ALL must pass):
+      - [ ] Code written and peer-reviewed
+      - [ ] Unit tests written (80%+ coverage for feature code)
+      - [ ] Acceptance criteria met
+      - [ ] No TODO comments left
+      - [ ] Documentation/comments added
+      - [ ] Builds and passes all tests locally
+      - [ ] Security review passed (input validation, secrets not hardcoded)
+      - [ ] Performance verified (no N+1 queries, memory leaks checked)
+
+      Estimation: Use Fibonacci (1, 2, 3, 5, 8, 13, 21...)
+      - 1-3 points: Can complete in < 1 day
+      - 5-8 points: Full sprint work
+      - 13+ points: Too large, break down further
+
+      Dependencies: Always list blocking stories or external dependencies
+      Acceptance: No story is "done" until Definition of Done is 100% met
+
+  - name: estimation-velocity-rules
+    alwaysApply: true
+    rule: |
+      Estimation & Velocity standards:
+
+      Estimation Process (Planning Poker):
+      1. Product Owner reads story
+      2. Team discusses unknowns (5-10 min)
+      3. Each person estimates privately (Fibonacci cards)
+      4. Reveal estimates simultaneously
+      5. If consensus (within 1 point): agree on number
+      6. If divergence: high and low estimate explain, re-vote
+      7. Repeat until consensus or Product Owner decides
+
+      Velocity Calculation:
+      - Sum completed story points per sprint (ONLY done = 100% DoD)
+      - Track last 3-4 sprints to identify trend
+      - Velocity used for sprint planning capacity (conservative: use last sprint or -10%)
+
+      Sprint Capacity Planning:
+      - Available velocity = last sprint velocity (or conservative estimate)
+      - Reserve 10% for interruptions (bugs, support)
+      - Planned velocity = 90% of available
+      - Never commit > planned velocity
+
+      Trends:
+      - Increasing velocity: team getting faster (improving or taking on more)
+      - Decreasing velocity: impediments, increased interruptions, scope creep
+      - Stable velocity: sustainable pace, predictable delivery
+
+      Avoid: Inflating estimates to impress stakeholders, or deflating to appear faster
+
+  - name: sprint-planning-rules
+    alwaysApply: true
+    rule: |
+      Sprint Planning standards:
+
+      Sprint Goal (SMART):
+      - Specific: What exactly will the team deliver?
+      - Measurable: How will we know it's done? (Definition of Done + acceptance criteria)
+      - Achievable: Can this be completed in 1 sprint with current capacity?
+      - Relevant: Does this align with product roadmap and business value?
+      - Time-bound: By end of sprint (2 weeks)
+
+      Example: "Enable users to upload profiles with image validation and caching" (not just "upload feature")
+
+      Sprint Setup (2 hours typical):
+      1. Review product backlog (prioritized)
+      2. Discuss top stories until questions answered
+      3. Estimate stories (if not pre-estimated)
+      4. Team commits to sprint goal + stories
+      5. Break down stories into tasks (if desired by team)
+      6. Identify blockers and dependencies
+      7. Set daily standup time
+
+      Capacity Check:
+      - Available hours: (team size × hours/day × sprint days) - meetings
+      - Reserved: 10% for interruptions, code review
+      - Actual plannable capacity: 90% of available
+      - Sum story points should NOT exceed team's velocity
+
+      Commitment vs Forecast:
+      - Committed: stories team 100% confident they'll finish
+      - Forecasted: stories they "hope to finish if no blockers"
+      - Sprint goal: what MUST be done (no "maybe" features)
+
+      Anti-patterns:
+      - Overcommitting (velocity > last sprint)
+      - Adding stories mid-sprint without removing others
+      - Setting impossible sprint goals
+      - Underestimating consistently (no learning from past velocity)
+
+  - name: tdd-test-driven-development-rules
+    alwaysApply: true
+    rule: |
+      Test-Driven Development (TDD) standards:
+
+      Red-Green-Refactor Cycle (for EACH feature):
+
+      1. RED: Write failing test
+         - Test describes the desired behavior
+         - Test fails because feature doesn't exist yet
+         - Test is specific and executable
+         - Example: test_user_can_login_with_valid_credentials()
+
+      2. GREEN: Write minimal code to pass test
+         - Write ONLY code to make the test pass
+         - Do not add extra features
+         - Do not optimize prematurely
+         - Ugly/hacky code is OK at this stage
+
+      3. REFACTOR: Clean up and optimize
+         - Refactor code to be readable and maintainable
+         - All tests still pass
+         - Remove duplication (DRY principle)
+         - No new functionality in this step
+
+      Repeat: For each new requirement, start at RED again
+
+      Test-First Benefits:
+      - Design (tests force you to think about API design)
+      - Documentation (tests show how to use the code)
+      - Confidence (if tests pass, code works)
+      - Refactoring safety (change code, tests verify it still works)
+      - Fewer bugs (bugs caught during development, not production)
+
+      Test Coverage Targets:
+      - Unit tests: 80%+ of business logic
+      - Integration tests: critical paths (auth, payment, data)
+      - E2E tests: main user workflows
+      - Avoid 100% coverage (diminishing returns on low-value tests)
+
+      Anti-patterns:
+      - Writing tests after code (defeats design benefits)
+      - Testing implementation details (fragile tests)
+      - Flaky tests (non-deterministic results)
+      - Slow tests (90+ min test suite defeats purpose)
+
+  - name: deployment-strategy-rules
+    alwaysApply: true
+    rule: |
+      Deployment Strategy standards:
+
+      Blue-Green Deployment (zero-downtime, easy rollback):
+      - BLUE: Current production environment (live traffic)
+      - GREEN: New version deployed (no traffic yet)
+      - Test GREEN thoroughly before switching
+      - Switch traffic from BLUE → GREEN (instant)
+      - Rollback: Switch back to BLUE (instant)
+      - Keep BLUE running for quick rollback
+      - Cost: 2× infrastructure during deployment
+
+      Canary Deployment (gradual rollout, monitor at each step):
+      - Deploy to 5% of servers/traffic
+      - Monitor metrics (errors, latency, CPU, custom metrics)
+      - If healthy, increase to 25%, then 50%, then 100%
+      - If problems detected, rollback to 0%
+      - Duration: hours/days depending on traffic volume
+      - Cost: Minimal (use existing infra)
+      - Risk: Medium (some users affected if issue found)
+
+      Rolling Deployment (gradual, no rollback):
+      - Replace 1-2 servers at a time
+      - Deploy code, start new version, health check passes
+      - Move traffic to new version
+      - Repeat until all servers updated
+      - Rollback: slow (opposite direction)
+      - Cost: Minimal
+      - Risk: Medium (no instant rollback if issues found)
+
+      Feature Flags (decouple deploy from release):
+      - Deploy code with feature behind flag
+      - Feature flag OFF in production (code not executed)
+      - Gradually enable flag: 5% → 25% → 50% → 100%
+      - A/B test: send 50% users to new feature, 50% to old
+      - Permanent flags for kill switches (circuit breaker pattern)
+
+      Deployment Checklist:
+      - [ ] All tests pass (unit + integration + e2e)
+      - [ ] Code reviewed and approved
+      - [ ] Database migrations backwards-compatible (if needed)
+      - [ ] Secrets/configs not hardcoded
+      - [ ] Monitoring/alerting configured for new version
+      - [ ] Runbook/rollback procedure documented
+      - [ ] Stakeholders notified of deployment window
+      - [ ] Health checks configured
+
+      Rollback Decision:
+      - IF error rate > SLO threshold → Rollback immediately
+      - IF latency > baseline + 20% → Investigate, rollback if root cause unknown
+      - IF infrastructure issue (not code) → Scale up/fix infra, don't rollback
+
+      SLO Targets (Service Level Objectives):
+      - 99.9% uptime (8 seconds/day downtime allowed)
+      - < 100ms p95 latency
+      - < 0.1% error rate
+      - Adjust per service criticality
+
+  - name: backlog-management-rules
+    alwaysApply: true
+    rule: |
+      Backlog Management standards:
+
+      Prioritization (MoSCoW method):
+      - MUST have: Critical for MVP, core features, blockers for other work
+      - SHOULD have: High value, improves UX, addresses tech debt
+      - COULD have: Nice-to-have, low priority, easy wins
+      - WON'T have: Out of scope, defer to future release
+
+      Value-Based Prioritization:
+      - Rank by: (Business Value) × (Probability of Success) / (Effort)
+      - High value + low effort = do first
+      - High value + high effort = plan carefully, break down
+      - Low value = defer or consider alternatives
+
+      Risk-Based Prioritization:
+      - Address high-risk items early (unfamiliar tech, blocking other work, compliance)
+      - De-risk by: spiking, proof-of-concept, expert review
+
+      Story Readiness Checklist (before sprint):
+      - [ ] Story has clear acceptance criteria (Gherkin format)
+      - [ ] Story estimated (story points assigned)
+      - [ ] Dependencies identified and cleared
+      - [ ] Acceptance criteria testable and verifiable
+      - [ ] No unknowns that would block development
+      - [ ] Story fits in 1 sprint (if not, break down)
+      - [ ] Definition of Done understood by team
+
+      Epic Breakdown:
+      - Epic: large initiative (2-4 sprints worth of work)
+      - Stories: single sprint work items (5-13 points)
+      - Tasks: sub-tasks within a story (optional, not estimated separately)
+
+      Backlog Health Metrics:
+      - % of top 20 stories refined and ready: target 100%
+      - Average time story sits in backlog before sprint: should be < 4 weeks
+      - Backlog velocity trend: should be stable (same ± 10% each sprint)
+      - Tech debt % of sprint: target 20-30% of capacity reserved
+
+      Technical Debt:
+      - Track as separate stories in backlog (don't hide in regular stories)
+      - Reserve 20-30% of sprint for tech debt/refactoring
+      - Don't accumulate debt indefinitely (causes slowdowns)
+      - Tag: "tech-debt" for visibility and tracking
+
+  # ── Phase 2: HIGH (Agile Ceremonies, Incident Management, Monitoring/Alerting, Feature Flags)
+
+  - name: agile-ceremonies-rules
+    alwaysApply: true
+    rule: |
+      Agile Ceremonies standards:
+
+      Daily Standup (15 min max, same time each day):
+      - Each person (2 min max):
+        1. What did I accomplish yesterday?
+        2. What am I working on today?
+        3. What blockers do I have? (ask for help)
+      - Focus: unblock team, not status report
+      - Blocker follow-up: assign owner, set 24h resolution target
+      - Remote: use video if possible, minimize lag
+
+      Sprint Review/Demo (1 hour, end of sprint):
+      - Show completed work only (demo Definition of Done)
+      - Walk through acceptance criteria (story by story)
+      - Gather stakeholder feedback
+      - Discuss: what worked, what was hard, what to improve
+      - NOT: review code, debate implementation
+      - Outcome: stakeholder sign-off on "done" work
+
+      Sprint Retrospective (1 hour, after review):
+      - What went well? (continue doing)
+      - What didn't work? (stop doing)
+      - What should we try? (experiment this sprint)
+      - Action items: assign owner, set deadline (do before next sprint)
+      - Blameless: focus on process, not people
+      - Outcome: 3-5 actionable improvements for next sprint
+
+      Backlog Refinement (1-2 hours, mid-sprint):
+      - Clarify upcoming stories with team
+      - Estimate stories (planning poker)
+      - Discuss unknowns and dependencies
+      - Ensure top 20 stories are "ready" for next sprint
+      - NOT: commit to stories (that's sprint planning)
+      - Outcome: prioritized, estimated, ready backlog for next sprint
+
+      Meeting Anti-patterns:
+      - Standups becoming status reports (devolve to async Slack)
+      - Demos only showing features, not quality
+      - Retros with no follow-up (action items never assigned/done)
+      - Refinement with no estimation (wastes time later)
+
+  - name: incident-management-rules
+    alwaysApply: true
+    rule: |
+      Incident Management standards:
+
+      Severity Classification:
+      - SEV-1 (Critical): Total service outage, revenue impact, >5min downtime
+      - SEV-2 (High): Partial outage, major feature broken, user-facing error
+      - SEV-3 (Medium): Minor feature broken, workaround exists, non-critical path
+      - SEV-4 (Low): Cosmetic issue, low-impact bug, can wait for next release
+
+      Incident Response (24/7 on-call rotation):
+      1. TRIAGE (5 min): Assess severity, notify relevant teams
+      2. INVESTIGATE (5-30 min): Identify root cause, don't fix blind
+      3. REMEDIATE (5-60 min): Deploy hotfix or workaround
+      4. COMMUNICATE (ongoing): Update status page every 15 min
+      5. RECOVER (5-30 min): Full data consistency check, verify fix stable
+
+      Root Cause Analysis (RCA) — 5 Whys Method:
+      1. Why did the incident happen? (e.g., database connection pool exhausted)
+      2. Why did that happen? (e.g., new feature caused 10x traffic spike)
+      3. Why wasn't this caught? (e.g., load test didn't simulate real peak)
+      4. Why don't we have better load testing? (e.g., test infra cost constraint)
+      5. Why haven't we addressed this constraint? (e.g., budget, priority, staffing)
+
+      Postmortem Template (24-48h after incident):
+      - Timeline: when did incident start, what actions taken, when resolved
+      - Root cause: the ONE thing that, if fixed, would prevent recurrence
+      - Contributing factors: other issues that made it worse
+      - Impact: users affected, duration, revenue impact if applicable
+      - Action items: 3-5 changes to prevent (owner, deadline)
+      - Lessons learned: what we learned about our system
+
+      Action Items (immediate follow-up):
+      - Critical: within 1 week (often hotfix deployed same day)
+      - Important: within 1 sprint (added to backlog as tech debt)
+      - Nice-to-have: future improvements (low priority)
+
+      Blameless Culture:
+      - Focus on system failures, not people failures
+      - Everyone can make mistakes (no punishment for incident)
+      - Goal: fix systems so same incident can't recur
+      - Share postmortems publicly (learning for entire org)
+
+  - name: monitoring-alerting-rules
+    alwaysApply: true
+    rule: |
+      Monitoring & Alerting standards:
+
+      Service Level Indicators (SLI) — What to measure:
+      - Availability: % of requests that succeed (not errors, not timeouts)
+      - Latency: p50, p95, p99 response time (important: p99, not just average)
+      - Error rate: % of requests returning 5xx errors
+      - Throughput: requests per second (capacity planning)
+      - Saturation: % CPU/memory/disk/connections used
+
+      Service Level Objectives (SLO) — What's acceptable:
+      - 99.9% availability (< 8.6 hours/month downtime)
+      - p95 latency < 100ms
+      - Error rate < 0.1%
+      - Adjust per service criticality (payment critical, blog less critical)
+
+      Alert Fatigue Prevention:
+      - Alert threshold: only when SLO is at risk (not "might be a problem")
+      - Example: alert if error rate > 0.5% (threshold), not > 0.1% (noise)
+      - Aggregation: combine related alerts (don't page for every instance failure)
+      - Runbook: each alert must have a clear runbook (what to do?)
+      - SNooze: suppress non-critical alerts during known outages
+
+      Dashboards (at-a-glance health):
+      - Green: all SLOs met, system healthy
+      - Yellow: approaching SLO threshold, watch closely
+      - Red: SLO breached, incident in progress
+      - Metrics: availability, latency p95, error rate, saturation
+
+      Logs (detailed diagnostics):
+      - Structured format (JSON, not unstructured text)
+      - Correlation ID: same request traced through all systems
+      - Context: user ID, request ID, feature flag state, deployment version
+      - Levels: DEBUG (dev only), INFO (normal), WARN (degraded), ERROR (user impact)
+      - Retention: 30 days prod logs, 7 days debug logs
+
+      Alerting Rules:
+      - Page on-call (urgent): SEV-1, SEV-2, SLO breach
+      - Email alert (less urgent): SEV-3, SLO approaching
+      - Slack (informational): metrics, deployments, low-severity issues
+
+  - name: feature-flags-rules
+    alwaysApply: true
+    rule: |
+      Feature Flags standards:
+
+      Types:
+      - Kill switch: disable feature if broken (circuit breaker)
+      - Canary: rollout to percentage of users (5% → 25% → 100%)
+      - A/B test: compare old vs new feature for experiment
+      - Dark deploy: deploy code without user-facing change (for performance testing)
+      - Operational: enable/disable based on capacity (e.g., throttle signup if DB full)
+
+      Flag Lifecycle:
+      1. CREATED: flag OFF, code deployed, only dev environment
+      2. TESTING: flag ON for QA, tested before rollout
+      3. ROLLOUT: gradually enable 5% → 25% → 50% → 100% of users
+      4. STABLE: flag ON for all users, stable in production
+      5. CLEANUP: remove flag from code, delete from system (don't accumulate dead flags)
+
+      Flag Management:
+      - Flag name: descriptive (payment_method_v2, not flag_x)
+      - Owner: which team owns this feature?
+      - Expiration: when should this flag be reviewed/removed?
+      - Config: which environments? (dev, staging, production)
+
+      Best Practices:
+      - Keep flag logic simple: avoid nested flags or complex conditions
+      - Test both flag ON and OFF paths (100% coverage for flag code)
+      - Monitor flag usage: is this flag actually used? remove if not
+      - Cleanup: each sprint, remove 1-2 stable flags to keep system clean
+      - Document: why does this flag exist? when will it be removed?
+
+      Gradual Rollout Example (Canary):
+      - Deploy feature code (flag OFF)
+      - Enable for 5% of traffic (internal users or beta)
+      - Monitor SLOs (latency, error rate, saturation) for 4h
+      - If healthy: enable for 25% of traffic
+      - Continue: 50%, 100% with 4h monitoring between each step
+      - If problems: disable immediately (not a long rollback)
+
+  # ── Phase 3: MEDIUM (Kanban, Refactoring, Release Management, Pair Programming, Performance SLO)
+
+  - name: kanban-rules
+    alwaysApply: true
+    rule: |
+      Kanban Board Management standards:
+
+      Kanban Columns (adapt to your workflow):
+      - BACKLOG: prioritized work items
+      - TODO: selected for current work
+      - IN-PROGRESS: being actively worked on
+      - IN-REVIEW: code review, QA testing
+      - DONE: completed, deployed to production
+
+      Work-in-Progress (WIP) Limits:
+      - Set limit per column (e.g., max 5 in TODO, max 3 in IN-PROGRESS)
+      - Purpose: prevent overload, focus on finishing work
+      - Calculation: WIP limit = (team size × average cycle time) / 7
+      - Enforce strictly: no work starts if column at limit (push completion)
+
+      Flow Metrics (measure system health):
+      - Lead Time: time from ticket creation to done (includes waiting)
+      - Cycle Time: time from started to done (excludes waiting)
+      - Throughput: tickets completed per day/week
+      - Predictability: % variance in cycle time (low = predictable)
+
+      Service Level Expectation (SLE):
+      - 85% of work completed within X days (based on historical data)
+      - Example: "85% of tickets completed within 5 days"
+      - Track SLE weekly, trend analysis
+      - If SLE declining: identify and remove bottleneck
+
+      Bottleneck Identification:
+      - Column with most tickets in progress = bottleneck
+      - Example: IN-REVIEW has 10 items, others have 2-3 = review bottleneck
+      - Action: add reviewer, simplify review process, parallelize reviews
+
+      Continuous Flow (vs Sprint-based):
+      - No fixed sprint boundaries
+      - Pull model: new item only when capacity exists
+      - No sprint commitments, only WIP limits
+      - Metrics-driven: measure lead/cycle time, optimize continuously
+
+  - name: refactoring-rules
+    alwaysApply: true
+    rule: |
+      Safe Refactoring standards:
+
+      Prerequisites (before refactoring):
+      - [ ] Existing code has 80%+ test coverage (tests protect against breakage)
+      - [ ] No ongoing feature work in this module (don't refactor + feature together)
+      - [ ] Tests are fast enough to run frequently (can't refactor safely with 10 min test suite)
+      - [ ] Team agrees on refactoring goal (not aesthetic, but improve maintainability/performance)
+
+      Refactoring Types:
+      - Small: rename variable, extract method (1-4 hours, PR)
+      - Medium: redesign class, extract service (4-16 hours, multiple PRs)
+      - Large: redesign module architecture (2+ weeks, parallel with features)
+
+      Refactoring Process:
+      1. Choose scope: identify code smell (duplication, complexity, unclear naming)
+      2. Plan: how will structure change? which tests protect against errors?
+      3. Test locally: make changes, run full test suite after each micro-change
+      4. Git commits: small incremental commits (revert any one commit without breaking)
+      5. Code review: separate refactoring PR (no feature changes mixed in)
+      6. Merge: verify tests pass in CI before merging
+      7. Monitor: watch for regressions in production
+
+      Big Bang Refactoring Anti-pattern:
+      - Rewrite entire module at once (high risk, hard to review, easy to introduce bugs)
+      - Better: use Strangler Fig pattern (new code in parallel, gradually replace old)
+
+      Tech Debt Tracking:
+      - Track refactoring as "tech debt" stories in backlog
+      - Reserve 20-30% of sprint for tech debt
+      - Priority tech debt based on: impact on velocity, risk to production, team morale
+
+      Refactoring + Feature Balance:
+      - If 100% refactoring: slow feature development (morale, business unhappy)
+      - If 0% refactoring: codebase rots, velocity decreases (technical debt compounds)
+      - Target: 70% features, 30% tech debt (refactoring + testing + documentation)
+
+  - name: release-management-rules
+    alwaysApply: true
+    rule: |
+      Release Management standards:
+
+      Semantic Versioning (MAJOR.MINOR.PATCH):
+      - MAJOR: breaking changes (old clients break, require migration)
+      - MINOR: new features, backwards compatible
+      - PATCH: bug fixes, no feature changes
+      - Example: 2.4.1 → 2.5.0 (new feature) → 3.0.0 (breaking change)
+
+      Release Process:
+      1. PLAN: decide version number, identify changes in this release
+      2. PREPARE: branch from main (release/2.5.0), lock features
+      3. TEST: regression testing, security review, performance baseline
+      4. NOTES: write release notes (features, fixes, breaking changes)
+      5. TAG: git tag v2.5.0, merge back to main
+      6. DEPLOY: blue-green or canary to production
+      7. MONITOR: watch SLOs closely, rollback plan ready
+
+      Release Notes Template:
+      - Version: 2.5.0 (release date)
+      - New Features: [list of MINOR bumps with user impact]
+      - Bug Fixes: [list of PATCH fixes with severity]
+      - Breaking Changes: [list with migration guide if MAJOR bump]
+      - Known Issues: [any known problems, workarounds]
+      - Deprecations: [features being removed next version]
+      - Security: [any CVE fixes, security notices]
+
+      Hotfix Procedure (critical bug in production):
+      1. Create hotfix branch from last release tag (not main)
+      2. Fix bug on hotfix branch
+      3. Test thoroughly
+      4. Deploy hotfix to production (bump PATCH version)
+      5. Merge hotfix back to main (catch up main with fix)
+      6. Tag as new PATCH version
+
+      Frequency:
+      - Major release: quarterly/annually (breaking changes, big refactors)
+      - Minor release: weekly/monthly (features, improvements)
+      - Patch release: daily (bug fixes, hotfixes)
+      - Example: v2.0.0 (major) → v2.1.0 → v2.1.1 → v2.2.0 → v3.0.0
+
+  - name: pair-programming-rules
+    alwaysApply: true
+    rule: |
+      Pair Programming standards:
+
+      Roles (rotate every 15-30 min):
+      - DRIVER: hands on keyboard, writes code
+      - NAVIGATOR: thinks ahead, spots errors, asks questions, reads docs
+      - Switch often: both stay engaged, prevent driver fatigue
+
+      When to Pair:
+      - Complex/risky code (critical business logic, security-sensitive)
+      - Knowledge transfer (junior learning from senior)
+      - Difficult debugging (two minds better than one)
+      - Architecture decisions (design while pairing)
+
+      When NOT to Pair:
+      - Simple, well-defined tasks (typing exercise, waste of time)
+      - Independent work (different developers on different files)
+      - Code review can substitute (both parties not coding)
+
+      Remote Pairing Setup:
+      - Screen share (driver shows code)
+      - Audio: clear audio critical (not video, but voice must be clear)
+      - Duration: 1-2 hours max per session (mental fatigue)
+      - Tools: VS Code Live Share, Tuple, or tmux over SSH
+
+      Pair Programming Benefits:
+      - Knowledge transfer: junior learns patterns, senior learns new approaches
+      - Quality: fewer bugs caught real-time (not in code review)
+      - Morale: problem-solving together, less isolation
+      - Onboarding: new team member learns codebase faster
+
+      Anti-patterns:
+      - One person dominating keyboard (driver hogging)
+      - Navigator asleep (checking email, not engaged)
+      - Pairing on everything (waste of time on simple tasks)
+      - Remote pairing with poor audio (frustrating, unproductive)
+
+  - name: performance-slo-rules
+    alwaysApply: true
+    rule: |
+      Performance & SLO Management standards:
+
+      Error Budget:
+      - SLO target: 99.9% availability = 8.6 hours downtime/month allowed
+      - Error budget: 0.1% downtime allowed
+      - If used: no new feature deployments until recovery window
+      - If unused: can take calculated risks (major refactor, migration, etc.)
+
+      Performance Targets by Layer:
+      - API Gateway/Load Balancer: p95 < 10ms
+      - Application Server: p95 < 50ms
+      - Database Query: p95 < 20ms
+      - Cache: p95 < 5ms
+      - Total Latency: p95 < 100ms (API to client)
+
+      Capacity Planning:
+      - Current throughput: X requests/second
+      - Growth target: 2× or 3× for next year
+      - Peak traffic: plan for peak (not average)
+      - Example: if avg 1k req/s, peak 5k req/s, plan for 15k req/s (3x safety margin)
+
+      Performance Testing:
+      - Baseline: measure current p95 latency (before change)
+      - Load test: simulate peak traffic (1.5x expected peak)
+      - Soak test: run 24h at load (find memory leaks, connection pool exhaustion)
+      - Spike test: sudden 10x traffic increase (test auto-scaling)
+
+      Monitoring Performance:
+      - Real User Monitoring (RUM): measure actual users' experience (not synthetic)
+      - Custom metrics: business-specific (checkout latency, search quality)
+      - Histograms: track p50, p95, p99 (not just average)
+      - Anomaly detection: alert if latency suddenly increases 20%+ vs baseline
+
+      Performance Regression Prevention:
+      - Performance test in CI (fail build if p95 degrades > 5%)
+      - Benchmark before/after code changes
+      - Profile before optimizing (measure first, don't guess)
+      - Keep optimization focused: don't sacrifice code clarity for 1% improvement
+
   - name: sql-rules
     globs: ["**/*.sql"]
     alwaysApply: false
