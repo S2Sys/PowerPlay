@@ -44,18 +44,23 @@ rules:
     rule: |
       You are an expert AI assistant embedded in SmartWorkz Technologies.
       Supported Stacks:
-        - **Backend**: .NET 8, ASP.NET Core, Node.js, Python, PHP (Drupal)
-        - **Frontend**: Angular 17+, React 18+, Flutter, MAUI
+        - **Backend**: .NET 8/ASP.NET Core, Node.js/Express, Python/FastAPI/Django, Java/Spring Boot, PHP/Drupal
+        - **Frontend**: Angular 17+, React 18+ (Next.js), Vue 3, Flutter, MAUI
         - **Database**: SQL Server 2022, PostgreSQL, MySQL, MongoDB
+        - **ORMs**: Dapper, Entity Framework Core, Prisma, SQLAlchemy, TypeORM, Hibernate
         - **Cloud**: Azure DevOps, AWS, GCP
 
       Always:
         - Use C# 12 features (primary constructors, collection expressions) for .NET
-        - Prefer async/await with CancellationToken parameters for backend
-        - Use ILogger<T>, never Console.Write or console.log for logging
+        - Prefer async/await with CancellationToken parameters for backend (C#, Python, Node.js)
+        - Use ILogger<T> (C#), structured logging (Node.js/Python/Java), never console.log/print in production
         - Angular: standalone components, inject(), OnPush, typed forms
         - React: functional components, hooks, TypeScript strict mode
+        - Next.js: Server Components default, Client Components for interactivity
+        - Vue 3: Composition API, <script setup>, typed props and emits
         - Flutter/MAUI: null safety, immutable widgets, provider/bloc state management
+        - Node.js: async/await, error middleware, validation at boundary
+        - Python: type hints on all functions, dependency injection, ORM for database access
         - PHP: type hints, PSR-12 standards, dependency injection
       Never:
         - Leave TODO comments in generated code
@@ -152,6 +157,72 @@ rules:
       - Validation: use validator service for business logic
       - Comments: PHPDoc on all functions with @param @return @throws
       - No global functions — use service classes
+
+  - name: nodejs-express-rules
+    globs: ["**/*.js", "**/*.ts"]
+    alwaysApply: false
+    rule: |
+      Node.js / Express standards:
+      - Use async/await exclusively, never callback hell or promise chains
+      - Middleware: request → response order, proper error handling
+      - Route handlers: single responsibility, extract to service layer
+      - Error handling: custom error classes, central error middleware
+      - Validation: joi, yup, or class-validator at controller boundary
+      - Authentication: JWT with secure token storage (httpOnly cookies or secure headers)
+      - Database: use parameterised queries or ORM (Prisma, TypeORM, Sequelize)
+      - Logging: structured logging with winston or pino (not console.log)
+      - Environment variables: use dotenv, never hardcode config
+      - Testing: Jest with ts-jest for TypeScript projects
+
+  - name: python-fastapi-rules
+    globs: ["**/*.py"]
+    alwaysApply: false
+    rule: |
+      Python / FastAPI standards:
+      - Type hints on all functions: def function(param: Type) → Type:
+      - Pydantic models for request/response validation
+      - Dependency injection via Depends()
+      - Async routes: async def endpoint() — leverage uvicorn async
+      - Error handling: HTTPException with proper status codes, custom exception handlers
+      - Authentication: JWT with secure token handling
+      - Database: SQLAlchemy ORM with async driver (sqlalchemy[asyncio])
+      - Logging: use logging module (not print()), structured format
+      - Configuration: BaseSettings from pydantic for environment variables
+      - Testing: pytest with pytest-asyncio for async tests
+
+  - name: nextjs-rules
+    globs: ["**/*.tsx", "**/*.jsx"]
+    alwaysApply: false
+    rule: |
+      Next.js standards:
+      - Use App Router (not Pages Router) for new projects
+      - Server Components default, Client Components (use client) for interactivity
+      - API Routes (route.ts): treat as backend endpoints, validate inputs
+      - Data fetching: fetch() in Server Components, SWR/React Query in Client
+      - Environment variables: .env.local (never expose secrets to browser)
+      - Middleware: for auth, redirects, rate limiting at edge
+      - Image optimization: use <Image> component (next/image)
+      - Font optimization: use next/font for custom/system fonts
+      - Static generation: generateStaticParams for dynamic routes when possible
+      - Error handling: error.tsx and not-found.tsx for UI error boundaries
+
+  - name: python-django-rules
+    globs: ["**/*.py"]
+    alwaysApply: false
+    rule: |
+      Python / Django standards:
+      - Models: define all fields with explicit choices, use Meta for ordering/indexes
+      - Migrations: always commit migrations, use data migrations for data changes
+      - Views: use Class-Based Views (CBV) and mixins for reusability
+      - ViewSets: with ModelSerializer and Router for REST APIs (Django REST Framework)
+      - Serializers: nested serializers for relationships, custom validation methods
+      - URL routing: use path() with clear names, namespace for reusability
+      - Middleware: document order, keep logic minimal
+      - Signals: use sparingly (avoid over-coupling), document purpose
+      - Forms: ModelForm for CRUD, custom Form for complex logic
+      - Testing: use Django TestCase with transaction rollback, fixtures for data
+      - Queryset: use select_related() and prefetch_related() to avoid N+1
+      - Settings: use environment variables, separate settings by environment (dev/prod)
 
   - name: sql-rules
     globs: ["**/*.sql"]
