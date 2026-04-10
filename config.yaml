@@ -2449,8 +2449,21 @@ prompts:
       | Angular, component, standalone, frontend, UI component | Frontend | /ng-component | /frontend |
       | WCAG, accessibility, a11y, responsive design | Frontend | /design-audit | /frontend |
       | mobile, iOS, Android, React Native | Mobile | /mobile-architecture | /offline-sync |
-      | event-driven, CQRS, event sourcing | Integration | /event-driven-design | /message-queue-setup |
+      | event-driven, CQRS, event sourcing | Patterns | /event-sourcing | /event-sourcing |
       | webhook, message queue, Kafka | Integration | /webhook-implementation | /message-queue-setup |
+      | design pattern, GoF, factory, builder, decorator, proxy, state | Design | /design-patterns-guide | /design-patterns-guide |
+      | saga, distributed transaction, orchestration, choreography | Patterns | /saga-pattern | /choreography-vs-orchestration |
+      | pub/sub, publish-subscribe, event bus, topic, broadcast | Messaging | /pub-sub-messaging | /pub-sub-messaging |
+      | queue, point-to-point, load balance, work distribution | Messaging | /point-to-point-messaging | /point-to-point-messaging |
+      | request-reply, correlation ID, synchronous async | Messaging | /request-reply-messaging | /request-reply-messaging |
+      | eventual consistency, stale data, async propagation, cache | Patterns | /eventual-consistency | /eventual-consistency |
+      | decorator, add behavior, dynamic modification | Design | /decorator-pattern | /design-patterns-guide |
+      | proxy, lazy load, caching, access control, auth | Design | /proxy-pattern | /design-patterns-guide |
+      | idempotent, safe retry, deduplication, exactly-once | Patterns | /idempotency | /idempotency |
+      | dead letter queue, DLQ, failed messages, replay | Patterns | /dead-letter-queue | /dead-letter-queue |
+      | builder, fluent interface, complex objects, construction | Design | /builder-pattern | /design-patterns-guide |
+      | composite, tree, hierarchy, recursive composition | Design | /composite-pattern | /design-patterns-guide |
+      | state machine, state pattern, workflow, transitions | Design | /state-pattern | /design-patterns-guide |
       | deploy, release, pipeline, CI/CD, infra, Terraform, Bicep | Deployment | /docker-containerize | /deploy |
       | fix, bug, broken, error | Quick Fix | /quick-fix | /refactor-inline |
       | think, reason, explain why | AI Behavior | /think-through | /explain-deep |
@@ -2581,6 +2594,42 @@ prompts:
 
       **For /bi:**
       Route: schema/star/snowflake/fact → schema + CREATE TABLE; metric/KPI/definition → metric catalog; dashboard/chart/layout → wireframe spec; pipeline/dbt/Airflow/ELT → pipeline architecture.
+
+      **For /design-patterns-guide, /builder-pattern, /composite-pattern, /decorator-pattern, /proxy-pattern, /state-pattern:**
+      Present the selected design pattern with: Problem it solves | When to use | When NOT to use | Structure/example | Real-world use cases | Gotchas and trade-offs. Include code snippets where applicable.
+
+      **For /saga-pattern:**
+      Explain saga pattern: orchestration vs choreography distinction | compensation transactions | idempotency requirements | example (order processing) | decision factors.
+
+      **For /pub-sub-messaging:**
+      Pub/Sub architecture: publisher-topic-subscribers | topic naming | payload versioning | retry strategy | DLQ handling | when to use vs point-to-point.
+
+      **For /point-to-point-messaging:**
+      Queue architecture: sender-queue-consumers | FIFO/priority | message TTL | acknowledgment | load balancing | when to use vs pub/sub.
+
+      **For /request-reply-messaging:**
+      Request-reply pattern: correlation IDs | reply-to addresses | timeout handling | synchronous-style over async | when to use.
+
+      **For /eventual-consistency:**
+      Eventual consistency model: accept stale data | async propagation | staleness indicators | conflict resolution | when to use vs strong consistency.
+
+      **For /decorator-pattern:**
+      Decorator pattern: wrap object, delegate, add behavior | structure (IComponent + ConcreteComponent + Decorators) | stream wrappers example | middleware chains | performance costs | vs inheritance.
+
+      **For /proxy-pattern:**
+      Proxy types: lazy (deferred creation) | caching | access control (auth) | logging | structure | real-world examples | cache invalidation | concurrency issues.
+
+      **For /idempotency:**
+      Idempotency implementation: generate key | check idempotency store before processing | cache result | cleanup old keys | storage options (Redis/DB) | scope per-user/per-endpoint | gotchas (key expiry, race conditions).
+
+      **For /dead-letter-queue:**
+      DLQ pattern: retry policy (exponential backoff) | DLQ handler (log, alert, store) | manual replay | fields in DLQ message | monitoring (depth, rate by error type) | processing SLO.
+
+      **For /choreography-vs-orchestration:**
+      Comparison matrix: orchestration (centralized, tight coupling, easy to see) vs choreography (decentralized, loose coupling, hard to debug) | decision factors | hybrid approach | when simple (orchestration) vs complex (choreography).
+
+      **For /event-sourcing:**
+      Event sourcing: event log as source of truth | state reconstruction | snapshots | event store | Apply pattern | audit trail | time-travel queries | schema evolution | gotchas (query complexity, eventual consistency, storage).
 
       **For /git-workflow:**
       Branch name | Commit message rewrite (Conventional Commits) | Squash plan | Conflict guidance.
