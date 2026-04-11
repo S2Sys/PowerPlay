@@ -1829,65 +1829,67 @@ rules:
       See .continue/rules/feasibility-assessment.md for DoR checklist and estimation patterns.
 
 # ─────────────────────────────────────────────────────────
-# MODELS
+# MODELS — FIXED FOR OLLAMA
+# ─────────────────────────────────────────────────────────
+# IMPORTANT: These are NOW configured for LOCAL OLLAMA MODELS
+# If using local Ollama, keep ollama serve running
+# If using cloud, use OpenRouter configs at bottom
 # ─────────────────────────────────────────────────────────
 models:
-  # ── Local Chat — Dhoni GPU ─────────────────────────────
+  # ═══════════════════════════════════════════════════════
+  # LOCAL OLLAMA MODELS (Recommended)
+  # Start with: ollama serve
+  # ═══════════════════════════════════════════════════════
 
-  - name: Qwen 3.5 9B [Local Chat]
-    provider: openai
-    model: dhoni-qwen
-    apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
-    roles: [chat]
-    capabilities: [tool_use]
+  - name: DeepSeek Coder 6.7B [Local]
+    provider: ollama
+    model: deepseek-coder:6.7b
+    roles: [chat, edit]
+    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
+    # This causes JSON parsing errors in litellm
     chatOptions:
       baseSystemMessage: |
         Senior .NET/Angular architect. Be concise. Use code blocks.
         Never repeat questions back. Get straight to the solution.
-      baseAgentSystemMessage: |
-        Autonomous coding agent. Think step-by-step. Use tools to read
-        files before editing. Verify logic before finishing.
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Qwen 2.5 7B [Local Chat]
+    provider: ollama
+    model: qwen2.5:7b
+    roles: [chat]
+    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
+    chatOptions:
+      baseSystemMessage: |
+        You are a helpful AI coding assistant. Be concise and clear.
     defaultCompletionOptions:
       maxTokens: 8192
       temperature: 0.3
 
   - name: DeepSeek R1 8B [Reasoning]
-    provider: openai
-    model: dhoni-deepseek
-    apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+    provider: ollama
+    model: deepseek-r1:8b
     roles: [chat]
-    capabilities: [tool_use]
+    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
+    # R1 is slow but very good at reasoning — use for analysis only
     defaultCompletionOptions:
-      maxTokens: 8192
+      maxTokens: 16384
       temperature: 0.1
 
-  # ── Fast Apply — KapilDev GPU ──────────────────────────
-  # CRITICAL FIX: maxTokens=16384 prevents mid-file truncation
-  # temperature=0.05 prevents hallucinated code deletion
-
-  - name: Qwen Coder [Apply]
-    provider: openai
-    model: kapil-qwen-coder
-    apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
-    roles: [apply, edit]
-    defaultCompletionOptions:
-      maxTokens: 16384
-      temperature: 0.05
-
-  - name: DeepSeek Coder 6.7B [Edit]
-    provider: openai
-    model: kapil-deepseek-coder
-    apiBase: http://rohit:4000/v1
-    apiKey: ${DHONI_API_KEY}
+  - name: Qwen Coder [Fast Edit]
+    provider: ollama
+    model: qwen2.5-coder:7b
     roles: [edit, chat]
+    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     defaultCompletionOptions:
       maxTokens: 16384
       temperature: 0.05
 
-  # ── Cloud Fallback — OpenRouter Free ──────────────────
+  # ═══════════════════════════════════════════════════════
+  # CLOUD FALLBACK — OpenRouter Free (No Local Setup)
+  # Use if Ollama is offline or you prefer cloud models
+  # ═══════════════════════════════════════════════════════
 
   - name: GPT OSS 120B [Cloud]
     provider: openai
@@ -1895,22 +1897,12 @@ models:
     apiBase: https://openrouter.ai/api/v1
     apiKey: ${OPENROUTER_API_KEY}
     roles: [chat]
-    capabilities: [tool_use]
+    # ✅ Cloud models CAN use tool_use (if needed)
     defaultCompletionOptions:
       maxTokens: 8192
       temperature: 0.3
 
-  - name: MiniMax M2.5 [Cloud]
-    provider: openai
-    model: minimax/minimax-m2.5:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 4096
-      temperature: 0.7
-
-  - name: Qwen3 Coder [Cloud Edit]
+  - name: Qwen Coder [Cloud]
     provider: openai
     model: qwen/qwen3-coder:free
     apiBase: https://openrouter.ai/api/v1
@@ -1920,19 +1912,7 @@ models:
       maxTokens: 16384
       temperature: 0.05
 
-  - name: Gemma 4 26B [Cloud]
-    provider: openai
-    model: google/gemma-4-26b-a4b-it:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat]
-    defaultCompletionOptions:
-      maxTokens: 8192
-      temperature: 0.3
-
-  # ── v1.2.0 New Models ──────────────────────────────────
-
-  - name: Llama 3.1 70B [Reasoning]
+  - name: Llama 3.1 70B [Cloud Reasoning]
     provider: openai
     model: meta-llama/llama-3.1-70b-instruct:free
     apiBase: https://openrouter.ai/api/v1
@@ -1941,8 +1921,6 @@ models:
     defaultCompletionOptions:
       maxTokens: 8192
       temperature: 0.2
-
-  # ── Embeddings ─────────────────────────────────────────
 
   - name: NVIDIA Nemotron Embed
     provider: openai
