@@ -1841,10 +1841,11 @@ models:
   # Start with: ollama serve
   # ═══════════════════════════════════════════════════════
 
-  - name: DeepSeek Coder 6.7B [Remote - rohit]
-    provider: ollama
+  - name: DeepSeek Coder 6.7B [Remote - AnythingLLM]
+    provider: openai
     model: deepseek-coder:6.7b
-    apiBase: http://rohit:11434
+    apiBase: http://rohit:3001/api/v1
+    apiKey: anything-llm
     roles: [chat, edit]
     # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     # This causes JSON parsing errors in litellm
@@ -1856,12 +1857,12 @@ models:
       maxTokens: 16384
       temperature: 0.05
 
-  - name: Qwen 2.5 7B [Remote - rohit]
-    provider: ollama
+  - name: Qwen 2.5 7B [Remote - AnythingLLM]
+    provider: openai
     model: qwen2.5:7b
-    apiBase: http://rohit:11434
+    apiBase: http://rohit:3001/api/v1
+    apiKey: anything-llm
     roles: [chat]
-    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     chatOptions:
       baseSystemMessage: |
         You are a helpful AI coding assistant. Be concise and clear.
@@ -1869,13 +1870,12 @@ models:
       maxTokens: 8192
       temperature: 0.3
 
-  - name: DeepSeek R1 8B [Remote - rohit]
-    provider: ollama
+  - name: DeepSeek R1 8B [Remote - AnythingLLM]
+    provider: openai
     model: deepseek-r1:8b
-    apiBase: http://rohit:11434
+    apiBase: http://rohit:3001/api/v1
+    apiKey: anything-llm
     roles: [chat]
-    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
-    # R1 is slow but very good at reasoning — use for analysis only
     defaultCompletionOptions:
       maxTokens: 16384
       temperature: 0.1
