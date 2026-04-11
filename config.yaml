@@ -1841,9 +1841,10 @@ models:
   # Start with: ollama serve
   # ═══════════════════════════════════════════════════════
 
-  - name: DeepSeek Coder 6.7B [Local]
+  - name: DeepSeek Coder 6.7B [Remote - rohit]
     provider: ollama
     model: deepseek-coder:6.7b
+    apiBase: http://rohit:11434
     roles: [chat, edit]
     # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     # This causes JSON parsing errors in litellm
@@ -1855,9 +1856,10 @@ models:
       maxTokens: 16384
       temperature: 0.05
 
-  - name: Qwen 2.5 7B [Local Chat]
+  - name: Qwen 2.5 7B [Remote - rohit]
     provider: ollama
     model: qwen2.5:7b
+    apiBase: http://rohit:11434
     roles: [chat]
     # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     chatOptions:
@@ -1867,9 +1869,10 @@ models:
       maxTokens: 8192
       temperature: 0.3
 
-  - name: DeepSeek R1 8B [Reasoning]
+  - name: DeepSeek R1 8B [Remote - rohit]
     provider: ollama
     model: deepseek-r1:8b
+    apiBase: http://rohit:11434
     roles: [chat]
     # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
     # R1 is slow but very good at reasoning — use for analysis only
