@@ -13,21 +13,18 @@ $apiKeys = @(
     @{
         Name = "DHONI"
         EnvVar = "DHONI_API_KEY"
-        Url = "https://dhoni.ai/keys"
         Format = "dhoni-"
         Description = "DHONI API"
     },
     @{
         Name = "KAPIL"
         EnvVar = "KAPIL_API_KEY"
-        Url = "https://kapil.ai/keys"
         Format = "kapil-"
         Description = "KAPIL API"
     },
     @{
         Name = "OpenRouter"
         EnvVar = "OPENROUTER_API_KEY"
-        Url = "https://openrouter.ai/keys"
         Format = "sk-or-v1-"
         Description = "Cloud models for auto-apply"
     }
@@ -59,7 +56,7 @@ function Test-EnvVar {
     return [bool](Get-Item -Path "env:$VarName" -ErrorAction SilentlyContinue)
 }
 
-function Get-ApiKey {
+function Set-ApiKey {
     param(
         [hashtable]$KeyConfig
     )
@@ -92,21 +89,9 @@ function Get-ApiKey {
         }
     }
 
-    # Open provider website
-    Write-Host "Opening $($KeyConfig.Url)..." -ForegroundColor $InfoColor
-    Write-Host ""
-    Write-Host "Instructions:" -ForegroundColor $InfoColor
-    Write-Host "  1. Go to: $($KeyConfig.Url)" -ForegroundColor $InfoColor
-    Write-Host "  2. Sign up or log in (if needed)" -ForegroundColor $InfoColor
-    Write-Host "  3. Create a new API key" -ForegroundColor $InfoColor
-    Write-Host "  4. Copy the key (starts with: $($KeyConfig.Format))" -ForegroundColor $InfoColor
-    Write-Host ""
-
-    Start-Process $KeyConfig.Url
-    Start-Sleep -Seconds 2
-
     # Get API key from user
-    Write-Host "Waiting for you to copy your $($KeyConfig.Name) API key..." -ForegroundColor $WarningColor
+    Write-Host "Enter your $($KeyConfig.Name) API key" -ForegroundColor $WarningColor
+    Write-Host "Expected format: starts with '$($KeyConfig.Format)'" -ForegroundColor "Gray"
     Write-Host ""
     $apiKey = Read-Host "Paste your $($KeyConfig.Name) API key"
 
@@ -121,7 +106,7 @@ function Get-ApiKey {
     if (-not $apiKey.StartsWith($KeyConfig.Format)) {
         Write-Host ""
         Write-Host "[WARNING] API key does not start with '$($KeyConfig.Format)'" -ForegroundColor $WarningColor
-        Write-Host "Double-check you copied it correctly from $($KeyConfig.Name)." -ForegroundColor $WarningColor
+        Write-Host "Double-check you copied it correctly." -ForegroundColor $WarningColor
         Write-Host ""
     }
 
@@ -184,7 +169,7 @@ while ($true) {
     $index = [int]$choice - 1
 
     if ($index -ge 0 -and $index -lt $apiKeys.Count) {
-        Get-ApiKey $apiKeys[$index]
+        Set-ApiKey $apiKeys[$index]
     } else {
         Write-Host ""
         Write-Host "[ERROR] Invalid choice. Please enter a number between 1 and $($apiKeys.Count)" -ForegroundColor $ErrorColor
