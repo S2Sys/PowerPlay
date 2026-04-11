@@ -21,7 +21,7 @@ if ($env:OPENROUTER_API_KEY) {
     Write-Host "✅ OPENROUTER_API_KEY is already set!" -ForegroundColor $Success
     Write-Host ""
     $firstChars = $env:OPENROUTER_API_KEY.Substring(0, 20)
-    Write-Host "   Current value (first 20 chars): $firstChars..." -ForegroundColor "Gray"
+    Write-Host "   Current value (first 20 chars): $($firstChars)..." -ForegroundColor "Gray"
     Write-Host ""
 
     $changeKey = Read-Host "Change it? (Y/N)"
@@ -90,7 +90,7 @@ Write-Host ""
 if ($env:OPENROUTER_API_KEY) {
     $firstChars = $env:OPENROUTER_API_KEY.Substring(0, 20)
     Write-Host "✅ OPENROUTER_API_KEY is set!" -ForegroundColor $Success
-    Write-Host "   First 20 characters: $firstChars..." -ForegroundColor "Gray"
+    Write-Host "   First 20 characters: $($firstChars)..." -ForegroundColor "Gray"
 } else {
     Write-Host "❌ API key not found in environment!" -ForegroundColor $Error
 }
