@@ -1877,40 +1877,35 @@ models:
       maxTokens: 16384
       temperature: 0.1
 
-  - name: Qwen Coder [Fast Edit]
-    provider: ollama
-    model: qwen2.5-coder:7b
-    roles: [edit, chat]
-    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
+  # ═══════════════════════════════════════════════════════
+  # ⚠️ AUTO-APPLY WORKAROUND — Use Cloud Models for Edits
+  # Ollama models DON'T work well with auto-apply because:
+  # - No structured output/tool support
+  # - Can't guarantee proper code syntax
+  # - Continue.dev needs tool_use for precise edits
+  # Solution: Use cloud models (OpenRouter) for auto-apply
+  # ═══════════════════════════════════════════════════════
+
+  - name: Qwen Coder [Cloud - For Auto Apply]
+    provider: openai
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [edit, apply]
+    # ✅ Cloud models support tool_use for precise code edits
     defaultCompletionOptions:
       maxTokens: 16384
       temperature: 0.05
 
-  # ═══════════════════════════════════════════════════════
-  # CLOUD FALLBACK — OpenRouter Free (No Local Setup)
-  # Use if Ollama is offline or you prefer cloud models
-  # ═══════════════════════════════════════════════════════
-
-  - name: GPT OSS 120B [Cloud]
+  - name: GPT OSS 120B [Cloud - Chat/Reasoning]
     provider: openai
     model: openai/gpt-oss-120b:free
     apiBase: https://openrouter.ai/api/v1
     apiKey: ${OPENROUTER_API_KEY}
     roles: [chat]
-    # ✅ Cloud models CAN use tool_use (if needed)
     defaultCompletionOptions:
       maxTokens: 8192
       temperature: 0.3
-
-  - name: Qwen Coder [Cloud]
-    provider: openai
-    model: qwen/qwen3-coder:free
-    apiBase: https://openrouter.ai/api/v1
-    apiKey: ${OPENROUTER_API_KEY}
-    roles: [chat, edit]
-    defaultCompletionOptions:
-      maxTokens: 16384
-      temperature: 0.05
 
   - name: Llama 3.1 70B [Cloud Reasoning]
     provider: openai
