@@ -1841,13 +1841,11 @@ models:
   # Start with: ollama serve
   # ═══════════════════════════════════════════════════════
 
-  - name: DeepSeek Coder 6.7B [Remote - AnythingLLM]
-    provider: ollama
-    model: deepseek-coder:6.7b
-    apiBase: http://rohit:3001
+  - name: DHONI DeepSeek [Remote - Rohit]
+    provider: openai
+    model: dhoni-deepseek
+    apiBase: http://rohit:4000/v1
     roles: [chat, edit]
-    # ⚠️ CRITICAL: No capabilities: [tool_use] for Ollama
-    # This causes JSON parsing errors in litellm
     chatOptions:
       baseSystemMessage: |
         Senior .NET/Angular architect. Be concise. Use code blocks.
@@ -1856,10 +1854,10 @@ models:
       maxTokens: 16384
       temperature: 0.05
 
-  - name: Qwen 2.5 7B [Remote - AnythingLLM]
-    provider: ollama
-    model: qwen2.5:7b
-    apiBase: http://rohit:3001
+  - name: KAPIL Qwen [Remote - Rohit]
+    provider: openai
+    model: kapil-qwen
+    apiBase: http://rohit:4000/v1
     roles: [chat]
     chatOptions:
       baseSystemMessage: |
@@ -1868,10 +1866,10 @@ models:
       maxTokens: 8192
       temperature: 0.3
 
-  - name: DeepSeek R1 8B [Remote - AnythingLLM]
-    provider: ollama
-    model: deepseek-r1:8b
-    apiBase: http://rohit:3001
+  - name: DHONI Reasoning [Remote - Rohit]
+    provider: openai
+    model: dhoni-reasoning
+    apiBase: http://rohit:4000/v1
     roles: [chat]
     defaultCompletionOptions:
       maxTokens: 16384
