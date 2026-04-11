@@ -115,7 +115,12 @@
       "Bash(mv GAP-IMPROVEMENT-PLAN-v38.md archive/2026-04-11-v2.0.0-cleanup/)",
       "Bash(xargs basename:*)",
       "Bash(mv INDEX.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
-      "Bash(mv SETTINGS-PANEL-GUIDE.md docs/archive/2026-04-11-v2.0.0-cleanup/)"
+      "Bash(mv SETTINGS-PANEL-GUIDE.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv FRESH-INSTALL-READY.md docs/)",
+      "Bash(mv INSTALLATION-CHECKLIST.md docs/)",
+      "Bash(mv QUICK-REFERENCE-v2.0.0.md docs/)",
+      "Bash(mv QUICK-START-SETTINGS.md docs/)",
+      "Bash(mv README-EXTENSION-v2.0.0.md docs/)"
     ],
     "additionalDirectories": [
       "\\dev",
