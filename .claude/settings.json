@@ -101,7 +101,21 @@
       "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/out/chatPanel.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/)",
       "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/out/extension.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/)",
       "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/chat.css\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)",
-      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/chat.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)"
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/chat.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)",
+      "Bash(awk '{print $9}')",
+      "Bash(mkdir -p docs/archive/2026-04-11-v2.0.0-cleanup)",
+      "Bash(mv DEPLOY-v2.0.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv EXTENSION-QUICK-COMMANDS.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv EXTENSION-STATUS-REPORT.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv EXTENSION-TROUBLESHOOTING.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv v38-*.md archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv v39-*.md archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv CHANGELOG.md archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv COVERAGE-*.md archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv GAP-IMPROVEMENT-PLAN-v38.md archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(xargs basename:*)",
+      "Bash(mv INDEX.md docs/archive/2026-04-11-v2.0.0-cleanup/)",
+      "Bash(mv SETTINGS-PANEL-GUIDE.md docs/archive/2026-04-11-v2.0.0-cleanup/)"
     ],
     "additionalDirectories": [
       "\\dev",
