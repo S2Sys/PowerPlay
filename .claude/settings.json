@@ -68,12 +68,42 @@
       "Bash(npx @vscode/vsce package)",
       "Bash(ls -lh s:/Code101/PowerPlay/vscode-extension/*.vsix)",
       "Bash(ls -lh s:/Code101/PowerPlay/vscode-extension/out/*.js)",
-      "Bash(awk '{print $NF, $5}')"
+      "Bash(awk '{print $NF, $5}')",
+      "Bash(ls -lh s:/Code101/PowerPlay/vscode-extension/src/*.ts s:/Code101/PowerPlay/vscode-extension/out/*.js s:/Code101/PowerPlay/vscode-extension/media/*)",
+      "Bash(awk '{print $9, \"\\(\" $5 \"\\)\"}')",
+      "Bash(ls -lh *.vsix)",
+      "Bash(unzip -l powerplay-ai-2.0.0.vsix)",
+      "Bash(\"/c/Users/tsent/AppData/Local/Programs/Microsoft VS Code/Code.exe\" --install-extension \"s:/Code101/PowerPlay/vscode-extension/powerplay-ai-2.0.0.vsix\" --force)",
+      "Bash(powershell -Command ':*)",
+      "Bash(mkdir -p /tmp/powerplay-extract)",
+      "Bash(unzip -q \"s:/Code101/PowerPlay/vscode-extension/powerplay-ai-2.0.0.vsix\" -d /tmp/powerplay-extract)",
+      "Bash(mkdir -p __TRACKED_VAR__/.vscode/extensions/smartworkz.powerplay-ai-2.0.0)",
+      "Bash(cp -r '/tmp/powerplay-extract/extension/*' __TRACKED_VAR__/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/)",
+      "Bash(grep -n \"^  - name: play$\" s:/Code101/PowerPlay/config.yaml)",
+      "Bash(code --version)",
+      "Bash(pkill -f \"code\")",
+      "Bash(code \"s:/Code101/PowerPlay\")",
+      "Bash(code .)",
+      "Bash(code --list-extensions)",
+      "Read(//c/Users/tsent/.vscode/extensions/**)",
+      "Bash(pkill -9 code)",
+      "Bash(pkill -9 \"Code Helper\")",
+      "Read(//c/Users/tsent/AppData/Roaming/Code/User/**)",
+      "Bash(mkdir -p /tmp/vscode-test-workspace)",
+      "Bash(cat)",
+      "Bash(code --install-extension powerplay-ai-2.0.0.vsix)",
+      "Bash(cp -r \"s:/Code101/PowerPlay/vscode-extension/out/\"* ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/\"* ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)",
+      "Bash(taskkill /F /IM code.exe)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/package.json\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/powerplay.code-snippets\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/)",
+      "Bash(ls -lh \"s:\\\\Code101\\\\PowerPlay\"/local* \"s:\\\\Code101\\\\PowerPlay\"/START* \"s:\\\\Code101\\\\PowerPlay\"/LOCAL*)"
     ],
     "additionalDirectories": [
       "\\dev",
       "C:\\Users\\tsent\\.continue",
-      "\\tmp"
+      "\\tmp",
+      "C:\\Users\\tsent\\.vscode\\extensions"
     ]
   }
 }

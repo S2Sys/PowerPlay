@@ -75,6 +75,116 @@ export class PowerPlaySettingsPanel {
         const uri = vscode.Uri.file(configPath);
         await vscode.window.showTextDocument(uri);
         break;
+
+      case 'testApiKey':
+        await this.handleTestApiKey(config);
+        break;
+
+      case 'resetDefaults':
+        await this.handleResetDefaults(config);
+        break;
+
+      case 'exportSettings':
+        await this.handleExportSettings(config);
+        break;
+    }
+  }
+
+  private async handleTestApiKey(config: vscode.WorkspaceConfiguration) {
+    const apiKey = config.get<string>('apiKey', '');
+    if (!apiKey) {
+      vscode.window.showWarningMessage('PowerPlay: No API key configured');
+      return;
+    }
+
+    try {
+      const startTime = Date.now();
+      const response = await fetch('https://api.anthropic.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+      });
+      const latency = Date.now() - startTime;
+
+      if (response.ok) {
+        vscode.window.showInformationMessage(
+          `✅ API Key Valid • Latency: ${latency}ms`
+        );
+        this.panel.webview.postMessage({ type: 'apiTestResult', success: true, latency });
+      } else {
+        vscode.window.showErrorMessage(
+          `❌ API Key Invalid (HTTP ${response.status})`
+        );
+        this.panel.webview.postMessage({ type: 'apiTestResult', success: false });
+      }
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        `❌ Failed to test API key: ${error}`
+      );
+      this.panel.webview.postMessage({ type: 'apiTestResult', success: false });
+    }
+  }
+
+  private async handleResetDefaults(config: vscode.WorkspaceConfiguration) {
+    const confirmed = await vscode.window.showWarningMessage(
+      'Reset all PowerPlay settings to defaults?',
+      'Yes',
+      'Cancel'
+    );
+
+    if (confirmed === 'Yes') {
+      const settingKeys = [
+        'defaultModel',
+        'fastModel',
+        'apiKey',
+        'configPath',
+        'temperature',
+        'maxTokens',
+        'maxIterations',
+        'timeout',
+        'parallelExecution',
+        'caching',
+        'debugMode',
+      ];
+
+      for (const key of settingKeys) {
+        await config.update(key, undefined, vscode.ConfigurationTarget.Global);
+      }
+
+      vscode.window.showInformationMessage('✅ PowerPlay settings reset to defaults');
+    }
+  }
+
+  private async handleExportSettings(config: vscode.WorkspaceConfiguration) {
+    const settings = {
+      defaultModel: config.get('defaultModel'),
+      fastModel: config.get('fastModel'),
+      apiKey: '***' + (config.get<string>('apiKey', '').slice(-4)),
+      configPath: config.get('configPath'),
+      temperature: config.get('temperature'),
+      maxTokens: config.get('maxTokens'),
+      maxIterations: config.get('maxIterations'),
+      timeout: config.get('timeout'),
+      parallelExecution: config.get('parallelExecution'),
+      caching: config.get('caching'),
+      debugMode: config.get('debugMode'),
+    };
+
+    const home = require('os').homedir();
+    const filePath = require('path').join(home, 'powerplay-settings.json');
+    const fs = require('fs');
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(settings, null, 2));
+      vscode.window.showInformationMessage(
+        `✅ Settings exported to ${filePath}`
+      );
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        `Failed to export settings: ${error}`
+      );
     }
   }
 

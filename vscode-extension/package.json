@@ -104,6 +104,11 @@
         "title": "PowerPlay: Open Settings",
         "category": "PowerPlay",
         "icon": "$(settings-gear)"
+      },
+      {
+        "command": "powerplay.openChat",
+        "title": "PowerPlay: Open Chat Panel",
+        "category": "PowerPlay"
       }
     ],
     "keybindings": [
@@ -111,6 +116,12 @@
         "command": "powerplay.pickCommand",
         "key": "alt+p",
         "mac": "cmd+shift+p",
+        "when": "editorFocus || !editorFocus"
+      },
+      {
+        "command": "powerplay.openChat",
+        "key": "ctrl+shift+space",
+        "mac": "cmd+shift+space",
         "when": "editorFocus || !editorFocus"
       }
     ],

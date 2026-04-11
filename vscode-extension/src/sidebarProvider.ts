@@ -8,6 +8,8 @@ export class PowerPlaySidebarProvider implements vscode.WebviewViewProvider {
 
   private view?: vscode.WebviewView;
   private prompts: PowerPlayPrompt[] = [];
+  private watcher?: vscode.FileSystemWatcher;
+  private disposables: vscode.Disposable[] = [];
 
   constructor(private extensionUri: vscode.Uri) {}
 
@@ -51,16 +53,20 @@ export class PowerPlaySidebarProvider implements vscode.WebviewViewProvider {
     // Watch for config.yaml changes
     const configPath = this.getConfigPath();
     if (configPath) {
-      const watcher = vscode.workspace.createFileSystemWatcher(
+      this.watcher = vscode.workspace.createFileSystemWatcher(
         new vscode.RelativePattern(vscode.workspace.workspaceFolders?.[0] ?? vscode.Uri.file('/'), '**/config.yaml')
       );
 
-      watcher.onDidChange(() => {
-        this.refreshPrompts();
-      });
-
-      // Store watcher in subscriptions (would be done by extension.ts)
+      this.disposables.push(
+        this.watcher.onDidChange(() => {
+          this.refreshPrompts();
+        })
+      );
     }
+  }
+
+  public refresh(): void {
+    this.refreshPrompts();
   }
 
   private refreshPrompts(): void {
@@ -155,5 +161,13 @@ export class PowerPlaySidebarProvider implements vscode.WebviewViewProvider {
   <script src="${scriptUri}"></script>
 </body>
 </html>`;
+  }
+
+  public dispose(): void {
+    if (this.watcher) {
+      this.watcher.dispose();
+    }
+    this.disposables.forEach(d => d.dispose());
+    this.disposables = [];
   }
 }

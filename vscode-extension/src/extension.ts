@@ -5,6 +5,7 @@ import { parsePrompts, getConfigPath, PowerPlayPrompt } from './configParser';
 import { PowerPlaySidebarProvider } from './sidebarProvider';
 import { showCommandPicker, insertOrCopyCommand } from './commandPicker';
 import { PowerPlaySettingsPanel } from './settingsPanel';
+import { PowerPlayChatPanel } from './chatPanel';
 
 let statusBarItem: vscode.StatusBarItem;
 let sidebarProvider: PowerPlaySidebarProvider;
@@ -15,8 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Create status bar item
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBarItem.command = 'powerplay.showStatus';
-  statusBarItem.tooltip = 'PowerPlay AI for Continue.dev';
+  statusBarItem.command = 'powerplay.openChat';
+  statusBarItem.tooltip = 'PowerPlay Chat — Click to open';
 
   // Register sidebar provider
   sidebarProvider = new PowerPlaySidebarProvider(context.extensionUri);
@@ -54,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   const reloadConfigCmd = vscode.commands.registerCommand('powerplay.reloadConfig', () => {
+    sidebarProvider.refresh();
     vscode.window.showInformationMessage('PowerPlay config reloaded');
   });
 
@@ -72,6 +74,10 @@ export function activate(context: vscode.ExtensionContext) {
     PowerPlaySettingsPanel.createOrShow(context.extensionUri);
   });
 
+  const openChatCmd = vscode.commands.registerCommand('powerplay.openChat', () => {
+    PowerPlayChatPanel.createOrShow(context.extensionUri);
+  });
+
   // Watch for config changes
   const configWatcher = vscode.workspace.createFileSystemWatcher('**/config.yaml');
   configWatcher.onDidCreate(() => updateStatusBar());
@@ -87,6 +93,7 @@ export function activate(context: vscode.ExtensionContext) {
     reloadConfigCmd,
     copyCommandCmd,
     settingsCmd,
+    openChatCmd,
     configWatcher,
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('powerplay')) {
