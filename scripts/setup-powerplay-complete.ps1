@@ -2,6 +2,9 @@
 # Simple script to set and validate OPENROUTER_API_KEY environment variable
 # Run as Administrator!
 
+# ═══════════════════════════════════════════════════════════════
+# Configuration (Top-Level Assignments)
+# ═══════════════════════════════════════════════════════════════
 $Success = "Green"
 $Warning = "Yellow"
 $Error = "Red"
