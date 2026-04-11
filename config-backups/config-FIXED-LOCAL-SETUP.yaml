@@ -1,0 +1,198 @@
+# PowerPlay v2.0.0 — FIXED LOCAL MODEL CONFIGURATION
+# For use with Continue.dev IDE Extension
+
+# BEFORE USING THIS CONFIG:
+# 1. Make sure you have Ollama or similar running locally
+# 2. Replace YOUR_LOCAL_SERVER_ADDRESS with your actual server
+# 3. Set up environment variables or edit directly
+# 4. Test the connection
+
+models:
+  # ═══════════════════════════════════════════════════════════
+  # OPTION 1: Using Ollama (Most Common)
+  # ═══════════════════════════════════════════════════════════
+  # Ollama runs on http://localhost:11434 by default
+
+  - name: DeepSeek Coder 6.7B [Local - Ollama]
+    provider: ollama
+    model: deepseek-coder:6.7b
+    # For Ollama, apiBase is: http://localhost:11434/api
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Qwen 2.5 7B [Local - Ollama]
+    provider: ollama
+    model: qwen2.5:7b
+    capabilities: [tool_use]
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  # ═══════════════════════════════════════════════════════════
+  # OPTION 2: Using LM Studio
+  # ═══════════════════════════════════════════════════════════
+  # LM Studio runs on http://localhost:1234/v1 by default
+
+  - name: DeepSeek Coder 6.7B [Local - LM Studio]
+    provider: openai
+    model: local-model
+    apiBase: http://localhost:1234/v1
+    apiKey: not-needed
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Qwen 2.5 Coder [Local - LM Studio]
+    provider: openai
+    model: local-model
+    apiBase: http://localhost:1234/v1
+    apiKey: not-needed
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  # ═══════════════════════════════════════════════════════════
+  # OPTION 3: Using Jan.ai
+  # ═══════════════════════════════════════════════════════════
+  # Jan.ai runs on http://localhost:1337/v1 by default
+
+  - name: DeepSeek Coder 6.7B [Local - Jan.ai]
+    provider: openai
+    model: deepseek-coder:6.7b
+    apiBase: http://localhost:1337/v1
+    apiKey: not-needed
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  # ═══════════════════════════════════════════════════════════
+  # OPTION 4: Using OpenRouter (Cloud Fallback - FREE)
+  # ═══════════════════════════════════════════════════════════
+  # Sign up at https://openrouter.ai (FREE credits: $5/month)
+  # Set environment variable: OPENROUTER_API_KEY=your-key
+
+  - name: DeepSeek Coder 6.7B [OpenRouter - Free]
+    provider: openai
+    model: deepseek/deepseek-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Qwen 3 [OpenRouter - Free]
+    provider: openai
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    capabilities: [tool_use]
+    roles: [chat, edit]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Llama 3.1 70B [OpenRouter - Free]
+    provider: openai
+    model: meta-llama/llama-3.1-70b-instruct:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    capabilities: [tool_use]
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+---
+
+# SETUP GUIDE
+# ═══════════════════════════════════════════════════════════
+
+## STEP 1: Choose Your Option
+
+Option A: Use Ollama (Recommended for local development)
+  - Download: https://ollama.ai
+  - Pull model: ollama pull deepseek-coder:6.7b
+  - Start: ollama serve
+  - Uses: Provider "ollama", model "deepseek-coder:6.7b"
+
+Option B: Use LM Studio (GUI, easier)
+  - Download: https://lmstudio.ai
+  - Load model: DeepSeek Coder 6.7B
+  - Start server on localhost:1234
+  - Uses: Provider "openai", apiBase "http://localhost:1234/v1"
+
+Option C: Use Jan.ai (Beginner friendly)
+  - Download: https://jan.ai
+  - Install model: DeepSeek Coder 6.7B
+  - Start server
+  - Uses: Provider "openai", apiBase "http://localhost:1337/v1"
+
+Option D: Use OpenRouter (Cloud - No local setup needed)
+  - Sign up: https://openrouter.ai (FREE $5/month)
+  - Get API key
+  - Set env var: OPENROUTER_API_KEY=your-key
+  - Uses: Provider "openai", apiBase "https://openrouter.ai/api/v1"
+
+## STEP 2: Update Your Continue.dev Config
+
+1. Open Continue settings (Cmd/Ctrl + Shift + P → Continue: Open Config)
+2. Copy the appropriate model configuration from above
+3. Make sure the server is running
+4. Test by sending a message in Continue
+
+## STEP 3: Verify Connection
+
+Test with a simple message:
+  - Send: "Hello, can you respond?"
+  - If error: Check server is running at the apiBase address
+  - If success: You're set up!
+
+## TROUBLESHOOTING
+
+Error: "No chat model selected"
+  Fix: Make sure apiBase server is running (Ollama/LM Studio/Jan)
+
+Error: "Connection refused"
+  Fix: Check server address is correct (localhost:11434, 1234, 1337, etc)
+
+Error: "Invalid API key"
+  Fix: For local: apiKey can be empty or "not-needed"
+       For cloud: Set OPENROUTER_API_KEY environment variable
+
+Error: "Model not found"
+  Fix: Download the model first (ollama pull deepseek-coder:6.7b)
+
+## ENVIRONMENT VARIABLES
+
+For OpenRouter (Cloud):
+  export OPENROUTER_API_KEY=your-api-key
+
+For Anthropic Claude (if upgrading):
+  export ANTHROPIC_API_KEY=your-api-key
+
+## TESTING
+
+After setup, test with:
+  1. Open any file in Continue
+  2. Send message: "Hello"
+  3. Should get response from the model
+
+If it works → You're done!
+If error → Check the apiBase server is running
+
+═══════════════════════════════════════════════════════════
+Last Updated: 2026-04-11
+Version: PowerPlay v2.0.0
+═══════════════════════════════════════════════════════════
