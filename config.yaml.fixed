@@ -1,0 +1,718 @@
+name: SmartWorkz PowerPlay — Continue.dev Elite Config
+version: 3.9.0
+
+# Release metadata
+metadata:
+  schema: v1
+  releaseDate: "2026-04-10"
+  lastUpdated: "2026-04-10"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.9.0"
+  wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
+  changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
+  supportedContinueVersions: ">=0.8.0"
+  author: "SmartWorkz Dev"
+  license: "MIT"
+
+# ╔══════════════════════════════════════════════════════╗
+# ║  SMARTWORKZ POWERPLAY — Continue.dev Elite Config    ║
+# ║  Cursor-level AI. Windsurf-level agents. Zero cost.  ║
+# ╚══════════════════════════════════════════════════════╝
+
+defaultCompletionOptions:
+  maxTokens: 4096
+  temperature: 0.3
+
+# ─────────────────────────────────────────────────────────
+# RULES — System instructions (Continue.dev valid keys only)
+# ─────────────────────────────────────────────────────────
+rules:
+  - name: smartworkz-core
+    alwaysApply: true
+    rule: |
+      You are an expert AI assistant embedded in SmartWorkz Technologies.
+      Supported Stacks:
+        - Backend: .NET 8/ASP.NET Core, Node.js/Express, Python/FastAPI/Django, Java/Spring Boot, PHP/Drupal
+        - Frontend: Angular 17+, React 18+ (Next.js), Vue 3, Flutter, MAUI
+        - Database: SQL Server 2022, PostgreSQL, MySQL, MongoDB
+        - ORMs: Dapper, Entity Framework Core, Prisma, SQLAlchemy, TypeORM, Hibernate
+        - Cloud: Azure DevOps, AWS, GCP
+
+      Always:
+        - Use C# 12 features (primary constructors, collection expressions) for .NET
+        - Prefer async/await with CancellationToken parameters
+        - Use ILogger<T> (C#), structured logging (Node.js/Python/Java), never console.log/print in production
+        - Angular: standalone components, inject(), OnPush, typed forms
+        - React: functional components, hooks, TypeScript strict mode
+        - Next.js: Server Components default, Client Components for interactivity
+        - Vue 3: Composition API, <script setup>, typed props and emits
+        - Flutter/MAUI: null safety, immutable widgets, provider/bloc state management
+        - Node.js: async/await, error middleware, validation at boundary
+        - Python: type hints on all functions, dependency injection, ORM for database access
+        - PHP: type hints, PSR-12 standards, dependency injection
+      Never:
+        - Leave TODO comments in generated code
+        - Use Thread.Sleep (C#) or setTimeout (blocking) — always Task.Delay or async patterns
+        - Expose raw exceptions to API consumers
+        - Hardcode secrets or connection strings
+        - Use plain text passwords or tokens in code
+
+  - name: dotnet-rules
+    globs: ["**/*.cs"]
+    alwaysApply: false
+    rule: |
+      .NET/C# standards:
+      - Controllers: [ApiController] + [Route("api/v1/[controller]")] — no business logic
+      - Services: interface + Scoped implementation
+      - Repositories: Dapper with parameterised queries only
+      - Validation: FluentValidation at controller boundary
+      - Errors: ProblemDetails RFC 7807
+      - All DB calls must be async with Async suffix
+      - Enable nullable reference types (#nullable enable)
+      - XML docs required on all public members
+
+  - name: security-rules
+    alwaysApply: true
+    rule: |
+      Security (applied everywhere):
+      - Never hardcode secrets, API keys, connection strings
+      - Parameterised queries only — flag string concatenation
+      - Sanitise all user input before use
+      - Flag any code logging passwords, tokens, or PII
+      - Angular: use DomSanitizer — never bypass security
+
+defaultCompletionOptions:
+  maxTokens: 4096
+  temperature: 0.3
+
+# ─────────────────────────────────────────────────────────
+# MODELS
+# ─────────────────────────────────────────────────────────
+models:
+  - name: Qwen 3.5 9B [Chat]
+    provider: openai
+    model: gpt-4o
+    apiBase: https://api.openrouter.io/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    chatOptions:
+      baseSystemMessage: |
+        Senior .NET/Angular architect. Be concise. Use code blocks.
+        Never repeat questions back. Get straight to the solution.
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Claude Opus [Reasoning]
+    provider: openai
+    model: claude-opus-4-6
+    apiBase: https://api.anthropic.com/v1
+    apiKey: ${ANTHROPIC_API_KEY}
+    roles: [chat]
+    capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.1
+
+  - name: Claude Sonnet [Apply]
+    provider: openai
+    model: claude-sonnet-4-6
+    apiBase: https://api.anthropic.com/v1
+    apiKey: ${ANTHROPIC_API_KEY}
+    roles: [apply, edit]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+# ─────────────────────────────────────────────────────────
+# TAB AUTOCOMPLETE
+# ─────────────────────────────────────────────────────────
+tabAutocompleteModel:
+  provider: openai
+  model: gpt-4o-mini
+  apiBase: https://api.openrouter.io/api/v1
+  apiKey: ${OPENROUTER_API_KEY}
+
+tabAutocompleteOptions:
+  debounceDelay: 400
+  maxPromptTokens: 1500
+  prefixPercentage: 0.75
+  multilineCompletions: "auto"
+  useCache: true
+  useOtherFiles: true
+
+# ─────────────────────────────────────────────────────────
+# EMBEDDINGS
+# ─────────────────────────────────────────────────────────
+embeddingsProvider:
+  provider: openai
+  model: text-embedding-3-small
+  apiBase: https://api.openrouter.io/api/v1
+  apiKey: ${OPENROUTER_API_KEY}
+
+# ─────────────────────────────────────────────────────────
+# CONTEXT PROVIDERS
+# ─────────────────────────────────────────────────────────
+contextProviders:
+  - name: code
+    params:
+      nRetrieveFiles: 15
+  - name: codebase
+    params:
+      nRetrieve: 30
+      nFinal: 8
+      useReranking: false
+  - name: docs
+    params: {}
+  - name: diff
+    params: {}
+  - name: terminal
+    params: {}
+  - name: problems
+    params: {}
+  - name: folder
+    params: {}
+  - name: file
+    params: {}
+  - name: currentFile
+    params: {}
+  - name: repo-map
+    params: {}
+  - name: open
+    params: {}
+
+# ─────────────────────────────────────────────────────────
+# DOCS INDEXING
+# ─────────────────────────────────────────────────────────
+docs:
+  - name: Continue.dev
+    startUrl: https://docs.continue.dev/intro
+  - name: ASP.NET Core 8
+    startUrl: https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core
+  - name: Angular 17
+    startUrl: https://angular.dev/overview
+
+# ─────────────────────────────────────────────────────────
+# PROMPTS — /slash commands (FIXED: proper apply/edit handling)
+# ─────────────────────────────────────────────────────────
+prompts:
+  # ══════════════════════════════════════════════════════
+  # FAST-PATH COMMANDS (Quick decision-making)
+  # ══════════════════════════════════════════════════════
+
+  - name: play
+    description: "PowerPlay orchestrator — describe any task and get routed to the right command"
+    prompt: |
+      You are the PowerPlay orchestrator. Route the user's task to the best command.
+      Identify: intent (review/test/fix/security/perf/db/api/arch/deploy/doc) → scope (quick/full) → command.
+      Execute the command inline. Show: **Intent**: [category] | **Command**: /[name] | **Scope**: [quick/full]
+      Do the work directly without preamble.
+
+  - name: quick
+    description: "Fast-path — execute immediately with minimal explanation"
+    prompt: |
+      Fast-path execution. Do the work directly.
+      - Fix: output ONLY corrected code, no explanation
+      - Review: Severity | Line | Issue | Fix (table only)
+      - Test: generate xUnit tests (happy path + 2 edge cases only)
+      - Doc: add XML docs to public members only
+      - No preamble, no questions. Execute.
+
+  # ══════════════════════════════════════════════════════
+  # CODE REVIEW & QUALITY
+  # ══════════════════════════════════════════════════════
+
+  - name: review
+    description: "Full code review — bugs, patterns, security"
+    prompt: |
+      Perform a thorough code review. Structure as:
+      ## Summary — one sentence
+      ## Issues Found — table: Severity | Line | Issue | Fix
+      ## Security Concerns — SQL injection, XSS, exposed secrets, auth
+      ## Performance Notes — N+1, blocking calls, missing indexes
+      ## Suggested Refactors — SOLID violations, design patterns
+      Be direct. Include code snippets for every fix.
+
+  - name: quick-fix
+    description: "Auto-fix the selected code — apply best practices"
+    prompt: |
+      Fix the selected code. Output ONLY the corrected code block.
+      No explanation, no comments, just the fixed code.
+      Apply: proper naming, async/await, error handling, nullable types, IDisposable.
+      Make it production-ready in one pass.
+
+  - name: inline-review
+    description: "Inline code review — annotated issues with severity"
+    prompt: |
+      Quick inline review of selected code.
+      Format: Severity | Line | Issue | Fix Code
+      Keep it tight — one issue per row, no explanations.
+      Severity: Critical | Warning | Info
+      Include specific line numbers and code snippets.
+
+  - name: audit-all
+    description: "Full audit — security, performance, quality, coverage, docs"
+    prompt: |
+      Full audit of selected code across all dimensions.
+      ## Security (OWASP Top 10)
+      Table: Severity | Issue | Fix Code | Recommendation
+      ## Performance
+      Table: Issue | Impact | Fix | Estimated Improvement
+      ## Code Quality
+      SOLID violations, complexity, duplication, naming, patterns
+      ## Test Coverage
+      What's missing, high-value tests to add, coverage gap estimate
+      ## Documentation
+      What's undocumented, examples missing
+      Be direct and specific. Include fix code for every issue. Prioritize by impact.
+
+  # ══════════════════════════════════════════════════════
+  # CODE GENERATION & EDITING
+  # ══════════════════════════════════════════════════════
+
+  - name: add-docs
+    description: "Add XML documentation comments"
+    prompt: |
+      Add XML docs to all public members:
+      <summary>, <param>, <returns>, <exception>, <remarks>.
+      Add <example> for utility methods. Keep logic unchanged.
+      Output: code with documentation added.
+
+  - name: add-types
+    description: "Add TypeScript types or C# explicit types"
+    prompt: |
+      Add types to the selected code.
+      TypeScript: replace 'any', add param/return types, add generic constraints.
+      C#: replace 'var' with explicit types, add nullable annotations (#nullable enable).
+      Output: typed code only, no explanation.
+      Make every type as specific as possible.
+
+  - name: ng-component
+    description: "Generate Angular standalone component"
+    prompt: |
+      Generate a complete Angular 17+ standalone component:
+      - inject(), OnPush, standalone: true
+      - Typed FormGroup<T> if form needed
+      - Service interface + implementation
+      - DevExtreme HTML template
+      - SCSS with sw- BEM naming
+      Output: compilable component + service + model files.
+
+  - name: explain-deep
+    description: "Deep explanation of complex code"
+    prompt: |
+      Explain this code:
+      1. Problem it solves
+      2. Step-by-step logic
+      3. Key design decisions
+      4. Potential failure modes
+      5. How to improve it
+      Use ASCII diagrams for complex flows.
+
+  - name: explain-inline
+    description: "Explain selected code with inline comments"
+    prompt: |
+      Add // comments to explain the selected code.
+      One comment per meaningful line.
+      Tone: explain to a junior developer.
+      Output: same code with // comments added.
+      Never change logic, only add explanations.
+
+  - name: doc-complete
+    description: "Generate complete documentation — XML docs, examples, README"
+    prompt: |
+      Generate complete documentation for this code:
+      1. XML docs on all public members (<summary>, <param>, <returns>, <exception>, <example>)
+      2. Usage examples (2-3 realistic scenarios with code)
+      3. README section: description, how to use, error handling, gotchas
+      Keep logic unchanged. Output annotated code + README markdown block.
+
+  - name: migrate-version
+    description: "Create migration plan for version/framework upgrade"
+    prompt: |
+      Create a migration plan for the described version or framework upgrade.
+      Step 1: Breaking changes — what will break, why, impact assessment
+      Step 2: Migration steps — ordered, safe, incremental steps
+      Step 3: Code changes — before/after examples for key patterns
+      Step 4: Testing plan — how to verify migration succeeded
+      Output: numbered migration guide with code examples and safety notes.
+
+  # ══════════════════════════════════════════════════════
+  # TESTING
+  # ══════════════════════════════════════════════════════
+
+  - name: add-tests
+    description: "Add unit tests — happy path and edge cases"
+    prompt: |
+      Generate xUnit tests with Moq and FluentAssertions.
+      Cover: happy path, edge cases, null inputs, exceptions.
+      Pattern: MethodName_Scenario_ExpectedResult.
+      AAA comments. Mock all externals. Output: complete test class — no placeholders.
+
+  - name: generate-tests-complete
+    description: "Generate complete test suite — unit, integration, boundary"
+    prompt: |
+      Generate complete test suite: Unit (happy path, edge cases, nulls, exceptions) + Integration tests + Boundary cases.
+      Use xUnit + Moq + FluentAssertions. AAA comments. Mock externals. Output: complete test file.
+
+  - name: coverage-gaps
+    description: "Identify untested code paths and suggest high-value test cases"
+    prompt: |
+      Gap analysis: 1. Identify untested methods/branches. 2. Prioritize by risk. 3. For top 5 gaps, generate complete test case (AAA pattern).
+      Output: Gap analysis table + 5 complete test cases ready to paste.
+
+  # ══════════════════════════════════════════════════════
+  # SECURITY
+  # ══════════════════════════════════════════════════════
+
+  - name: security-scan
+    description: "OWASP Top 10 security scan — vulnerabilities and fixes"
+    prompt: |
+      OWASP Top 10 scan. Check: SQL injection, XSS, hardcoded secrets, missing auth, insecure deserialization, path traversal, sensitive data in logs, CORS misconfiguration, missing validation, exposed stack traces.
+      Output: Severity | Line | Vulnerability | Fix Code
+
+  - name: security-agent
+    description: "Full OWASP audit — vulnerabilities and remediation"
+    prompt: |
+      Full OWASP audit. Check all categories:
+      A1 Broken Access | A2 Cryptographic Failures | A3 Injection | A4 Insecure Design | A5 Misconfiguration | A6 Vulnerable Deps | A7 Auth Failures | A8 Integrity | A9 Logging | A10 SSRF.
+      Output: Severity | Category | Issue | Line | Exact Fix Code
+
+  - name: zero-trust-design
+    description: "Zero-trust architecture design"
+    prompt: |
+      Zero-trust design (5 steps):
+      1. Identity & Access (MFA, OAuth, JWT)
+      2. Authentication (verify every)
+      3. Authorization (RBAC, JIT)
+      4. Network (microseg, mTLS)
+      5. Encryption (TLS 1.2+, AES-256) | Monitoring (audit logs, alerts).
+      Output: Zero-trust architecture diagram + policy matrix.
+
+  # ══════════════════════════════════════════════════════
+  # PERFORMANCE & DATABASE
+  # ══════════════════════════════════════════════════════
+
+  - name: performance-check
+    description: "Identify performance issues — N+1, allocations, blocking calls"
+    prompt: |
+      Performance audit. Check: N+1 queries, SELECT specific columns, memory allocations in loops, blocking await, missing indexes.
+      Output: Issue | Impact | Line | Fix | Estimated Improvement
+
+  - name: perf-optimize
+    description: "Optimize code — before/after performance comparison"
+    prompt: |
+      Optimize the selected code.
+      1. Identify bottleneck (profiling, N+1, allocations)
+      2. Refactor (code + SQL changes)
+      3. Before/after metrics (latency, throughput, memory)
+      Output: optimized code + performance impact statement.
+
+  - name: optimize-sql
+    description: "SQL query optimization — indexes, execution plans, rewrites"
+    prompt: |
+      Optimize SQL Server query or stored procedure:
+      1. SET NOCOUNT ON
+      2. BEGIN TRY/CATCH
+      3. Replace cursors with set-based ops
+      4. CREATE INDEX for missing indexes
+      5. Use temp tables for > 10k rows
+      6. WITH (NOLOCK) where safe
+      7. SARGable WHERE clauses
+      Output: optimized procedure + index recommendations + change log.
+
+  - name: database-design
+    description: "Database schema design from requirements"
+    prompt: |
+      Schema design from requirements:
+      1. Tables and relationships
+      2. PKs/FKs
+      3. Constraints and indexes
+      4. Normalization rationale
+      5. Soft delete columns
+      6. Audit columns
+      Output: CREATE TABLE statements + index recommendations + design rationale.
+
+  - name: data-model
+    description: "Entity relationship diagram and data model"
+    prompt: |
+      Design a data model:
+      1. Identify entities and relationships
+      2. Primary/foreign keys
+      3. Cardinality (1-1, 1-many, many-many)
+      4. Normalization (1NF, 2NF, 3NF)
+      5. Entity attributes and types
+      Output: ERD diagram + CREATE TABLE DDL + design documentation.
+
+  # ══════════════════════════════════════════════════════
+  # ARCHITECTURE & DESIGN
+  # ══════════════════════════════════════════════════════
+
+  - name: architecture-design
+    description: "Feature-level architecture — layers, patterns, DI"
+    prompt: |
+      Feature architecture design applying SmartWorkz rules:
+      1. Diagram (Controller → Service → Repository → Database)
+      2. Layer descriptions
+      3. Pattern rationale
+      4. DI registration sketch
+      Output: ASCII architecture diagram + component descriptions.
+
+  - name: refactor-inline
+    description: "Single best refactoring for selected code"
+    prompt: |
+      Single best refactoring. Output refactored code only.
+      No explanation. Apply one transformation:
+      - Extract method
+      - Extract interface
+      - Eliminate duplication
+      - Reduce complexity
+      - Apply design pattern
+
+  - name: refactor-large
+    description: "Module refactoring plan — dependencies, risks, steps"
+    prompt: |
+      Module refactoring plan:
+      Step 1: Dependency map (what depends on what)
+      Step 2: Issues (SOLID violations, duplication, complexity)
+      Step 3: Plan (ordered steps with risk and effort)
+      Step 4: File structure (files to create/modify/delete)
+      Output: structured plan with file paths, effort, and risks.
+
+  - name: design-patterns-guide
+    description: "GoF design patterns reference and application"
+    prompt: |
+      Design patterns reference. Identify pattern and explain:
+      - Problem it solves
+      - When to use / when NOT to use
+      - Structure / code example (.NET or TypeScript)
+      - Real-world use cases
+      - Gotchas and trade-offs
+
+  # ══════════════════════════════════════════════════════
+  # APIs & CONTRACTS
+  # ══════════════════════════════════════════════════════
+
+  - name: api-contract
+    description: "Generate OpenAPI spec and endpoint contracts"
+    prompt: |
+      Generate OpenAPI 3.0 spec:
+      Step 1: Endpoints (routes, methods, parameters)
+      Step 2: Request bodies (POST/PUT/PATCH schemas)
+      Step 3: Responses (200, 400, 401, 403, 404, 500 schemas)
+      Step 4: Auth (JWT bearer security schemes)
+      Step 5: Examples (realistic request/response per endpoint)
+      Output: complete OpenAPI 3.0 YAML spec.
+
+  - name: api
+    description: "Generate ASP.NET Core endpoint with service and repository"
+    prompt: |
+      Generate complete ASP.NET Core 8 endpoint:
+      - Controller + DTOs + FluentValidation
+      - Service interface + Scoped implementation
+      - Dapper repository with parameterised SQL
+      - ILogger<T> + ProblemDetails error handling
+      - DI registration comment for Program.cs
+      Output: complete compilable C# files.
+
+  # ══════════════════════════════════════════════════════
+  # DEPLOYMENT & INFRASTRUCTURE
+  # ══════════════════════════════════════════════════════
+
+  - name: docker-containerize
+    description: "Generate Dockerfile and Docker Compose"
+    prompt: |
+      Generate containerization setup:
+      Step 1: Multi-stage Dockerfile — builder and runtime
+      Step 2: Docker Compose — app, database, cache, nginx
+      Step 3: Volumes — persistent data, code hot-reload
+      Step 4: Networking — service-to-service DNS, health checks
+      Step 5: Security — non-root user, secrets via .env
+      Output: Dockerfile + docker-compose.yml + .dockerignore + dev guide.
+
+  - name: kubernetes-deploy
+    description: "Generate Kubernetes manifests — deployments, services, ingress"
+    prompt: |
+      Generate Kubernetes manifests:
+      Step 1: Namespace — isolation for environment
+      Step 2: Deployments — replicas, resource limits, probes
+      Step 3: Services — ClusterIP, LoadBalancer
+      Step 4: ConfigMaps — non-secret configuration
+      Step 5: HPA — auto-scaling based on metrics
+      Output: YAML manifests (namespace, deployment, service, ingress, hpa).
+
+  - name: generate-helm-charts
+    description: "Generate Helm charts for Kubernetes deployment"
+    prompt: |
+      Generate complete Helm chart:
+      1. Chart.yaml — metadata
+      2. values.yaml — image, replicas, ports, env vars
+      3. templates/deployment.yaml — Deployment with templating
+      4. templates/service.yaml — Service mapping
+      5. templates/ingress.yaml — Ingress configuration
+      6. templates/configmap.yaml — ConfigMaps and Secrets
+      Output: Complete Helm chart (6 files) + helm install commands.
+
+  - name: iac-generate
+    description: "Generate Terraform or Bicep infrastructure code"
+    prompt: |
+      Generate Infrastructure as Code:
+      Step 1: Provider setup — cloud config, remote state
+      Step 2: Modules — network, compute, database, storage
+      Step 3: Variables — input variables with validation
+      Step 4: State management — encryption, locking
+      Step 5: Outputs — export created resources
+      Output: Complete Terraform .tf or Bicep .bicep files.
+
+  - name: aws-design
+    description: "Design AWS architecture — Lambda, S3, RDS, DynamoDB"
+    prompt: |
+      Design AWS architecture:
+      Step 1: Compute — Lambda vs ECS vs App Runner
+      Step 2: Database — RDS (relational), DynamoDB (NoSQL)
+      Step 3: API layer — API Gateway + Lambda, rate limiting, WAF
+      Step 4: Storage — S3, CloudFront CDN, lifecycle policies
+      Step 5: Monitoring — CloudWatch, X-Ray, alarms
+      Output: AWS architecture diagram + resources + costs + security checklist.
+
+  - name: azure-setup
+    description: "Generate Azure deployment — App Service, Functions, SQL"
+    prompt: |
+      Generate Azure deployment:
+      Step 1: Compute — App Service, Azure Functions
+      Step 2: Database — Azure SQL Database, Cosmos DB
+      Step 3: Networking — Virtual Network, private endpoints
+      Step 4: Security — Managed Identity, Key Vault, TLS
+      Step 5: Monitoring — Application Insights, alerts
+      Output: Bicep infrastructure code + deployment guide + costs.
+
+  # ══════════════════════════════════════════════════════
+  # FRONTEND & UI
+  # ══════════════════════════════════════════════════════
+
+  - name: frontend
+    description: "Generate frontend component — Angular, React, or Vue"
+    prompt: |
+      Generate frontend component:
+      - Angular: standalone, inject(), OnPush, FormGroup<T>, SCSS
+      - React: functional, hooks, TypeScript strict, styled-components
+      - Vue: Composition API, <script setup>, typed props
+      Output: complete, production-ready component.
+
+  - name: design-audit
+    description: "WCAG accessibility audit — contrast, focus, ARIA"
+    prompt: |
+      WCAG 2.1 AA audit:
+      1. Contrast check (4.5:1 for text, 3:1 for UI)
+      2. Focus indicators (visible and clear)
+      3. ARIA labels (buttons, inputs, modals)
+      4. Keyboard navigation (Tab, Enter, Escape work)
+      5. Color not sole differentiator
+      Output: audit table (Issue | WCAG Level | Fix Code).
+
+  # ══════════════════════════════════════════════════════
+  # DEVELOPER EXPERIENCE
+  # ══════════════════════════════════════════════════════
+
+  - name: git-workflow-cmd
+    description: "Git assistance — branch naming, commit messages, squashing"
+    prompt: |
+      Git workflow assistance:
+      Step 1: Branch name — suggest feature/123-title format
+      Step 2: Commits — rewrite to Conventional Commits format
+      Step 3: Squash plan — identify commits to squash
+      Step 4: Conflict guidance — explain merge conflicts
+      Output: suggested branch name + rewritten commits + squash plan.
+
+  - name: workspace-learn
+    description: "Analyse project conventions and suggest relevant PowerPlay commands"
+    prompt: |
+      Analyse project conventions:
+      Step 1: Naming conventions (files, classes, methods, variables)
+      Step 2: Folder structure and module boundaries
+      Step 3: Recurring patterns (repository, service, DI)
+      Step 4: Error handling (middleware, try/catch, custom exceptions)
+      Step 5: Testing approach (framework, naming, coverage)
+      Step 6: Key architectural decisions
+      Output: conventions document + top 5 relevant PowerPlay commands.
+
+  - name: think-through
+    description: "Force explicit chain-of-thought reasoning"
+    prompt: |
+      Work through this problem explicitly.
+      Step 1: RESTATE — problem in your own words
+      Step 2: DECOMPOSE — break into sub-problems
+      Step 3: ASSUMPTIONS — list every assumption
+      Step 4: REASONING — state reasoning for each sub-problem
+      Step 5: ANSWER — actual answer informed by above
+      Step 6: CONFIDENCE — HIGH / MEDIUM / LOW + caveats
+
+  - name: pr-review
+    description: "Autonomous PR review — quality, security, performance, testing"
+    prompt: |
+      Autonomous PR review:
+      Step 1: Code quality — complexity, duplication, SOLID
+      Step 2: Security — OWASP Top 10, injection risks, secrets
+      Step 3: Performance — N+1, allocations, blocking awaits
+      Step 4: Testing — coverage gaps, test quality
+      Step 5: Documentation — missing docs, stale comments
+      Step 6: Summary — table: Category | Severity | Issue | Line | Fix
+      Output: Approve or request changes with specifics.
+
+  - name: observability-audit
+    description: "Audit logging, tracing, metrics — find gaps"
+    prompt: |
+      Audit observability:
+      Step 1: Logging gaps — missing error and critical path logs
+      Step 2: Log quality — structured logging (key=value), not string interpolation
+      Step 3: Sensitive data — flag PII, secrets, tokens
+      Step 4: Tracing — missing correlation IDs and spans
+      Step 5: Metrics — suggest counters/histograms
+      Output: table of gaps (Operation | Gap | Severity) + code fixes.
+
+  - name: dep-update
+    description: "Dependency audit — outdated packages, CVEs, update path"
+    prompt: |
+      Dependency audit:
+      Step 1: Outdated — packages behind latest stable
+      Step 2: CVE check — security vulnerabilities
+      Step 3: Breaking changes — impact per package
+      Step 4: Safe update path — ordered steps
+      Step 5: Test plan — what to test after update
+      Output: table: Package | Current | Latest | Days Outdated | CVE | Breaking Changes | Safe to Update.
+
+  # ══════════════════════════════════════════════════════
+  # ALIASES (Shortcuts)
+  # ══════════════════════════════════════════════════════
+
+  - name: doc
+    description: "Alias — add XML documentation comments"
+    prompt: |
+      Add XML docs to all public members.
+      <summary>, <param>, <returns>, <exception>, <remarks>.
+      Keep logic unchanged.
+
+  - name: deep
+    description: "Alias — deep code explanation"
+    prompt: |
+      Deep explanation: Problem | Logic | Design Decisions | Failure Modes | Edge Cases.
+
+  - name: learn
+    description: "Alias — analyze project conventions and suggest commands"
+    prompt: |
+      Analyse project and save output to docs/WORKSPACE_CONVENTIONS.md
+
+  - name: spec
+    description: "Alias — generate technical specification"
+    prompt: |
+      Convert business requirement to technical specification.
+      PARSE | FUNCTIONAL REQUIREMENTS | NON-FUNCTIONAL | TECHNICAL SPEC | DESIGN IMPLICATIONS | OPEN QUESTIONS.
+
+  - name: requirement
+    description: "Alias — full requirements engineering chain"
+    prompt: |
+      Execute full 4-phase requirements chain:
+      Phase 1: Requirements → Specs | Phase 2: Specs → Criteria | Phase 3: Risk Assessment | Phase 4: Review.
+
+experimental:
+  readResponseToCursor: false

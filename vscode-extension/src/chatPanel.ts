@@ -88,7 +88,8 @@ export class PowerPlayChatPanel {
     }
   }
 
-  private _handleMessage(message: any): void {
+  private async _handleMessage(message: any): Promise<void> {
+    const config = vscode.workspace.getConfiguration('powerplay');
     switch (message.type) {
       case 'ready':
         this._panel.webview.postMessage({ type: 'prompts', data: this._prompts });
@@ -101,6 +102,57 @@ export class PowerPlayChatPanel {
         this._history = [];
         this._panel.webview.postMessage({ type: 'history', data: [] });
         break;
+      case 'loadSettings':
+        this._panel.webview.postMessage({
+          type: 'settings',
+          data: {
+            configPath: config.get('configPath'),
+            defaultModel: config.get('defaultModel'),
+            temperature: config.get('temperature'),
+          },
+        });
+        break;
+      case 'saveSettings':
+        await config.update('configPath', message.settings.configPath, vscode.ConfigurationTarget.Global);
+        await config.update('defaultModel', message.settings.defaultModel, vscode.ConfigurationTarget.Global);
+        await config.update('temperature', message.settings.temperature, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage('✅ PowerPlay settings saved');
+        this._loadPrompts();
+        this._panel.webview.postMessage({ type: 'prompts', data: this._prompts });
+        break;
+      case 'testConnection':
+        await this._testApiConnection(message.apiKey);
+        break;
+      case 'openConfigFile':
+        if (message.path) {
+          await vscode.window.showTextDocument(vscode.Uri.file(message.path));
+        }
+        break;
+    }
+  }
+
+  private async _testApiConnection(apiKey: string): Promise<void> {
+    try {
+      const startTime = Date.now();
+      const response = await fetch('https://api.anthropic.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+      });
+      const latency = Date.now() - startTime;
+
+      if (response.ok) {
+        vscode.window.showInformationMessage(`✅ API connection successful (${latency}ms)`);
+        this._panel.webview.postMessage({ type: 'testResult', success: true, latency });
+      } else {
+        vscode.window.showErrorMessage(`❌ API connection failed (HTTP ${response.status})`);
+        this._panel.webview.postMessage({ type: 'testResult', success: false });
+      }
+    } catch (error) {
+      vscode.window.showErrorMessage(`❌ Connection error: ${error}`);
+      this._panel.webview.postMessage({ type: 'testResult', success: false });
     }
   }
 
@@ -149,9 +201,40 @@ export class PowerPlayChatPanel {
         <span class="badge" id="prompt-count">...</span>
       </div>
       <div class="header-right">
+        <button class="icon-btn" id="settings-btn" title="Open settings">⚙</button>
         <button class="icon-btn" id="clear-btn" title="Clear history">↺</button>
       </div>
     </header>
+    <div id="settings-panel" class="hidden">
+      <div class="settings-content">
+        <div class="settings-header">
+          <h3>⚙️ Settings</h3>
+          <button id="close-settings-btn" class="close-btn">✕</button>
+        </div>
+        <div class="settings-form">
+          <label>Config Path:</label>
+          <input type="text" id="config-path" placeholder="s:/Code101/PowerPlay/config.yaml" />
+          <button id="open-config-btn" class="btn-primary">📂 Browse</button>
+
+          <label>Default Model:</label>
+          <select id="default-model">
+            <option value="claude-opus-4-6">Claude Opus 4.6</option>
+            <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
+            <option value="claude-haiku-4-5">Claude Haiku 4.5</option>
+          </select>
+
+          <label>API Key:</label>
+          <input type="password" id="api-key" placeholder="sk-ant-..." />
+
+          <label>Temperature (0-2):</label>
+          <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" />
+          <span id="temp-value">0.7</span>
+
+          <button id="test-connection-btn" class="btn-secondary">🔗 Test Connection</button>
+          <button id="save-settings-btn" class="btn-primary">💾 Save Settings</button>
+        </div>
+      </div>
+    </div>
     <div id="messages"></div>
     <div id="autocomplete" class="hidden"></div>
     <div id="input-area">

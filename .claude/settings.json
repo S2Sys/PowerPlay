@@ -97,7 +97,11 @@
       "Bash(taskkill /F /IM code.exe)",
       "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/package.json\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/)",
       "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/powerplay.code-snippets\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/)",
-      "Bash(ls -lh \"s:\\\\Code101\\\\PowerPlay\"/local* \"s:\\\\Code101\\\\PowerPlay\"/START* \"s:\\\\Code101\\\\PowerPlay\"/LOCAL*)"
+      "Bash(ls -lh \"s:\\\\Code101\\\\PowerPlay\"/local* \"s:\\\\Code101\\\\PowerPlay\"/START* \"s:\\\\Code101\\\\PowerPlay\"/LOCAL*)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/out/chatPanel.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/out/extension.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/chat.css\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)",
+      "Bash(cp \"s:/Code101/PowerPlay/vscode-extension/media/chat.js\" ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/)"
     ],
     "additionalDirectories": [
       "\\dev",

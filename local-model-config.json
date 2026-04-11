@@ -1,0 +1,99 @@
+{
+  "models": {
+    "qwen": {
+      "name": "Qwen Coder 3.5B",
+      "endpoint": "http://localhost:11434/api/generate",
+      "modelName": "qwen:latest",
+      "temperature": 0.1,
+      "topP": 0.9,
+      "description": "Fast, good for HTML/CSS/JavaScript",
+      "bestFor": ["web", "frontend", "quick-generation"]
+    },
+    "deepseek": {
+      "name": "Deepseek Coder 6.7B",
+      "endpoint": "http://localhost:11434/api/generate",
+      "modelName": "deepseek-coder:latest",
+      "temperature": 0.1,
+      "topP": 0.9,
+      "description": "Excellent code quality, slightly slower",
+      "bestFor": ["python", "nodejs", "complex-logic"]
+    },
+    "llama": {
+      "name": "Llama 2 7B",
+      "endpoint": "http://localhost:11434/api/generate",
+      "modelName": "llama2:latest",
+      "temperature": 0.2,
+      "topP": 0.9,
+      "description": "General purpose, handles all languages",
+      "bestFor": ["general", "education", "learning"]
+    },
+    "mistral": {
+      "name": "Mistral 7B",
+      "endpoint": "http://localhost:11434/api/generate",
+      "modelName": "mistral:latest",
+      "temperature": 0.15,
+      "topP": 0.9,
+      "description": "Balanced performance and quality",
+      "bestFor": ["mixed-tasks", "moderate-complexity"]
+    },
+    "neural-chat": {
+      "name": "Neural Chat 7B",
+      "endpoint": "http://localhost:11434/api/generate",
+      "modelName": "neural-chat:latest",
+      "temperature": 0.2,
+      "topP": 0.9,
+      "description": "Conversational, good for explanations",
+      "bestFor": ["chat", "explanations", "documentation"]
+    }
+  },
+
+  "execution": {
+    "mode": "sequential",
+    "description": "Only sequential (not parallel) for local models",
+    "waitBetweenTasks": 2000,
+    "comment": "2 second wait between tasks to allow model recovery"
+  },
+
+  "validation": {
+    "enabled": true,
+    "detectAnalysis": true,
+    "autoCorrect": true,
+    "maxRetries": 2,
+    "retryTemperatureDrop": 0.05,
+    "comment": "Lower temperature on retry = more deterministic"
+  },
+
+  "performance": {
+    "timeout": 60000,
+    "comment": "60 seconds per request. Increase for slower models",
+    "maxTokens": 4096,
+    "comment_tokens": "Maximum tokens per generation"
+  },
+
+  "prompting": {
+    "strategy": "direct-code",
+    "noParallel": true,
+    "oneTaskAtATime": true,
+    "skipAnalysis": true,
+    "comment": "Force code generation, skip analysis phases"
+  },
+
+  "output": {
+    "extractMarkdown": true,
+    "validateSyntax": true,
+    "saveToFile": true,
+    "comment": "Extract code from markdown, validate, then save"
+  },
+
+  "fallback": {
+    "enabled": false,
+    "cloudFallback": "openrouter",
+    "comment": "Set to true to fallback to cloud if local fails"
+  },
+
+  "logging": {
+    "level": "info",
+    "verbose": false,
+    "comment": "Set to true for detailed debugging"
+  }
+}

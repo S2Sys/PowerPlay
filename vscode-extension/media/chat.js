@@ -17,10 +17,22 @@ const messagesEl = document.getElementById('messages');
 const autocompleteEl = document.getElementById('autocomplete');
 const clearBtn = document.getElementById('clear-btn');
 const promptCountEl = document.getElementById('prompt-count');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsPanelEl = document.getElementById('settings-panel');
+const closeSettingsBtn = document.getElementById('close-settings-btn');
+const configPathInput = document.getElementById('config-path');
+const defaultModelSelect = document.getElementById('default-model');
+const apiKeyInput = document.getElementById('api-key');
+const temperatureSlider = document.getElementById('temperature');
+const tempValueEl = document.getElementById('temp-value');
+const testConnectionBtn = document.getElementById('test-connection-btn');
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+const openConfigBtn = document.getElementById('open-config-btn');
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
+  loadSettings();
   vscode.postMessage({ type: 'ready' });
 });
 
@@ -45,6 +57,55 @@ function setupEventListeners() {
   inputEl.addEventListener('keydown', handleKeydown);
   inputEl.addEventListener('input', handleInput);
   clearBtn.addEventListener('click', handleClear);
+
+  settingsBtn.addEventListener('click', openSettings);
+  closeSettingsBtn.addEventListener('click', closeSettings);
+  saveSettingsBtn.addEventListener('click', saveSettings);
+  testConnectionBtn.addEventListener('click', testConnection);
+  openConfigBtn.addEventListener('click', openConfig);
+  temperatureSlider.addEventListener('input', updateTempValue);
+}
+
+function openSettings() {
+  settingsPanelEl.classList.remove('hidden');
+  inputEl.blur();
+}
+
+function closeSettings() {
+  settingsPanelEl.classList.add('hidden');
+}
+
+function updateTempValue(e) {
+  tempValueEl.textContent = e.target.value;
+}
+
+function loadSettings() {
+  vscode.postMessage({ type: 'loadSettings' });
+}
+
+function saveSettings() {
+  const settings = {
+    configPath: configPathInput.value,
+    defaultModel: defaultModelSelect.value,
+    apiKey: apiKeyInput.value,
+    temperature: parseFloat(temperatureSlider.value),
+  };
+  vscode.postMessage({ type: 'saveSettings', settings });
+  closeSettings();
+}
+
+function testConnection() {
+  if (!apiKeyInput.value) {
+    alert('Please enter an API key first');
+    return;
+  }
+  testConnectionBtn.textContent = 'Testing...';
+  testConnectionBtn.disabled = true;
+  vscode.postMessage({ type: 'testConnection', apiKey: apiKeyInput.value });
+}
+
+function openConfig() {
+  vscode.postMessage({ type: 'openConfigFile', path: configPathInput.value });
 }
 
 // Handle send button / Enter key
