@@ -56,7 +56,26 @@ export class PowerPlayChatPanel {
       this._disposables
     );
 
+    // Reload prompts when panel becomes visible (in case config was just set)
+    this._panel.onDidChangeViewState(
+      e => {
+        if (e.webviewPanel.visible) {
+          this._loadPrompts();
+          this._panel.webview.postMessage({ type: 'prompts', data: this._prompts });
+        }
+      },
+      null,
+      this._disposables
+    );
+
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+  }
+
+  public refresh(): void {
+    this._loadPrompts();
+    if (this._panel) {
+      this._panel.webview.postMessage({ type: 'prompts', data: this._prompts });
+    }
   }
 
   private _loadPrompts(): void {
@@ -64,6 +83,8 @@ export class PowerPlayChatPanel {
     const configPath = config.get<string>('configPath') || '';
     if (configPath && fs.existsSync(configPath)) {
       this._prompts = parsePrompts(configPath);
+    } else {
+      this._prompts = [];
     }
   }
 

@@ -9,6 +9,7 @@ import { PowerPlayChatPanel } from './chatPanel';
 
 let statusBarItem: vscode.StatusBarItem;
 let sidebarProvider: PowerPlaySidebarProvider;
+let chatPanel: PowerPlayChatPanel | undefined;
 let powerplayVersion = '3.9.0';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -76,6 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const openChatCmd = vscode.commands.registerCommand('powerplay.openChat', () => {
     PowerPlayChatPanel.createOrShow(context.extensionUri);
+    chatPanel = PowerPlayChatPanel.currentPanel;
   });
 
   // Watch for config changes
@@ -98,6 +100,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('powerplay')) {
         updateStatusBar();
+        sidebarProvider.refresh();
+        if (chatPanel) {
+          chatPanel.refresh();
+        }
       }
     })
   );
