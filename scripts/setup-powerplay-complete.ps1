@@ -38,8 +38,8 @@ if ($env:OPENROUTER_API_KEY) {
 Write-Host "Opening https://openrouter.ai/keys..." -ForegroundColor $Info
 Write-Host ""
 Write-Host "Instructions:" -ForegroundColor $Info
-Write-Host "  1. Sign up (free, no credit card needed)" -ForegroundColor $Info
-Write-Host "  2. Copy your API key - starts with sk-or-v1-" -ForegroundColor $Info
+Write-Host "  1. Sign up `(free, no credit card needed`)" -ForegroundColor $Info
+Write-Host "  2. Copy your API key `(starts with sk-or-v1-`)" -ForegroundColor $Info
 Write-Host ""
 
 Start-Process "https://openrouter.ai/keys"
