@@ -24,7 +24,7 @@ if ($env:OPENROUTER_API_KEY) {
     Write-Host "   Current value `(first 20 chars`): $($firstChars)..." -ForegroundColor "Gray"
     Write-Host ""
 
-    $changeKey = Read-Host "Change it? (Y/N)"
+    $changeKey = Read-Host "Change it`? `(Y/N`)"
     if ($changeKey -ne "Y" -and $changeKey -ne "y") {
         Write-Host ""
         Write-Host "✅ Keeping current API key." -ForegroundColor $Success
