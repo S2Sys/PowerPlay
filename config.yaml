@@ -1,12 +1,12 @@
 name: SmartWorkz PowerPlay — Streamlined Config
-version: 3.8.0
+version: 3.9.0
 schema: v1
 
 # Release metadata (updated per version)
 metadata:
-  releaseDate: "2026-04-10"
-  lastUpdated: "2026-04-10"
-  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.8.0"
+  releaseDate: "2026-04-11"
+  lastUpdated: "2026-04-11"
+  releaseUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/releases/tag/v3.9.0"
   wikiUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/wiki"
   changelogUrl: "https://github.com/SmartWorkz-Dev/PowerPlay/blob/main/CHANGELOG.md"
   supportedContinueVersions: ">=0.8.0"
@@ -19,16 +19,16 @@ metadata:
 # ╚══════════════════════════════════════════════════════╝
 #
 #  CAPABILITY MAP (FREE MODELS ONLY):
-#  ┌─────────────────┬────────────────────────────────────┐
-#  │ Chat / Reason   │ Qwen 3.5 9B, DeepSeek R1 8B (local) │
-#  │ Fast Apply      │ Qwen Coder, DeepSeek Coder (local)  │
-#  │ Autocomplete    │ Qwen Coder — debounce 400ms (local) │
-#  │ Cloud Fallback  │ GPT OSS 120B, Llama 3.1 70B (free)  │
-#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)   │
-#  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite │
-#  │ Rules (14)      │ Core, Security, .NET, Angular, SQL (simplified) │
-#  │ Prompts (96)    │ /play, /quick + 94 including /sec /test /db /api /arch /deploy /data /frontend + 55 role/tech/sdlc rules (20 phase1 + 14 phase2 + 7 phase3) │
-#  └─────────────────┴────────────────────────────────────┘
+#  ┌─────────────────┬────────────────────────────────────────────────────┐
+#  │ Local Chat      │ DeepSeek Coder, Qwen 2.5, DeepSeek R1 (remote:3001)│
+#  │ Cloud Chat      │ Mistral 7B, Neural Chat, Capybara, Hermes, DSkChat │
+#  │ Auto-Apply      │ Qwen Coder [Cloud] (OpenRouter free)               │
+#  │ Reasoning       │ Llama 3.1 70B, GPT OSS 120B, Hermes 3 8B (free)    │
+#  │ Embeddings      │ NVIDIA Nemotron (OpenRouter free)                  │
+#  │ MCP Tools       │ Git, FileSystem, Playwright, SQLite                │
+#  │ Rules (50+)     │ Core, Security, .NET, Angular, SQL, SDLC, Agile    │
+#  │ Prompts (96+)   │ /play, /quick + 94+ /sec /test /db /api /arch etc  │
+#  └─────────────────┴────────────────────────────────────────────────────┘
 
 defaultCompletionOptions:
   maxTokens: 4096
