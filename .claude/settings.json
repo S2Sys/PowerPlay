@@ -120,7 +120,13 @@
       "Bash(mv INSTALLATION-CHECKLIST.md docs/)",
       "Bash(mv QUICK-REFERENCE-v2.0.0.md docs/)",
       "Bash(mv QUICK-START-SETTINGS.md docs/)",
-      "Bash(mv README-EXTENSION-v2.0.0.md docs/)"
+      "Bash(mv README-EXTENSION-v2.0.0.md docs/)",
+      "Bash(echo \"✅ Root .md files: $\\(find . -maxdepth 1 -name \"*.md\")",
+      "Bash(mkdir -p scripts)",
+      "Bash(mkdir -p config-backups)",
+      "Bash(mkdir -p resources)",
+      "Bash(mkdir -p web)",
+      "Bash(mkdir -p notes)"
     ],
     "additionalDirectories": [
       "\\dev",
