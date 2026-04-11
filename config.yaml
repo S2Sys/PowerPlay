@@ -1920,6 +1920,56 @@ models:
       maxTokens: 8192
       temperature: 0.2
 
+  - name: Mistral 7B [Cloud - Fast Chat]
+    provider: openai
+    model: mistralai/mistral-7b-instruct:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Neural Chat 7B [Cloud - Fast]
+    provider: openai
+    model: intel/neural-chat-7b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Capybara 7B [Cloud - Chat]
+    provider: openai
+    model: nousresearch/nous-capybara-7b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Hermes 3 8B [Cloud - Reasoning]
+    provider: openai
+    model: nousresearch/hermes-3-8b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.2
+
+  - name: DeepSeek Chat [Cloud - Fast]
+    provider: openai
+    model: deepseek/deepseek-chat:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
   - name: NVIDIA Nemotron Embed
     provider: openai
     model: llama-nemotron-embed-vl-1b-v2
