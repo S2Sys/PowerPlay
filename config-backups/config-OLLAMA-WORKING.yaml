@@ -1,0 +1,309 @@
+# PowerPlay v2.0.0 — WORKING OLLAMA LOCAL CONFIGURATION
+# Tested and verified to work with local Ollama models
+# This fixes the "Invalid control character" JSON error
+
+# BEFORE USING:
+# 1. Start Ollama: ollama serve
+# 2. Verify models: ollama list
+# 3. Paste the models section below into your Continue.dev config.yaml
+# 4. Restart Continue.dev
+
+models:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CHAT MODELS (Recommended for conversations)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: DeepSeek Coder 6.7B
+    provider: ollama
+    model: deepseek-coder:6.7b
+    roles: [chat, edit]
+    # ⚠️ IMPORTANT: Do NOT enable tool_use for Ollama models
+    # This causes the JSON parsing error when litellm tries to format function calls
+    # capabilities: [tool_use]  # ❌ Remove this line
+    chatOptions:
+      baseSystemMessage: |
+        You are a helpful coding assistant. Be concise and provide code examples.
+        Use markdown for code blocks with language tags.
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  - name: Qwen 2.5 7B
+    provider: ollama
+    model: qwen2.5:7b
+    roles: [chat]
+    # ⚠️ Do NOT add capabilities: [tool_use]
+    chatOptions:
+      baseSystemMessage: |
+        You are a helpful AI assistant. Provide clear, concise answers.
+        Use code blocks with language tags when showing code.
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Mistral 7B
+    provider: ollama
+    model: mistral:7b
+    roles: [chat]
+    # ⚠️ Do NOT add capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.7
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REASONING MODELS (For complex tasks - may be slow)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: DeepSeek R1 8B
+    provider: ollama
+    model: deepseek-r1:8b
+    roles: [chat]
+    # ⚠️ R1 is a reasoning model - very slow but high quality
+    # Do NOT use for code editing, only for analysis
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.1
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # FAST EDIT MODELS (For code modifications)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: Qwen Coder [Fast]
+    provider: ollama
+    model: qwen2.5-coder:7b
+    roles: [edit, chat]
+    # ⚠️ Do NOT add capabilities: [tool_use]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CLOUD FALLBACK (For when Ollama is offline)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: GPT OSS 120B [Cloud]
+    provider: openai
+    model: openai/gpt-oss-120b:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [chat]
+    defaultCompletionOptions:
+      maxTokens: 8192
+      temperature: 0.3
+
+  - name: Qwen Coder [Cloud]
+    provider: openai
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY}
+    roles: [edit, chat]
+    defaultCompletionOptions:
+      maxTokens: 16384
+      temperature: 0.05
+
+---
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SETUP INSTRUCTIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# STEP 1: Start Ollama
+# ────────────────────
+# Run in terminal:
+#   ollama serve
+#
+# Should show:
+#   Serving on 127.0.0.1:11434
+#
+# Keep this terminal open while using Continue.dev
+
+# STEP 2: Verify your models are downloaded
+# ──────────────────────────────────────────
+# Run in another terminal:
+#   ollama list
+#
+# Should show:
+#   NAME                 ID              SIZE    MODIFIED
+#   deepseek-coder:6.7b  ...             4.3GB   X minutes ago
+#   qwen2.5:7b           ...             4.7GB   X minutes ago
+#   deepseek-r1:8b       ...             5.0GB   X minutes ago
+
+# If a model isn't listed, download it:
+#   ollama pull deepseek-coder:6.7b
+#   ollama pull qwen2.5:7b
+#   ollama pull deepseek-r1:8b
+#   ollama pull qwen2.5-coder:7b
+
+# STEP 3: Update your Continue.dev config
+# ────────────────────────────────────────
+# 1. Open Continue settings
+#    Ctrl+Shift+P → Continue: Open Config
+#
+# 2. Find the models section (around line 1834)
+#
+# 3. DELETE all the models with:
+#    apiBase: http://rohit:4000/v1
+#    apiKey: ${DHONI_API_KEY}
+#
+# 4. COPY the models section from above (starting at line 11)
+#    PASTE into your config.yaml models section
+#
+# 5. SAVE the file
+#
+# 6. RESTART Continue.dev:
+#    - Close the chat
+#    - Close VS Code completely
+#    - Wait 3 seconds
+#    - Reopen VS Code
+#    - Wait 15 seconds for activation
+#    - Open chat: Ctrl+Shift+Space
+
+# STEP 4: Test
+# ────────────
+# In the chat:
+#   You: "Hello"
+#   Model: (should respond)
+#
+# If you get the same error:
+#   - Check that `ollama serve` is still running
+#   - Check that Ollama is on localhost:11434 (not a different address)
+#   - Check that your model is downloaded: `ollama list`
+#   - See troubleshooting section below
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TROUBLESHOOTING
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ERROR: "Invalid control character at: line 2 column 74"
+# ───────────────────────────────────────────────────────
+# CAUSE: capabilities: [tool_use] is enabled for Ollama models
+# FIX: Remove this line from the model config
+#
+# ❌ WRONG:
+#   - name: DeepSeek Coder
+#     provider: ollama
+#     model: deepseek-coder:6.7b
+#     capabilities: [tool_use]  # ← This causes the error!
+#
+# ✅ RIGHT:
+#   - name: DeepSeek Coder
+#     provider: ollama
+#     model: deepseek-coder:6.7b
+#     # No capabilities: [tool_use]
+
+# ERROR: "Connection refused" or "Cannot reach localhost:11434"
+# ─────────────────────────────────────────────────────────────
+# CAUSE: Ollama is not running
+# FIX: Start Ollama
+#
+#   ollama serve
+#
+# You should see:
+#   Serving on 127.0.0.1:11434
+#
+# Keep this terminal open
+
+# ERROR: "Model not found: deepseek-coder:6.7b"
+# ──────────────────────────────────────────────
+# CAUSE: Model hasn't been downloaded
+# FIX: Download the model
+#
+#   ollama pull deepseek-coder:6.7b
+#
+# Wait for it to complete (~5-10 minutes first time)
+
+# ERROR: "Unexpected end of JSON input"
+# ──────────────────────────────────────
+# CAUSE: Model crashed or Ollama disconnected
+# FIX: Restart Ollama
+#
+#   1. Stop `ollama serve` (Ctrl+C)
+#   2. Wait 2 seconds
+#   3. Run: ollama serve
+#   4. Restart Continue.dev
+
+# ERROR: Chat is very slow or hanging
+# ────────────────────────────────────
+# CAUSE: Model is too large for your GPU/RAM
+# FIX: Use a smaller model
+#
+# Instead of:  Try:
+#   deepseek-coder:6.7b  →  qwen2.5:7b
+#   deepseek-r1:8b       →  mistral:7b
+#
+# Or add more RAM/swap space to your system
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MODEL RECOMMENDATIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# FASTEST (1-2 seconds per response)
+#   qwen2.5:7b
+#   mistral:7b
+#   neural-chat:7b
+
+# BEST QUALITY (3-5 seconds per response)
+#   deepseek-coder:6.7b (best for coding)
+#   deepseek-coder:33b (if you have enough VRAM)
+#   qwen2.5-coder:7b (good alternative)
+
+# BEST REASONING (10-30 seconds per response, very good for complex tasks)
+#   deepseek-r1:8b (only use for analysis, not real-time editing)
+#   deepseek-r1:32b (if you have huge VRAM)
+
+# DOWNLOAD ALL (for testing)
+#   ollama pull qwen2.5:7b
+#   ollama pull mistral:7b
+#   ollama pull deepseek-coder:6.7b
+#   ollama pull deepseek-r1:8b
+#   ollama pull qwen2.5-coder:7b
+
+# ═══════════════════════════════════════════════════════════════════════════
+# IMPORTANT NOTES
+# ═══════════════════════════════════════════════════════════════════════════
+
+# 1. NEVER add capabilities: [tool_use] to Ollama models
+#    This causes litellm to try function calling, which breaks JSON parsing
+#    Ollama doesn't support tool_use in the way Continue.dev expects
+
+# 2. Keep ollama serve running in the background
+#    Continue.dev needs it to be available at localhost:11434
+
+# 3. Different models have different speeds
+#    Smaller models (7B) are faster but less intelligent
+#    Larger models (33B+) are smarter but require more VRAM
+
+# 4. Only use reasoning models (R1) for analysis
+#    They're very slow for real-time code editing
+
+# 5. Check your GPU VRAM for model requirements
+#    7B models: ~8GB VRAM
+#    13B models: ~16GB VRAM
+#    33B models: ~32GB VRAM
+#    70B models: ~40GB VRAM (not recommended)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VERIFY SETUP
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Terminal 1: Start Ollama
+#   $ ollama serve
+#   Serving on 127.0.0.1:11434
+
+# Terminal 2: Check models
+#   $ ollama list
+#   NAME                 ID              SIZE    MODIFIED
+#   deepseek-coder:6.7b  ...             4.3GB   2 minutes ago
+#   qwen2.5:7b           ...             4.7GB   1 hour ago
+
+# VS Code:
+#   1. Update config with models above
+#   2. Restart VS Code
+#   3. Press Ctrl+Shift+Space
+#   4. Type: "hello"
+#   5. Get response (no JSON error!)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Last Updated: April 11, 2026
+# For: PowerPlay v2.0.0 + Continue.dev with Ollama
+# ═══════════════════════════════════════════════════════════════════════════
