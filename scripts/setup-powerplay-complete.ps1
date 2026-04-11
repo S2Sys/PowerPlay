@@ -1,5 +1,5 @@
 # PowerPlay v2.0.0 - Set API Keys (PowerShell)
-# Support for multiple API providers: OpenRouter, OpenAI, Anthropic, etc.
+# Support for: DHONI_API_KEY, KAPIL_API_KEY, OPENROUTER_API_KEY
 # Run as Administrator!
 
 # Color assignments
@@ -8,42 +8,28 @@ $WarningColor = "Yellow"
 $ErrorColor = "Red"
 $InfoColor = "Cyan"
 
-# API Providers Configuration
-$providers = @(
+# API Keys Configuration
+$apiKeys = @(
+    @{
+        Name = "DHONI"
+        EnvVar = "DHONI_API_KEY"
+        Url = "https://dhoni.ai/keys"
+        Format = "dhoni-"
+        Description = "DHONI API"
+    },
+    @{
+        Name = "KAPIL"
+        EnvVar = "KAPIL_API_KEY"
+        Url = "https://kapil.ai/keys"
+        Format = "kapil-"
+        Description = "KAPIL API"
+    },
     @{
         Name = "OpenRouter"
         EnvVar = "OPENROUTER_API_KEY"
         Url = "https://openrouter.ai/keys"
         Format = "sk-or-v1-"
         Description = "Cloud models for auto-apply"
-    },
-    @{
-        Name = "OpenAI"
-        EnvVar = "OPENAI_API_KEY"
-        Url = "https://platform.openai.com/api-keys"
-        Format = "sk-"
-        Description = "GPT models"
-    },
-    @{
-        Name = "Anthropic"
-        EnvVar = "ANTHROPIC_API_KEY"
-        Url = "https://console.anthropic.com/account/keys"
-        Format = "sk-ant-"
-        Description = "Claude models"
-    },
-    @{
-        Name = "Groq"
-        EnvVar = "GROQ_API_KEY"
-        Url = "https://console.groq.com/keys"
-        Format = "gsk_"
-        Description = "Groq models"
-    },
-    @{
-        Name = "HuggingFace"
-        EnvVar = "HUGGINGFACE_API_KEY"
-        Url = "https://huggingface.co/settings/tokens"
-        Format = "hf_"
-        Description = "HuggingFace models"
     }
 )
 
@@ -53,14 +39,14 @@ function Show-Menu {
     Write-Host "   PowerPlay - API Key Manager" -ForegroundColor $InfoColor
     Write-Host "======================================================" -ForegroundColor $InfoColor
     Write-Host ""
-    Write-Host "Select API Provider:" -ForegroundColor $InfoColor
+    Write-Host "Select API Key to Set:" -ForegroundColor $InfoColor
     Write-Host ""
 
-    for ($i = 0; $i -lt $providers.Count; $i++) {
-        $p = $providers[$i]
-        $status = if (Test-EnvVar $p.EnvVar) { "[SET]" } else { "[ - ]" }
-        Write-Host "  $($i+1). $($p.Name) $status" -ForegroundColor $InfoColor
-        Write-Host "     $($p.Description)" -ForegroundColor "Gray"
+    for ($i = 0; $i -lt $apiKeys.Count; $i++) {
+        $k = $apiKeys[$i]
+        $status = if (Test-EnvVar $k.EnvVar) { "[SET]" } else { "[ - ]" }
+        Write-Host "  $($i+1). $($k.Name) $status" -ForegroundColor $InfoColor
+        Write-Host "     $($k.Description)" -ForegroundColor "Gray"
     }
 
     Write-Host ""
@@ -75,19 +61,19 @@ function Test-EnvVar {
 
 function Get-ApiKey {
     param(
-        [hashtable]$Provider
+        [hashtable]$KeyConfig
     )
 
     Write-Host ""
     Write-Host "======================================================" -ForegroundColor $InfoColor
-    Write-Host "   Setting: $($Provider.Name) - $($Provider.EnvVar)" -ForegroundColor $InfoColor
+    Write-Host "   Setting: $($KeyConfig.EnvVar)" -ForegroundColor $InfoColor
     Write-Host "======================================================" -ForegroundColor $InfoColor
     Write-Host ""
 
     # Check if already set
-    if (Test-EnvVar $Provider.EnvVar) {
-        $existingKey = [System.Environment]::GetEnvironmentVariable($Provider.EnvVar, "User")
-        Write-Host "[OK] $($Provider.EnvVar) is already set!" -ForegroundColor $SuccessColor
+    if (Test-EnvVar $KeyConfig.EnvVar) {
+        $existingKey = [System.Environment]::GetEnvironmentVariable($KeyConfig.EnvVar, "User")
+        Write-Host "[OK] $($KeyConfig.EnvVar) is already set!" -ForegroundColor $SuccessColor
         Write-Host ""
 
         $keyLength = $existingKey.Length
@@ -100,29 +86,29 @@ function Get-ApiKey {
         $changeKey = Read-Host "Change it - answer Y or N"
         if ($changeKey -ne "Y" -and $changeKey -ne "y") {
             Write-Host ""
-            Write-Host "[OK] Keeping current $($Provider.Name) key." -ForegroundColor $SuccessColor
+            Write-Host "[OK] Keeping current $($KeyConfig.Name) key." -ForegroundColor $SuccessColor
             Write-Host ""
             return
         }
     }
 
     # Open provider website
-    Write-Host "Opening $($Provider.Url)..." -ForegroundColor $InfoColor
+    Write-Host "Opening $($KeyConfig.Url)..." -ForegroundColor $InfoColor
     Write-Host ""
     Write-Host "Instructions:" -ForegroundColor $InfoColor
-    Write-Host "  1. Go to: $($Provider.Url)" -ForegroundColor $InfoColor
+    Write-Host "  1. Go to: $($KeyConfig.Url)" -ForegroundColor $InfoColor
     Write-Host "  2. Sign up or log in (if needed)" -ForegroundColor $InfoColor
     Write-Host "  3. Create a new API key" -ForegroundColor $InfoColor
-    Write-Host "  4. Copy the key (starts with: $($Provider.Format))" -ForegroundColor $InfoColor
+    Write-Host "  4. Copy the key (starts with: $($KeyConfig.Format))" -ForegroundColor $InfoColor
     Write-Host ""
 
-    Start-Process $Provider.Url
+    Start-Process $KeyConfig.Url
     Start-Sleep -Seconds 2
 
     # Get API key from user
-    Write-Host "Waiting for you to copy your $($Provider.Name) API key..." -ForegroundColor $WarningColor
+    Write-Host "Waiting for you to copy your $($KeyConfig.Name) API key..." -ForegroundColor $WarningColor
     Write-Host ""
-    $apiKey = Read-Host "Paste your $($Provider.Name) API key"
+    $apiKey = Read-Host "Paste your $($KeyConfig.Name) API key"
 
     # Validate
     if (-not $apiKey -or $apiKey -eq "") {
@@ -132,20 +118,20 @@ function Get-ApiKey {
         return
     }
 
-    if (-not $apiKey.StartsWith($Provider.Format)) {
+    if (-not $apiKey.StartsWith($KeyConfig.Format)) {
         Write-Host ""
-        Write-Host "[WARNING] API key does not start with '$($Provider.Format)'" -ForegroundColor $WarningColor
-        Write-Host "Double-check you copied it correctly from $($Provider.Name)." -ForegroundColor $WarningColor
+        Write-Host "[WARNING] API key does not start with '$($KeyConfig.Format)'" -ForegroundColor $WarningColor
+        Write-Host "Double-check you copied it correctly from $($KeyConfig.Name)." -ForegroundColor $WarningColor
         Write-Host ""
     }
 
     # Set environment variable
     Write-Host ""
-    Write-Host "Setting $($Provider.EnvVar)..." -ForegroundColor $InfoColor
+    Write-Host "Setting $($KeyConfig.EnvVar)..." -ForegroundColor $InfoColor
 
     try {
-        [Environment]::SetEnvironmentVariable($Provider.EnvVar, $apiKey, "User")
-        [System.Environment]::SetEnvironmentVariable($Provider.EnvVar, $apiKey, "Process")
+        [Environment]::SetEnvironmentVariable($KeyConfig.EnvVar, $apiKey, "User")
+        [System.Environment]::SetEnvironmentVariable($KeyConfig.EnvVar, $apiKey, "Process")
         Write-Host "[OK] Environment variable set!" -ForegroundColor $SuccessColor
     } catch {
         Write-Host "[ERROR] Failed to set environment variable!" -ForegroundColor $ErrorColor
@@ -159,9 +145,9 @@ function Get-ApiKey {
     Write-Host "Verifying..." -ForegroundColor $InfoColor
     Write-Host ""
 
-    $setKey = [System.Environment]::GetEnvironmentVariable($Provider.EnvVar, "User")
+    $setKey = [System.Environment]::GetEnvironmentVariable($KeyConfig.EnvVar, "User")
     if ($setKey) {
-        Write-Host "[OK] $($Provider.EnvVar) is set!" -ForegroundColor $SuccessColor
+        Write-Host "[OK] $($KeyConfig.EnvVar) is set!" -ForegroundColor $SuccessColor
         $keyLength = $setKey.Length
         $charsToShow = if ($keyLength -gt 20) { 20 } else { $keyLength }
         $firstChars = $setKey.Substring(0, $charsToShow)
@@ -197,11 +183,11 @@ while ($true) {
 
     $index = [int]$choice - 1
 
-    if ($index -ge 0 -and $index -lt $providers.Count) {
-        Get-ApiKey $providers[$index]
+    if ($index -ge 0 -and $index -lt $apiKeys.Count) {
+        Get-ApiKey $apiKeys[$index]
     } else {
         Write-Host ""
-        Write-Host "[ERROR] Invalid choice. Please enter a number between 1 and $($providers.Count)" -ForegroundColor $ErrorColor
+        Write-Host "[ERROR] Invalid choice. Please enter a number between 1 and $($apiKeys.Count)" -ForegroundColor $ErrorColor
         Write-Host ""
     }
 }
