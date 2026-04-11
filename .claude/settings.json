@@ -126,7 +126,9 @@
       "Bash(mkdir -p config-backups)",
       "Bash(mkdir -p resources)",
       "Bash(mkdir -p web)",
-      "Bash(mkdir -p notes)"
+      "Bash(mkdir -p notes)",
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(netstat -ano)"
     ],
     "additionalDirectories": [
       "\\dev",
