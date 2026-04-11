@@ -1,6 +1,66 @@
 # Build & Release Guide
 
-## Build Process
+## Quick Start: Fresh Install
+
+### 1. Uninstall Old Extension
+```bash
+# Close VS Code completely
+pkill -9 code
+sleep 3
+
+# Remove old extension directory
+rm -rf ~/.vscode/extensions/smartworkz.powerplay-ai-*
+
+# Remove VS Code cache
+rm -rf ~/.config/Code/User/globalStorage/smartworkz*
+```
+
+### 2. Clean Build
+```bash
+cd s:/Code101/PowerPlay/vscode-extension
+npm install
+npm run compile
+npm run package
+```
+
+Output: `powerplay-ai-2.0.0.vsix` (50+ KB, includes chat panel + sidebar)
+
+### 3. Fresh Install
+```bash
+# Copy compiled files to extension directory
+mkdir -p ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out
+mkdir -p ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media
+
+cp -r out/* ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/
+cp -r media/* ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/media/
+cp package.json ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/
+cp powerplay.code-snippets ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/
+```
+
+### 4. Restart VS Code
+```bash
+# Wait 2 seconds for extension cleanup
+sleep 2
+
+# Reopen VS Code (full restart, not just reload)
+code .
+```
+
+Wait 10 seconds for extension activation.
+
+### 5. Verify Installation
+Look for:
+- ✅ **⚡ icon** in Activity Bar (left sidebar)
+- ✅ **⚡ PowerPlay v3.9.0** in status bar (bottom-right)
+- ✅ `Ctrl+Shift+P` → search "PowerPlay" shows commands
+- ✅ `Alt+P` opens quick pick with 134 prompts
+- ✅ `Ctrl+Shift+Space` opens chat panel on right side
+
+If none appear: See [Troubleshooting](#troubleshooting) below
+
+---
+
+## Build Process (Detailed)
 
 ### 1. Install Dependencies
 ```bash
@@ -13,24 +73,14 @@ npm install
 npm run compile
 ```
 
-Output: `out/extension.js` and type definitions
+Output: `out/extension.js`, `out/chatPanel.js`, `out/settingsPanel.js`, and type definitions
 
 ### 3. Package as .vsix
 ```bash
 npm run package
 ```
 
-Output: `powerplay-ai-1.0.0.vsix` (installable VS Code extension)
-
-### 4. Test Locally
-```bash
-code --install-extension powerplay-ai-1.0.0.vsix
-```
-
-Verify:
-- Status bar shows `$(zap) PowerPlay v3.9.0`
-- Snippets expand when typing `pp` + Tab
-- Commands work via Ctrl+Shift+P
+Output: `powerplay-ai-2.0.0.vsix` (installable VS Code extension)
 
 ---
 
@@ -260,16 +310,86 @@ Before packaging a new version:
 
 ---
 
+## Troubleshooting
+
+### Extension not appearing after restart
+**Problem:** No ⚡ icon in Activity Bar, commands not found in Ctrl+Shift+P
+
+**Fix:**
+```bash
+# 1. Verify VS Code is completely closed
+pkill -9 code
+sleep 5
+
+# 2. Check extension files exist
+ls -la ~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/out/extension.js
+
+# 3. Check for VS Code cache issues
+rm -rf ~/.config/Code/User/globalStorage
+
+# 4. Reopen VS Code
+code .
+
+# 5. Wait 15 seconds (longer startup = extension loading)
+```
+
+### "No results found" when searching for PowerPlay
+**Problem:** Commands exist but Ctrl+Shift+P doesn't find them
+
+**Fix:** Extension uses `onStartupFinished` activation event
+- This requires a FULL VS Code restart (not just reload)
+- Do NOT use "Developer: Reload Window"
+- Close all VS Code windows completely
+- Wait 3 seconds
+- Reopen VS Code
+- Wait 10 seconds for extension to fully load
+
+### Chat panel doesn't open with Ctrl+Shift+Space
+**Problem:** Keybinding doesn't work
+
+**Fix:**
+1. Open VS Code settings: `Ctrl+Shift+P` → "Preferences: Open Keyboard Shortcuts"
+2. Search for "powerplay.openChat"
+3. If missing: Try restart again
+4. If still missing: Check `~/.vscode/extensions/smartworkz.powerplay-ai-2.0.0/package.json` has keybinding entry
+5. Alternative: Use `Ctrl+Shift+P` → "PowerPlay: Open Chat Panel"
+
+### Alt+P doesn't show quick pick
+**Problem:** Quick pick command doesn't work
+
+**Fix:** Alt+P may conflict with system shortcuts on some machines
+- Try: `Ctrl+Shift+P` → "PowerPlay: Quick Pick Command" instead
+- Or customize keybinding: `Ctrl+Shift+P` → "Preferences: Open Keyboard Shortcuts" → search "pickCommand"
+
+### Settings panel is blank
+**Problem:** Settings panel opens but shows no content
+
+**Fix:**
+1. Toggle developer tools: `Help` → `Toggle Developer Tools`
+2. Check Console for errors (look for red X)
+3. If errors: Report them in GitHub issues
+4. Quick workaround: Edit settings manually:
+   ```bash
+   cat ~/.config/Code/User/settings.json | grep powerplay
+   ```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | 2026-04-10 | Initial release: 8 snippets, status bar, commands |
-| 1.1.0 | TBD | Real-time metrics, live dashboard |
-| 2.0.0 | TBD | WebView dashboard, streaming metrics |
+| 2.0.0 | 2026-04-11 | **Chat panel**: Cursor AI-style glassmorphism, slash autocomplete, message history. **Sidebar**: 134 prompts searchable. **Settings**: Dark UI with test connection. **Quick Pick**: Alt+P fuzzy search. **Fixes**: Memory leak in watcher, missing handlers, theme-aware CSS. |
+| 1.0.0 | 2026-04-10 | Initial release: 8 snippets, status bar, basic commands |
 
 ---
 
 **Build complete! 🚀**
 
-Next: Test the extension and publish to Marketplace when ready.
+After fresh install, test:
+- Open chat panel: `Ctrl+Shift+Space`
+- Type `/` in chat input
+- See all 134 commands in autocomplete
+- Click sidebar ⚡ icon to browse prompts
+- Press `Alt+P` for quick pick
+- Try Settings: `Ctrl+Shift+P` → "PowerPlay: Open Settings"
